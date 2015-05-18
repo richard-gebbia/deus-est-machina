@@ -12,6 +12,8 @@ import List
 import Mouse
 import PortraitBox
 import PortraitBoxGen
+import QuestionList
+import QuestionListGen
 import Signal exposing (Signal, (<~), (~))
 import Text
 import Textbox
@@ -27,7 +29,8 @@ type alias Model =
         conversation: Conversation,
         previous: String,
         portraitBox: PortraitBox.Model,
-        textboxList: TextboxList.Model
+        textboxList: TextboxList.Model,
+        questionList: QuestionList.Model
     }
 
 -- Action
@@ -152,6 +155,7 @@ updateTextboxList action model =
 view : Model -> List Collage.Form
 view model = 
     TextboxList.view model.textboxList ++
+    QuestionList.view model.questionList ++
     PortraitBox.view model.portraitBox
 
 -- Events
@@ -183,7 +187,8 @@ initModel =
                     (startingInterjections 
                         (PortraitBox.names portraitBox) 
                         (Conversation.getChildrenByName conversation))),
-        textboxList = TextboxListGen.genTextboxList
+        textboxList = TextboxListGen.genTextboxList,
+        questionList = QuestionListGen.genQuestionList
     }
     
 
