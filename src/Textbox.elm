@@ -1,6 +1,7 @@
 module Textbox where
 
 import Basics exposing (..)
+import ClickForm
 import Graphics.Collage as Collage
 import Graphics.Element as Element
 import List
@@ -44,6 +45,10 @@ timeToFinish model =
     |> List.sum
     |> Basics.toFloat
     |> \x -> x / model.lettersPerSecond
+
+isFinished : Model -> Bool
+isFinished model =
+    model.elapsedTime >= timeToFinish model
 
 -- Action
 
@@ -131,3 +136,18 @@ view model =
     ]
 
 -- Events
+
+type Event = Click
+
+onClick : Model -> Signal Event
+onClick model =
+    let sprite = model.background 
+        isHovering = 
+            ClickForm.rectHitTest 
+                sprite.width 
+                sprite.height 
+                (round sprite.x) 
+                (round sprite.y)
+    in
+    ClickForm.formClick isHovering
+    |> Signal.map (always Click)

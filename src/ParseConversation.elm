@@ -89,6 +89,7 @@ conversationNode =
         , questions
         ]
 
+
 conversation : Decoder (Dict String Node)
 conversation =
     dict conversationNode
@@ -133,6 +134,7 @@ verifyAllKeysValid dict =
     in
     List.foldr foldCheck (Result.Ok dict) children
 
+
 verifyValidNames : Dict String Node -> Result String (Dict String Node)
 verifyValidNames dict =
     let getName node =
@@ -161,7 +163,77 @@ verifyValidNames dict =
     in
     List.foldr foldCheck (Result.Ok dict) names
 
---verifyQuestionsLeadToSpeech : Dict String Node -> Result String (Dict String Node)
 
---verifyLeadToOneQuestion : Dict String Node -> Result String (Dict String Node)
+verifyQuestionsLeadToSpeech : Dict String Node -> Result String (Dict String Node)
+verifyQuestionsLeadToSpeech dict =
+    let isQuestion node =
+            case node of 
+                Conversation.Talking _ -> False
+                Conversation.Asking _ -> True
+        isSpeech =
+            not << isQuestion
+        getChildren (Conversation.Asking questions) =
+            List.concatMap .children questions
+        allQuestions =
+            Dict.values dict |> List.filter isQuestion
+        allQuestionPaths =
+            List.concatMap getChildren allQuestions
+        errorMessage1 name =
+            "Child \"" ++ name ++ "\" does not map to anything!"
+        errorMessage2 name =
+            "Expecting child \"" ++ name ++ "\" to be a Speech, not Questions!"
+        isChildASpeech name dict =
+            Dict.get name dict 
+            |> Maybe.map isSpeech
+            |> Maybe.withDefault False
+        check name dict =
+            if Dict.member name dict then
+                if isChildASpeech name dict then
+                    Result.Ok dict
+                else
+                    Result.Err (errorMessage2 name)
+            else
+                Result.Err (errorMessage1 name)
+        foldCheck name rDict =
+            Result.andThen rDict (check name)
+    in
+    List.foldr foldCheck (Result.Ok dict) allQuestionPaths
 
+
+verifyLeadToOneQuestion : Dict String Node -> Result String (Dict String Node)
+verifyLeadToOneQuestion dict =
+    let isSpeech node =
+            case node of
+                Conversation.Talking _ -> True
+                Conversation.Asking _ -> False
+        isQuestions =
+            not << isSpeech
+        getChildren (Conversation.Talking speech) =
+            speech.children
+        speechesWithMultipleChildren =
+            Dict.values dict
+            |> List.filter isSpeech
+            |> List.filter (getChildren >> List.length >> (\x -> x > 1))
+        childrenOfSelectedSpeeches =
+            speechesWithMultipleChildren
+            |> List.concatMap getChildren
+        errorMessage1 name =
+            "Child \"" ++ name ++ "\" does not map to anything!"
+        errorMessage2 name =
+            "Expecting child \"" ++ name ++ "\" to not be Questions!"
+        isChildNotQuestions name dict =
+            Dict.get name dict
+            |> Maybe.map (not << isQuestions)
+            |> Maybe.withDefault False
+        check name dict =
+            if Dict.member name dict then
+                if isChildNotQuestions name dict then
+                    Result.Ok dict
+                else
+                    Result.Err (errorMessage2 name)
+            else
+                Result.Err (errorMessage1 name)
+        foldCheck name rDict =
+            Result.andThen rDict (check name)
+    in
+    List.foldr foldCheck (Result.Ok dict) childrenOfSelectedSpeeches

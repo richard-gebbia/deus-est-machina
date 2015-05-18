@@ -66,8 +66,8 @@ type Event = OnPortraitClick String
 onPortraitClick : Model -> Signal Event
 onPortraitClick model =
     let portraitSignal portrait = 
-        Portrait.onClick portrait
-        |> Signal.map (always (OnPortraitClick portrait.name))
+            Portrait.onClick portrait
+            |> Signal.map (always (OnPortraitClick portrait.name))
     in
     List.map portraitSignal model.portraits
     |> Signal.mergeMany

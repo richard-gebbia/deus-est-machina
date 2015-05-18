@@ -15,5 +15,6 @@ genTextboxList =
                         |> Dict.insert "Sophie"    (TextboxGen.genTextbox "Sophie")
                         |> Dict.insert "Gavin"     (TextboxGen.genTextbox "Gavin")
                         |> Dict.insert "Ava"       (TextboxGen.genTextbox "Ava")
-                        |> Dict.insert "Sebastian" (TextboxGen.genTextbox "Sebastian")
+                        |> Dict.insert "Sebastian" (TextboxGen.genTextbox "Sebastian"),
+        hidden = False
     }

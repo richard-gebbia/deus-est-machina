@@ -58,3 +58,12 @@ view model =
 
 type Event
     = ChooseQuestion Int
+
+onChooseQuestion : Model -> Signal Event
+onChooseQuestion model =
+    let questionSignal index question =
+            Textbox.onClick question
+            |> Signal.map (always (ChooseQuestion index))
+    in
+    List.indexedMap questionSignal model.questions
+    |> Signal.mergeMany

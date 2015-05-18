@@ -15,8 +15,15 @@ type alias Model =
         textboxes: List Textbox.Model,
         animation: MoveByAnimation,
         enterPosition: (Float, Float),
-        textboxFrames: Dict String ((List String) -> (Float, Float) -> Textbox.Model)
+        textboxFrames: Dict String ((List String) -> (Float, Float) -> Textbox.Model),
+        hidden: Bool
     }
+
+isReadyForNewTextboxes : Model -> Bool
+isReadyForNewTextboxes model =
+    List.head model.textboxes
+    |> Maybe.map Textbox.isFinished
+    |> Maybe.withDefault True
 
 -- Action
 
@@ -116,6 +123,8 @@ update action model =
 
 view : Model -> List Collage.Form
 view model =
-    List.concatMap Textbox.view model.textboxes
+    if model.hidden then []
+    else
+        List.concatMap Textbox.view model.textboxes
 
 -- Events

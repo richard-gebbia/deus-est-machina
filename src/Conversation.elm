@@ -105,3 +105,8 @@ getChildrenByName conversation =
     |> fromJust
     |> getChildren
     |> List.foldl addToDict Dict.empty
+
+
+questionToSpeech : Question -> Speech
+questionToSpeech question = 
+    { question | name = "Question" }

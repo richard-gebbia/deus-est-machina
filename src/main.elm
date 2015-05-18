@@ -43,9 +43,10 @@ type Action
 getInterjection : Conversation -> String -> String -> Interjection
 getInterjection conversation previous name =
     let responseDict = Conversation.getChildrenByName conversation
+        getName (Conversation.Talking speech) = speech.name
         currentName = 
             Dict.get previous conversation.graph 
-            |> Maybe.map .name 
+            |> Maybe.map getName 
             |> Maybe.withDefault ""
         continueOrExclaim = 
             if name == currentName then 
@@ -80,7 +81,7 @@ startingInterjections names starters =
 advance : String -> Model -> Model
 advance name model =
     let (newConversation, didChange) = 
-        Conversation.advance name model.conversation
+            Conversation.advance name model.conversation
     in
     if didChange then
         { model | 
@@ -89,8 +90,10 @@ advance name model =
             textboxList <- 
                 TextboxList.update
                     (TextboxList.AddTextbox 
-                        (Conversation.currentName newConversation) 
-                        (Conversation.currentText newConversation))
+                        (Conversation.currentName newConversation
+                        |> Maybe.withDefault "") 
+                        (Conversation.currentText newConversation
+                        |> Maybe.withDefault []))
                     model.textboxList |> fst,
             portraitBox <- 
                 PortraitBox.update (PortraitBox.LetThemSpeak) model.portraitBox
@@ -102,7 +105,11 @@ advance name model =
 update : Action -> Model -> Model
 update action model = 
     case action of
-        Advance name -> advance name model
+        Advance name -> 
+            if TextboxList.isReadyForNewTextboxes model.textboxList then
+                advance name model
+            else
+                updateTextboxList FinishTextbox model
         FinishTextbox -> 
             updateTextboxList action model
         ChooseQuestion _ -> model   -- TODO : IMPLEMENT THIS !!! (when I add questions)

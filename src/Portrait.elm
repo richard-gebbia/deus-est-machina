@@ -41,7 +41,7 @@ view model =
 
 -- Events
 
-type Event = OnClick
+type Event = Click
 
 
 onClick : Model -> Signal Event
@@ -55,4 +55,4 @@ onClick model =
                 (round sprite.y)
     in
     ClickForm.formClick isHovering
-    |> Signal.map (always OnClick)
+    |> Signal.map (always Click)
