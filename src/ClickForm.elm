@@ -41,3 +41,15 @@ spriteButton sprite msg =
         (Element.image sprite.width sprite.height sprite.imageName)
     |> Collage.toForm
     |> Collage.move (sprite.x, sprite.y)
+
+
+formButton : Collage.Form -> Int -> Int -> Float -> Float -> Signal.Message -> Collage.Form
+formButton form width height x y msg =
+    let collage = Collage.collage width height [form]
+    in
+    Input.customButton msg
+        collage
+        collage
+        collage
+    |> Collage.toForm
+    |> Collage.move (x, y)
