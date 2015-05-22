@@ -32,27 +32,23 @@ update (SetInterjection interjection) model =
 
 -- View
 
-view : Model -> List Collage.Form
-view model = 
+view : Signal.Address Event -> Model -> List Collage.Form
+view address model = 
+    let spriteView = 
+        case model.interjection.interjection of
+            Interjection.Quiet ->
+                Sprite.draw model.sprite
+
+            _ ->
+                ClickForm.spriteButton 
+                    model.sprite 
+                    (Signal.message address Click)
+    in
     [
-        Sprite.draw model.sprite,
+        spriteView,
         Interjection.view model.interjection
     ]
 
 -- Events
 
 type Event = Click
-
-
-onClick : Model -> Signal Event
-onClick model =
-    let sprite = model.sprite 
-        isHovering = 
-            ClickForm.rectHitTest 
-                sprite.width 
-                sprite.height 
-                (round sprite.x) 
-                (round sprite.y)
-    in
-    ClickForm.formClick isHovering
-    |> Signal.map (always Click)

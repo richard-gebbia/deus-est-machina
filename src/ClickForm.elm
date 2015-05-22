@@ -1,8 +1,11 @@
 module ClickForm where
 
 import Graphics.Collage as Collage
+import Graphics.Element as Element
+import Graphics.Input as Input
 import Mouse
 import Signal
+import Sprite exposing (Sprite)
 import Window
 
 type alias HitTest = (Int, Int) -> Bool
@@ -28,3 +31,13 @@ rectHitTest width height x y (ox, oy) =
 toWorldSpace : (Int, Int) -> (Int, Int) -> (Int, Int)
 toWorldSpace (width, height) (x, y) = 
     (x - width // 2, (height // 2) - y)
+
+
+spriteButton : Sprite -> Signal.Message -> Collage.Form
+spriteButton sprite msg =
+    Input.customButton msg
+        (Element.image sprite.width sprite.height sprite.imageName)
+        (Element.image sprite.width sprite.height sprite.imageName)
+        (Element.image sprite.width sprite.height sprite.imageName)
+    |> Collage.toForm
+    |> Collage.move (sprite.x, sprite.y)

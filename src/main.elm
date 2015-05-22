@@ -152,24 +152,31 @@ updateTextboxList action model =
 
 -- View
 
-view : Model -> List Collage.Form
-view model = 
+view : Signal.Address Action -> Model -> List Collage.Form
+view address model = 
+    let pbEventToAction (PortraitBox.OnPortraitClick name) =
+            Advance name
+    in
     TextboxList.view model.textboxList ++
     QuestionList.view model.questionList ++
-    PortraitBox.view model.portraitBox
+    PortraitBox.view (Signal.forwardTo address pbEventToAction) model.portraitBox
 
 -- Events
+
+actions : Signal.Mailbox Action
+actions = Signal.mailbox (Tick 0)
+
 
 signals : Signal Action
 signals =
     let portraitClick (PortraitBox.OnPortraitClick name) = Advance name
     in
     Signal.mergeMany
+    (actions.signal ::
     [
-        portraitClick <~ (PortraitBox.onPortraitClick initModel.portraitBox),
         (always FinishTextbox) <~ Mouse.clicks,
         Tick <~ Time.fps 60
-    ]
+    ])
 
 
 initModel : Model 
@@ -195,5 +202,5 @@ initModel =
 main : Signal Element
 main =
     Signal.foldp update initModel signals
-    |> Signal.map view
+    |> Signal.map (view actions.address)
     |> Signal.map (Collage.collage 1024 768) 

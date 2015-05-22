@@ -51,23 +51,18 @@ update action model =
 
 -- View
 
-view : Model -> List Collage.Form
-view model = 
+view : Signal.Address Event -> Model -> List Collage.Form
+view address model = 
     let bgSprite = Sprite.draw model.background
-        portraits = List.map Portrait.view model.portraits |> List.concat
+        viewPortrait model = 
+            Portrait.view 
+                (Signal.forwardTo address 
+                    (always (OnPortraitClick model.name)))
+                model
+        portraits = List.map viewPortrait model.portraits |> List.concat
     in
     bgSprite :: portraits
 
 -- Events
 
 type Event = OnPortraitClick String
-
-
-onPortraitClick : Model -> Signal Event
-onPortraitClick model =
-    let portraitSignal portrait = 
-            Portrait.onClick portrait
-            |> Signal.map (always (OnPortraitClick portrait.name))
-    in
-    List.map portraitSignal model.portraits
-    |> Signal.mergeMany
