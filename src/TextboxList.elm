@@ -5,6 +5,7 @@ import Graphics.Collage as Collage
 import List exposing ((::))
 import Maybe exposing (andThen)
 import MoveByAnimation exposing (MoveByAnimation)
+import Signal
 import Textbox
 import TextboxGen
 
@@ -123,8 +124,15 @@ update action model =
 
 view : Model -> List Collage.Form
 view model =
+    let address = nullMailbox.address
+    in
     if model.hidden then []
     else
-        List.concatMap Textbox.view model.textboxes
+        List.concatMap 
+            (Textbox.view (Signal.forwardTo address (always ())))
+            model.textboxes
 
 -- Events
+
+nullMailbox : Signal.Mailbox ()
+nullMailbox = Signal.mailbox ()

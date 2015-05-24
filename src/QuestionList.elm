@@ -50,20 +50,17 @@ update action model =
 
 -- View
 
-view : Model -> List Collage.Form
-view model =
-    List.concatMap Textbox.view model.questions
+view : Signal.Address Event -> Model -> List Collage.Form
+view address model =
+    let viewQuestion index question =
+            Textbox.view 
+                (Signal.forwardTo address (always (ChooseQuestion index)))
+                question
+    in
+    List.indexedMap viewQuestion model.questions
+    |> List.concat
 
 -- Events
 
 type Event
     = ChooseQuestion Int
-
-onChooseQuestion : Model -> Signal Event
-onChooseQuestion model =
-    let questionSignal index question =
-            Textbox.onClick question
-            |> Signal.map (always (ChooseQuestion index))
-    in
-    List.indexedMap questionSignal model.questions
-    |> Signal.mergeMany

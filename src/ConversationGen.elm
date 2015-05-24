@@ -85,7 +85,7 @@ genConversation =
                 children = [starter]
             }
     in
-    Debug.log "conversation" {
+    {
         graph = 
             conversationGraph
             |> Dict.insert "starter" starterNode,

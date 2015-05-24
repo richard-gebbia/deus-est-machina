@@ -3,8 +3,8 @@ module TextboxGen where
 import Color
 import Textbox
 
-genTextbox : String -> List String -> (Float, Float) ->  Textbox.Model
-genTextbox name text (x, y) =
+genTextbox : String -> Bool -> List String -> (Float, Float) ->  Textbox.Model
+genTextbox name clickable text (x, y) =
     {
         name = name,
         text = text,
@@ -47,5 +47,6 @@ genTextbox name text (x, y) =
         textX = -378 + x,
         textY = 23 + y,
         lettersPerSecond = 15,
-        elapsedTime = 0
+        elapsedTime = 0,
+        clickable = clickable
     }

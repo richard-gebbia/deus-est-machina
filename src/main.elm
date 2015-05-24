@@ -38,7 +38,7 @@ type alias Model =
 type Action 
     = FinishTextbox
     | Advance String
-    | ChooseQuestion String
+    | ChooseQuestion Int
     | Tick Float
 
 -- Update
@@ -109,10 +109,7 @@ update : Action -> Model -> Model
 update action model = 
     case action of
         Advance name -> 
-            if TextboxList.isReadyForNewTextboxes model.textboxList then
-                advance name model
-            else
-                updateTextboxList FinishTextbox model
+            advance name model
         FinishTextbox -> 
             updateTextboxList action model
         ChooseQuestion _ -> model   -- TODO : IMPLEMENT THIS !!! (when I add questions)
@@ -156,9 +153,12 @@ view : Signal.Address Action -> Model -> List Collage.Form
 view address model = 
     let pbEventToAction (PortraitBox.OnPortraitClick name) =
             Advance name
+            
+        qlEventToAction (QuestionList.ChooseQuestion index) =
+            ChooseQuestion index
     in
     TextboxList.view model.textboxList ++
-    QuestionList.view model.questionList ++
+    QuestionList.view (Signal.forwardTo address qlEventToAction) model.questionList ++
     PortraitBox.view (Signal.forwardTo address pbEventToAction) model.portraitBox
 
 -- Events

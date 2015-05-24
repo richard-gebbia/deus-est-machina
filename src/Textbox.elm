@@ -24,7 +24,8 @@ type alias Model =
         textX: Float,
         textY: Float,
         lettersPerSecond: Float,
-        elapsedTime: Float
+        elapsedTime: Float,
+        clickable: Bool
     }
 
 
@@ -117,8 +118,9 @@ formText text =
     |> Collage.toForm
     |> Collage.move (elWidth / 2, -elHeight / 2)
 
-view : Model -> List Collage.Form
-view model = 
+
+view : Signal.Address Event -> Model -> List Collage.Form
+view address model = 
     let prepend x y = y ++ x
         drawText x y style text = 
             List.intersperse "\n" text
@@ -127,9 +129,16 @@ view model =
             |> Text.style style
             |> formText
             |> Collage.move (x, y)
+        background = 
+            if model.clickable then
+                ClickForm.spriteButton 
+                    model.background 
+                    (Signal.message address Click)
+            else
+                Sprite.draw model.background
     in
     [
-        Sprite.draw model.background,
+        background,
         Sprite.draw model.portrait,
         drawText model.nameX model.nameY model.nameStyle [model.name],
         drawText model.textX model.textY model.textStyle (textToShow model)
@@ -138,16 +147,3 @@ view model =
 -- Events
 
 type Event = Click
-
-onClick : Model -> Signal Event
-onClick model =
-    let sprite = model.background 
-        isHovering = 
-            ClickForm.rectHitTest 
-                sprite.width 
-                sprite.height 
-                (round sprite.x) 
-                (round sprite.y)
-    in
-    ClickForm.formClick isHovering
-    |> Signal.map (always Click)
