@@ -30,13 +30,16 @@ type alias Model =
         previous: String,
         portraitBox: PortraitBox.Model,
         textboxList: TextboxList.Model,
-        questionList: QuestionList.Model
+        questionList: QuestionList.Model,
+        waitToShowQuestions: Bool
     }
 
 -- Action
 
 type Action 
-    = FinishTextbox
+    = FinishTextboxOrShowQuestion
+    | FinishTextbox
+    | ShowQuestion
     | Advance String
     | ChooseQuestion Int
     | Tick Float
@@ -83,26 +86,25 @@ startingInterjections names starters =
 
 advance : String -> Model -> Model
 advance name model =
-    let (newConversation, didChange) = 
+    let (newConversation, maybeNode) = 
             Conversation.advance name model.conversation
     in
-    if didChange then
-        { model | 
-            previous <- model.conversation.current,
-            conversation <- newConversation,
-            textboxList <- 
-                TextboxList.update
-                    (TextboxList.AddTextbox 
-                        (Conversation.currentName newConversation
-                        |> Maybe.withDefault "") 
-                        (Conversation.currentText newConversation
-                        |> Maybe.withDefault []))
-                    model.textboxList |> fst,
-            portraitBox <- 
-                PortraitBox.update (PortraitBox.LetThemSpeak) model.portraitBox
-        }
-    else
-        model
+    case maybeNode of 
+        Just (Conversation.Talking speech) ->
+            { model | 
+                previous <- model.conversation.current,
+                conversation <- newConversation,
+                textboxList <- 
+                    TextboxList.update
+                        (TextboxList.AddTextbox speech.name speech.text)
+                        model.textboxList |> fst,
+                portraitBox <- 
+                    PortraitBox.update (PortraitBox.LetThemSpeak) model.portraitBox
+            }
+        Just (Conversation.Asking questions) ->
+            model   -- TODO : IMPLEMENT THIS !!! (when I add questions)
+        Nothing ->
+            model
 
 
 update : Action -> Model -> Model
@@ -110,8 +112,11 @@ update action model =
     case action of
         Advance name -> 
             advance name model
-        FinishTextbox -> 
-            updateTextboxList action model
+        FinishTextboxOrShowQuestion -> 
+            if model.waitToShowQuestions then
+                model   -- TODO : FIX THIS !!! (when I add questions) (show questions)
+            else
+                updateTextboxList action model
         ChooseQuestion _ -> model   -- TODO : IMPLEMENT THIS !!! (when I add questions)
         Tick dt -> 
             updateTextboxList action model
@@ -119,19 +124,24 @@ update action model =
 
 readyToAdvance : Model -> Model
 readyToAdvance model =
-    { model |
-        portraitBox <- 
-            PortraitBox.update
-                (PortraitBox.SetInterjections (getInterjections model))
-                model.portraitBox
-    }
+    if Conversation.areQuestionsComingUp model.conversation then
+        { model |
+            waitToShowQuestions <- True
+        }
+    else
+        { model |
+            portraitBox <- 
+                PortraitBox.update
+                    (PortraitBox.SetInterjections (getInterjections model))
+                    model.portraitBox
+        }
 
 
 updateTextboxList : Action -> Model -> Model
 updateTextboxList action model =
     let tblistAction = 
             case action of
-                FinishTextbox -> 
+                FinishTextboxOrShowQuestion -> 
                     TextboxList.FinishCurrentTextbox
 
                 Tick dt ->
@@ -153,7 +163,7 @@ view : Signal.Address Action -> Model -> List Collage.Form
 view address model = 
     let pbEventToAction (PortraitBox.OnPortraitClick name) =
             Advance name
-            
+
         qlEventToAction (QuestionList.ChooseQuestion index) =
             ChooseQuestion index
     in
@@ -174,7 +184,7 @@ signals =
     Signal.mergeMany
     (actions.signal ::
     [
-        (always FinishTextbox) <~ Mouse.clicks,
+        (always FinishTextboxOrShowQuestion) <~ Mouse.clicks,
         Tick <~ Time.fps 60
     ])
 
@@ -195,7 +205,8 @@ initModel =
                         (PortraitBox.names portraitBox) 
                         (Conversation.getChildrenByName conversation))),
         textboxList = TextboxListGen.genTextboxList,
-        questionList = QuestionListGen.genQuestionList
+        questionList = QuestionListGen.genQuestionList,
+        waitToShowQuestions = False
     }
     
 

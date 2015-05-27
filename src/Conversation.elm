@@ -31,15 +31,17 @@ type ConversationNode
 type alias Conversation =
     {
         graph: Dict String ConversationNode,
-        current: String
+        current: String,
+        chosenQuestionIndex: Maybe Int
     }
 
 
-fromJust : Maybe a -> a
-fromJust m =
-    case m of 
-        Just x -> x
-        Nothing -> Debug.crash ("Error: Supplied a Nothing to fromJust!")
+(!!) : List a -> Int -> Maybe a
+(!!) list index =
+    if index >= 0 then
+        List.head (List.drop index list)
+    else
+        Nothing
 
 
 isSpeech : ConversationNode -> Bool
@@ -64,27 +66,39 @@ justNode predicate node =
         Nothing
 
 
-currentName : Conversation -> Maybe String
-currentName conversation = 
+currentNode : Conversation -> Maybe ConversationNode
+currentNode conversation =
     Dict.get conversation.current conversation.graph
-    `andThen` justNode isSpeech
-    |> Maybe.map (\(Talking speech) -> speech.name)
 
 
-currentText : Conversation -> Maybe (List String)
-currentText conversation =
-    Dict.get conversation.current conversation.graph
-    `andThen` justNode isSpeech
-    |> Maybe.map (\(Talking speech) -> speech.text)
-
-
-advance : String -> Conversation -> (Conversation, Bool)
+advance : String -> Conversation -> (Conversation, Maybe ConversationNode)
 advance name conversation =
     let validNames = getChildrenByName conversation
+        node =  Dict.get name validNames
+                `andThen` (\key -> Dict.get key conversation.graph)
     in
     Dict.get name validNames
-    |> Maybe.map (\key -> ({ conversation | current <- key }, True))
-    |> Maybe.withDefault (conversation, False)
+    |> Maybe.map (\key -> ({ conversation | current <- key }, node))
+    |> Maybe.withDefault (conversation, Nothing)
+
+
+chooseQuestion : Int -> Conversation -> Conversation
+chooseQuestion index conversation =
+    let node = currentNode conversation
+        nullCase =
+            { conversation | chosenQuestionIndex <- Nothing }
+    in
+    case node of 
+        Just (Asking questions) -> 
+            if index >= 0 && index < List.length questions then
+                { conversation |
+                    chosenQuestionIndex <- Just index
+                }
+            else 
+                nullCase
+
+        _ ->
+            nullCase
 
 
 getChildrenByName : Conversation -> Dict String String
@@ -94,19 +108,35 @@ getChildrenByName conversation =
             `andThen` justNode isSpeech
             |> Maybe.map (\(Talking node) -> Dict.insert node.name childKey dict)
             |> Maybe.withDefault dict
+        allChildren questions =
+            List.concatMap .children questions
         getChildren node =
             case node of
                 Talking speech ->
                     speech.children
                 Asking questions ->
-                    List.concatMap .children questions
+                    case conversation.chosenQuestionIndex of
+                        Just i -> 
+                            case (questions !! i) of
+                                Just question ->
+                                    question.children
+                                Nothing ->
+                                    allChildren questions
+                        Nothing ->
+                            allChildren questions
     in
     Dict.get conversation.current conversation.graph
-    |> fromJust
-    |> getChildren
-    |> List.foldl addToDict Dict.empty
+    |> Maybe.map getChildren
+    |> Maybe.map (List.foldl addToDict Dict.empty)
+    |> Maybe.withDefault Dict.empty
 
 
-questionToSpeech : Question -> Speech
-questionToSpeech question = 
-    { question | name = "Question" }
+areQuestionsComingUp : Conversation -> Bool
+areQuestionsComingUp conversation =
+    (Dict.get conversation.current conversation.graph
+    `andThen` justNode isSpeech
+    |> Maybe.map (\(Talking node) -> node.children))
+    `andThen` List.head
+    `andThen` (\key -> Dict.get key conversation.graph)
+    |> Maybe.map isQuestion
+    |> Maybe.withDefault False
