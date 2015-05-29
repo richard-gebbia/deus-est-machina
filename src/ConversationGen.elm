@@ -59,8 +59,30 @@ conversation =
                 "Oh I already fucked up",
                 "Refrigerator anyway"
             ],
-            "children": []
-        }
+            "children": ["questions1"]
+        },
+        "questions1": [
+            {
+                "text": [
+                    "A wizard has turned you into a whale.",
+                    "Is this awesome? Y/N"
+                ],
+                "children": []
+            },
+            {
+                "text": [
+                    "How stupid can one face get?"
+                ],
+                "children": []
+            },
+            {
+                "text": [
+                    "To be, or to have a stupid face?",
+                    "That is the question."
+                ],
+                "children": []
+            }
+        ]
     }
     """
 
@@ -85,7 +107,7 @@ genConversation =
                 children = [starter]
             }
     in
-    {
+    {   -- TODO : Add verification
         graph = 
             conversationGraph
             |> Dict.insert "starter" starterNode,

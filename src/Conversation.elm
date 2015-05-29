@@ -82,6 +82,25 @@ advance name conversation =
     |> Maybe.withDefault (conversation, Nothing)
 
 
+advanceToQuestions : Conversation -> (Conversation, Maybe Questions)
+advanceToQuestions conversation =
+    let maybeAdvance key node =
+            case node of
+                Talking _ ->
+                    (conversation, Nothing)
+
+                Asking questions ->
+                    ({ conversation | current <- key }, Just questions)
+    in
+    (currentNode conversation
+    `andThen` justNode isSpeech
+    |> Maybe.map (\(Talking node) -> node.children))
+    `andThen` List.head
+    `andThen` (\key -> Dict.get key conversation.graph
+    |> Maybe.map (maybeAdvance key))
+    |> Maybe.withDefault (conversation, Nothing)
+
+
 chooseQuestion : Int -> Conversation -> Conversation
 chooseQuestion index conversation =
     let node = currentNode conversation

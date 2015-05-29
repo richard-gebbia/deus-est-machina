@@ -30,6 +30,8 @@ isReadyForNewTextboxes model =
 
 type Action = AddTextbox String (List String)
             | FinishCurrentTextbox
+            | Hide
+            | Show
             | Tick Float
 
 -- Update
@@ -116,6 +118,12 @@ update action model =
 
         FinishCurrentTextbox -> 
             finishCurrentTextbox model
+
+        Hide ->
+            ({ model | hidden <- True }, Nothing)
+
+        Show -> 
+            ({ model | hidden <- False }, Nothing)
 
         Tick dt -> 
             tick dt model

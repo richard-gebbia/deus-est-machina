@@ -41,10 +41,25 @@ type Action
     | FinishTextbox
     | ShowQuestion
     | Advance String
-    | ChooseQuestion Int
+    | ChooseQuestion (List String)
     | Tick Float
 
 -- Update
+
+update : Action -> Model -> Model
+update action model = 
+    case action of
+        Advance name -> 
+            advance name model
+        FinishTextboxOrShowQuestion -> 
+            if model.waitToShowQuestions then
+                showQuestions model
+            else
+                updateTextboxList action model
+        ChooseQuestion _ -> model   -- TODO : IMPLEMENT THIS !!! (when I add questions)
+        Tick dt -> 
+            updateTextboxList action model
+
 
 getInterjection : Conversation -> String -> String -> Interjection
 getInterjection conversation previous name =
@@ -101,25 +116,9 @@ advance name model =
                 portraitBox <- 
                     PortraitBox.update (PortraitBox.LetThemSpeak) model.portraitBox
             }
-        Just (Conversation.Asking questions) ->
-            model   -- TODO : IMPLEMENT THIS !!! (when I add questions)
-        Nothing ->
+        _ ->
             model
 
-
-update : Action -> Model -> Model
-update action model = 
-    case action of
-        Advance name -> 
-            advance name model
-        FinishTextboxOrShowQuestion -> 
-            if model.waitToShowQuestions then
-                model   -- TODO : FIX THIS !!! (when I add questions) (show questions)
-            else
-                updateTextboxList action model
-        ChooseQuestion _ -> model   -- TODO : IMPLEMENT THIS !!! (when I add questions)
-        Tick dt -> 
-            updateTextboxList action model
 
 
 readyToAdvance : Model -> Model
@@ -157,6 +156,28 @@ updateTextboxList action model =
         _ -> 
             { model | textboxList <- textboxList }
 
+
+showQuestions : Model -> Model
+showQuestions model =
+    let (newConversation, maybeQuestions) = 
+            Conversation.advanceToQuestions model.conversation
+    in
+    case maybeQuestions of
+        Just questions ->
+            { model |
+                questionList <-
+                    QuestionList.update 
+                        (QuestionList.ShowQuestions 
+                            (List.map .text questions)
+                            (List.map .children questions))
+                        model.questionList,
+                textboxList <- 
+                    TextboxList.update TextboxList.Hide model.textboxList 
+                    |> fst
+            }
+        _ ->
+            model
+
 -- View
 
 view : Signal.Address Action -> Model -> List Collage.Form
@@ -164,8 +185,8 @@ view address model =
     let pbEventToAction (PortraitBox.OnPortraitClick name) =
             Advance name
 
-        qlEventToAction (QuestionList.ChooseQuestion index) =
-            ChooseQuestion index
+        qlEventToAction (QuestionList.ChooseQuestion children) =
+            ChooseQuestion children
     in
     TextboxList.view model.textboxList ++
     QuestionList.view (Signal.forwardTo address qlEventToAction) model.questionList ++
@@ -179,8 +200,6 @@ actions = Signal.mailbox (Tick 0)
 
 signals : Signal Action
 signals =
-    let portraitClick (PortraitBox.OnPortraitClick name) = Advance name
-    in
     Signal.mergeMany
     (actions.signal ::
     [
