@@ -3,6 +3,8 @@ module Portrait where
 import ClickForm
 import Graphics.Collage as Collage
 import Graphics.Element as Element
+import List
+import Maybe
 import Interjection exposing (..)
 import Signal
 import Sprite exposing (..)
@@ -18,17 +20,43 @@ type alias Model =
 
 -- Action
 
-type Action = SetInterjection Interjection
+type Action 
+    = SetResponse (List String) String
+    | Quiet
 
 -- Update
 
 update : Action -> Model -> Model
-update (SetInterjection interjection) model = 
-    let action = (Interjection.SetInterjection interjection)
+update action model = 
+    let determineInterjection previous name =
+            if name == previous then
+                Interjection.Continuation
+            else
+                Interjection.Exclamation
+        interjection names previous = 
+            List.filter (\name -> name == model.name) names
+            |> List.head
+            |> Maybe.map (determineInterjection previous)
+            |> Maybe.withDefault Interjection.Quiet
+        iAction names previous = 
+            (Interjection.SetInterjection (interjection names previous))
     in
-    { model | 
-        interjection <- Interjection.update action model.interjection 
-    }
+    case action of
+        SetResponse names previous ->
+            { model | 
+                interjection <- 
+                    Interjection.update 
+                        (iAction names previous) 
+                        model.interjection 
+            }
+
+        Quiet -> 
+            { model |
+                interjection <- 
+                    Interjection.update 
+                        (Interjection.SetInterjection Interjection.Quiet)
+                        model.interjection
+            }
 
 -- View
 

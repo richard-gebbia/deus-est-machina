@@ -3,7 +3,7 @@ module Conversation where
 import Debug
 import Dict exposing (Dict)
 import List exposing ((::))
-import Maybe exposing (Maybe, andThen)
+import Maybe exposing (Maybe)
 
 type alias Speech = 
     {
@@ -35,127 +35,106 @@ type alias Conversation =
         chosenQuestionIndex: Maybe Int
     }
 
+-- Utility Functions
 
-(!!) : List a -> Int -> Maybe a
-(!!) list index =
-    if index >= 0 then
-        List.head (List.drop index list)
+(|?>) : Maybe a -> (a -> b) -> Maybe b
+m |?> f = Maybe.map f m
+
+
+(>>=) : Maybe a -> (a -> Maybe b) -> Maybe b
+m >>= f = Maybe.andThen m f
+
+
+maybeAnd : (Maybe a, Maybe b) -> Maybe (a, b)
+maybeAnd m =
+    case m of 
+        (Just x, Just y) -> Just (x, y)
+        _ -> Nothing
+
+
+maybeEvery : List (Maybe a) -> Maybe (List a)
+maybeEvery ms = 
+    let allValid m mlist = 
+            case (m, mlist) of
+                (Just x, Just xs) -> 
+                    Just (x :: xs)
+                _ ->
+                    Nothing
+    in
+    List.foldr allValid (Just []) ms
+
+
+justNode : (ConversationNode -> Bool) -> ConversationNode -> Maybe ConversationNode
+justNode pred node = 
+    if pred node then
+        Maybe.Just node
     else
         Nothing
 
 
 isSpeech : ConversationNode -> Bool
-isSpeech node =
+isSpeech node = 
     case node of
         Talking _ -> True
-        Asking _ -> False
+        _ -> False
 
 
 isQuestion : ConversationNode -> Bool
-isQuestion node =
-    case node of
-        Talking _ -> False
-        Asking _ -> True
-
-
-justNode : (ConversationNode -> Bool) -> ConversationNode -> Maybe ConversationNode
-justNode predicate node =
-    if predicate node then 
-        Just node
-    else
-        Nothing
-
-
-currentNode : Conversation -> Maybe ConversationNode
-currentNode conversation =
-    Dict.get conversation.current conversation.graph
-
-
-advance : String -> Conversation -> (Conversation, Maybe ConversationNode)
-advance name conversation =
-    let validNames = getChildrenByName conversation
-        node =  Dict.get name validNames
-                `andThen` (\key -> Dict.get key conversation.graph)
-    in
-    Dict.get name validNames
-    |> Maybe.map (\key -> ({ conversation | current <- key }, node))
-    |> Maybe.withDefault (conversation, Nothing)
-
-
-advanceToQuestions : Conversation -> (Conversation, Maybe Questions)
-advanceToQuestions conversation =
-    let maybeAdvance key node =
-            case node of
-                Talking _ ->
-                    (conversation, Nothing)
-
-                Asking questions ->
-                    ({ conversation | current <- key }, Just questions)
-    in
-    (currentNode conversation
-    `andThen` justNode isSpeech
-    |> Maybe.map (\(Talking node) -> node.children))
-    `andThen` List.head
-    `andThen` (\key -> Dict.get key conversation.graph
-    |> Maybe.map (maybeAdvance key))
-    |> Maybe.withDefault (conversation, Nothing)
-
-
-chooseQuestion : Int -> Conversation -> Conversation
-chooseQuestion index conversation =
-    let node = currentNode conversation
-        nullCase =
-            { conversation | chosenQuestionIndex <- Nothing }
-    in
+isQuestion node = 
     case node of 
-        Just (Asking questions) -> 
-            if index >= 0 && index < List.length questions then
-                { conversation |
-                    chosenQuestionIndex <- Just index
-                }
-            else 
-                nullCase
-
-        _ ->
-            nullCase
+        Asking _ -> True
+        _ -> False
 
 
-getChildrenByName : Conversation -> Dict String String
-getChildrenByName conversation =
-    let addToDict childKey dict = 
-            Dict.get childKey conversation.graph
-            `andThen` justNode isSpeech
-            |> Maybe.map (\(Talking node) -> Dict.insert node.name childKey dict)
-            |> Maybe.withDefault dict
-        allChildren questions =
-            List.concatMap .children questions
-        getChildren node =
-            case node of
-                Talking speech ->
-                    speech.children
-                Asking questions ->
-                    case conversation.chosenQuestionIndex of
-                        Just i -> 
-                            case (questions !! i) of
-                                Just question ->
-                                    question.children
-                                Nothing ->
-                                    allChildren questions
-                        Nothing ->
-                            allChildren questions
-    in
+asSpeech : Conversation -> Maybe Speech
+asSpeech conversation =
     Dict.get conversation.current conversation.graph
-    |> Maybe.map getChildren
-    |> Maybe.map (List.foldl addToDict Dict.empty)
-    |> Maybe.withDefault Dict.empty
+    >>= justNode isSpeech
+    |?> \(Talking speech) -> speech
+
+
+speakerChildren : Conversation -> Maybe (List String)
+speakerChildren conversation =
+    asSpeech conversation
+    |?> \speech -> speech.children
+
+-- Actual useful functions
+
+chooseSpeaker : String -> Conversation -> Maybe (Conversation, Speech)
+chooseSpeaker name conversation =
+    let doesChildHaveRequestedName key =
+            Dict.get key conversation.graph
+            >>= justNode isSpeech
+            |?> (\(Talking node) -> node.name == name)
+            |> Maybe.withDefault False
+    in
+    speakerChildren conversation
+    |?> List.filter doesChildHaveRequestedName
+    >>= List.head
+    |?> (\key -> Maybe.Just { conversation | current <- key })
+    |> Maybe.withDefault Nothing
+    |> (\conv -> (conv, conv >>= asSpeech))
+    |> maybeAnd
 
 
 areQuestionsComingUp : Conversation -> Bool
 areQuestionsComingUp conversation =
-    (Dict.get conversation.current conversation.graph
-    `andThen` justNode isSpeech
-    |> Maybe.map (\(Talking node) -> node.children))
-    `andThen` List.head
-    `andThen` (\key -> Dict.get key conversation.graph)
-    |> Maybe.map isQuestion
+    speakerChildren conversation
+    >>= List.head
+    >>= (\key -> Dict.get key conversation.graph)
+    |?> isQuestion
     |> Maybe.withDefault False
+
+
+getResponderNames : Conversation -> Maybe (List String)
+getResponderNames conversation =
+    let getName key =
+            Dict.get key conversation.graph
+            >>= justNode isSpeech
+            |?> (\(Talking node) -> Just node.name)
+            |> Maybe.withDefault Nothing
+    in
+    speakerChildren conversation
+    |?> List.map getName
+    |?> maybeEvery
+    |> Maybe.withDefault Nothing

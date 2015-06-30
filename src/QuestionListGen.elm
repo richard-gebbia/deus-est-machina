@@ -9,6 +9,5 @@ genQuestionList =
         questions = [],
         firstQuestionPosition = (10, 320),
         questionStride = (0, -140),
-        questionFrame = TextboxGen.genTextbox "Question" True,
-        questionChildren = []
+        questionFrame = TextboxGen.genTextbox "Question" True
     }

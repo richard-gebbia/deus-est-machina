@@ -2,7 +2,6 @@ module PortraitBox where
 
 import Graphics.Collage as Collage
 import Graphics.Element as Element
-import Interjection exposing (..)
 import List exposing ((::))
 import Portrait
 import Signal
@@ -13,7 +12,8 @@ import Sprite exposing (Sprite)
 type alias Model = 
     {
         background: Sprite,
-        portraits: List Portrait.Model
+        portraits: List Portrait.Model,
+        previous: String
     }
 
 
@@ -24,29 +24,38 @@ names model =
 -- Action
 
 type Action 
-    = SetInterjections (List Interjection)
-    | LetThemSpeak
+    = SetResponders (List String)
+    | LetThemSpeak String
+    | ThePlayerIsSpeaking
 
 -- Update
 
 update : Action -> Model -> Model
 update action model = 
-    let actions interjections = 
-            List.map Portrait.SetInterjection interjections
+    let actions names = 
+            List.repeat
+                (List.length model.portraits)
+                (Portrait.SetResponse names model.previous)
         quiet = 
-            Portrait.update (Portrait.SetInterjection Interjection.Quiet)
+            Portrait.update Portrait.Quiet
     in
     case action of 
-        SetInterjections interjections ->
+        SetResponders names ->
             { model |
                 portraits <- 
-                    List.map2 Portrait.update (actions interjections) model.portraits
+                    List.map2 Portrait.update (actions names) model.portraits
             }
 
-        LetThemSpeak ->
+        LetThemSpeak speakerName ->
             { model |
-                portraits <-
-                    List.map quiet model.portraits
+                portraits <- List.map quiet model.portraits,
+                previous <- speakerName
+            }
+
+        ThePlayerIsSpeaking -> 
+            { model |
+                portraits <- List.map quiet model.portraits,
+                previous <- ""
             }
 
 -- View

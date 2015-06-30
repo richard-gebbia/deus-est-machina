@@ -12,14 +12,13 @@ type alias Model =
         questions: List Textbox.Model,
         firstQuestionPosition: (Float, Float),
         questionStride: (Float, Float),
-        questionFrame: List String -> (Float, Float) -> Textbox.Model,
-        questionChildren: List (List String)
+        questionFrame: List String -> (Float, Float) -> Textbox.Model
     }
 
 -- Action
 
 type Action 
-    = ShowQuestions (List (List String)) (List (List String))
+    = ShowQuestions (List (List String))
     | Hide
 
 -- Update
@@ -43,10 +42,9 @@ makeQuestions model questions =
 update : Action -> Model -> Model
 update action model =
     case action of
-        ShowQuestions questions children ->
+        ShowQuestions questions ->
             { model |
-                questions <- makeQuestions model questions,
-                questionChildren <- children
+                questions <- makeQuestions model questions
             }
         Hide ->
             { model |
@@ -57,15 +55,15 @@ update action model =
 
 view : Signal.Address Event -> Model -> List Collage.Form
 view address model =
-    let viewQuestion question children =
+    let viewQuestion index question =
             Textbox.view 
-                (Signal.forwardTo address (always (ChooseQuestion children)))
+                (Signal.forwardTo address (always (ChooseQuestion index)))
                 question
     in
-    List.map2 viewQuestion model.questions model.questionChildren
+    List.indexedMap viewQuestion model.questions
     |> List.concat
 
 -- Events
 
 type Event
-    = ChooseQuestion (List String)
+    = ChooseQuestion Int

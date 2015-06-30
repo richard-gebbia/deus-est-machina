@@ -73,7 +73,7 @@ conversation =
                 "text": [
                     "How stupid can one face get?"
                 ],
-                "children": []
+                "children": ["ava3"]
             },
             {
                 "text": [
