@@ -118,7 +118,7 @@ waitingForTextboxToFinish action model =
             onClick (unwrap model) |> Model
 
         Tick dt ->
-            onTick (Debug.log "" dt) (unwrap model) |> Model
+            onTick dt (unwrap model) |> Model
 
         _ -> 
             model
