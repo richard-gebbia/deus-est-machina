@@ -125,7 +125,35 @@ waitingForTextboxToFinish action model =
 
 
 waitingToShowQuestions : Action -> Model -> Model
-waitingToShowQuestions _ model = model
+waitingToShowQuestions action model = 
+    let modelData = unwrap model
+        onClick (newConversation, questionText) =
+            { modelData |
+                conversation <- newConversation,
+                textboxList <-
+                    TextboxList.update TextboxList.Hide modelData.textboxList 
+                    |> fst,
+                questionList <-
+                    QuestionList.update
+                        (QuestionList.ShowQuestions questionText)
+                        modelData.questionList,
+                gameStateUpdate <- showingQuestions
+            }
+    in
+    case action of
+        Click ->
+            Conversation.getQuestions modelData.conversation
+            |> Maybe.withDefault (modelData.conversation, [])
+            |> onClick 
+            |> Model
+
+        _ ->
+            model
+
+
+showingQuestions : Action -> Model -> Model
+showingQuestions _ model = model
+
 
 update : Action -> Model -> Model
 update action model =

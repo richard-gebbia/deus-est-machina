@@ -93,27 +93,41 @@ asSpeech conversation =
     |?> \(Talking speech) -> speech
 
 
+asQuestions : Conversation -> Maybe Questions
+asQuestions conversation =
+    Dict.get conversation.current conversation.graph
+    >>= justNode isQuestion
+    |?> \(Asking questions) -> questions
+
+
 speakerChildren : Conversation -> Maybe (List String)
 speakerChildren conversation =
     asSpeech conversation
     |?> \speech -> speech.children
 
+
+questionText : Questions -> List (List String)
+questionText questions =
+    List.map .text questions
+
+
 -- Actual useful functions
 
-chooseSpeaker : String -> Conversation -> Maybe (Conversation, Speech)
+chooseSpeaker : String -> Conversation -> Maybe (Conversation, {name: String, text: List String})
 chooseSpeaker name conversation =
     let doesChildHaveRequestedName key =
             Dict.get key conversation.graph
             >>= justNode isSpeech
             |?> (\(Talking node) -> node.name == name)
             |> Maybe.withDefault False
+        withoutChildren speech = {speech - children}
     in
     speakerChildren conversation
     |?> List.filter doesChildHaveRequestedName
     >>= List.head
     |?> (\key -> Maybe.Just { conversation | current <- key })
     |> Maybe.withDefault Nothing
-    |> (\conv -> (conv, conv >>= asSpeech))
+    |> (\conv -> (conv, (conv >>= asSpeech) |?> withoutChildren ))
     |> maybeAnd
 
 
@@ -138,3 +152,12 @@ getResponderNames conversation =
     |?> List.map getName
     |?> maybeEvery
     |> Maybe.withDefault Nothing
+
+
+getQuestions : Conversation -> Maybe (Conversation, List (List String))
+getQuestions conversation = 
+    speakerChildren conversation                   
+    >>= List.head                                  
+    |?> (\key -> { conversation | current <- key })
+    |> (\conv -> (conv, (conv >>= asQuestions) |?> questionText))     
+    |> maybeAnd                                    
