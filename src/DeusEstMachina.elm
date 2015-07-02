@@ -127,6 +127,7 @@ waitingForTextboxToFinish action model =
 waitingToShowQuestions : Action -> Model -> Model
 waitingToShowQuestions action model = 
     let modelData = unwrap model
+
         onClick (newConversation, questionText) =
             { modelData |
                 conversation <- newConversation,
@@ -152,7 +153,37 @@ waitingToShowQuestions action model =
 
 
 showingQuestions : Action -> Model -> Model
-showingQuestions _ model = model
+showingQuestions action model =
+    let modelData = unwrap model
+
+        respondToChosenQuestion index names =
+            { modelData | 
+                questionList <- 
+                    QuestionList.update QuestionList.Hide modelData.questionList,
+                textboxList <- 
+                    TextboxList.update TextboxList.Show modelData.textboxList 
+                    |> fst,
+                portraitBox <-
+                    PortraitBox.update 
+                        (PortraitBox.SetResponders names)
+                        modelData.portraitBox,
+                gameStateUpdate <-
+                    waitingForQuestionResponse index
+            }
+    in
+    case action of 
+        ChooseQuestion index ->
+            Conversation.chooseQuestion index modelData.conversation
+            |> Maybe.withDefault []
+            |> respondToChosenQuestion index
+            |> Model
+
+        _ ->
+            model
+
+
+waitingForQuestionResponse : Int -> Action -> Model -> Model
+waitingForQuestionResponse index action model = model
 
 
 update : Action -> Model -> Model

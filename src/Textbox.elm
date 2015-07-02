@@ -5,6 +5,7 @@ import ClickForm
 import Graphics.Collage as Collage
 import Graphics.Element as Element
 import List
+import Maybe
 import Sprite exposing (Sprite)
 import String
 import Text exposing (Text)
@@ -114,18 +115,17 @@ formText text =
         (iElWidth, iElHeight) = Element.sizeOf el
         (elWidth, elHeight) = (Basics.toFloat iElWidth, Basics.toFloat iElHeight)
     in
-    contain (Element.sizeOf el) Element.topLeft el
-    |> Collage.toForm
+    -- contain (Element.sizeOf el) Element.topLeft el
+    -- |> Collage.toForm
+    Collage.text text
     |> Collage.move (elWidth / 2, -elHeight / 2)
 
 
 view : Signal.Address Event -> Model -> List Collage.Form
 view address model = 
     let prepend x y = y ++ x
-        drawText x y style text = 
-            List.intersperse "\n" text
-            |> List.foldl prepend ""
-            |> Text.fromString
+        drawText style x y text = 
+            Text.fromString text
             |> Text.style style
             |> formText
             |> Collage.move (x, y)
@@ -136,13 +136,22 @@ view address model =
                     (Signal.message address Click)
             else
                 Sprite.draw model.background
+        linesOfText = List.length (textToShow model)
+        lineSpacing style = 
+            style.height
+            |> Maybe.map (\y -> y + 2)
+            |> Maybe.withDefault 20
+        textYValues = 
+            List.map 
+                (\y -> model.textY - (lineSpacing model.textStyle) * (toFloat y)) 
+                [0..linesOfText]
     in
     [
         background,
         Sprite.draw model.portrait,
-        drawText model.nameX model.nameY model.nameStyle [model.name],
-        drawText model.textX model.textY model.textStyle (textToShow model)
-    ]
+        drawText model.nameStyle model.nameX model.nameY model.name
+    ] ++
+    List.map2 (drawText model.textStyle model.textX) textYValues (textToShow model)
 
 -- Events
 

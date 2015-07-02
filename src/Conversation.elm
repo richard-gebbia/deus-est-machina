@@ -31,11 +31,14 @@ type ConversationNode
 type alias Conversation =
     {
         graph: Dict String ConversationNode,
-        current: String,
-        chosenQuestionIndex: Maybe Int
+        current: String
     }
 
 -- Utility Functions
+
+(!!) : List a -> Int -> Maybe a
+list !! index = List.drop index list |> List.head
+
 
 (|?>) : Maybe a -> (a -> b) -> Maybe b
 m |?> f = Maybe.map f m
@@ -111,6 +114,14 @@ questionText questions =
     List.map .text questions
 
 
+getNameFromKey : Conversation -> String -> Maybe String
+getNameFromKey conversation key =
+    Dict.get key conversation.graph
+    >>= justNode isSpeech
+    |?> (\(Talking node) -> Just node.name)
+    |> Maybe.withDefault Nothing   
+
+
 -- Actual useful functions
 
 chooseSpeaker : String -> Conversation -> Maybe (Conversation, {name: String, text: List String})
@@ -142,14 +153,8 @@ areQuestionsComingUp conversation =
 
 getResponderNames : Conversation -> Maybe (List String)
 getResponderNames conversation =
-    let getName key =
-            Dict.get key conversation.graph
-            >>= justNode isSpeech
-            |?> (\(Talking node) -> Just node.name)
-            |> Maybe.withDefault Nothing
-    in
     speakerChildren conversation
-    |?> List.map getName
+    |?> List.map (getNameFromKey conversation)
     |?> maybeEvery
     |> Maybe.withDefault Nothing
 
@@ -157,7 +162,16 @@ getResponderNames conversation =
 getQuestions : Conversation -> Maybe (Conversation, List (List String))
 getQuestions conversation = 
     speakerChildren conversation                   
-    >>= List.head                                  
+    >>= List.head 
     |?> (\key -> { conversation | current <- key })
     |> (\conv -> (conv, (conv >>= asQuestions) |?> questionText))     
-    |> maybeAnd                                    
+    |> maybeAnd 
+
+
+chooseQuestion : Int -> Conversation -> Maybe (List String)
+chooseQuestion index conversation =
+    asQuestions conversation                  
+    >>= (\questions -> questions !! index)    
+    |?> .children                             
+    |?> List.map (getNameFromKey conversation)
+    >>= maybeEvery                            

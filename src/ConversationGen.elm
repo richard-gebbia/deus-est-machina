@@ -111,6 +111,5 @@ genConversation =
         graph = 
             conversationGraph
             |> Dict.insert "starter" starterNode,
-        current = "starter",
-        chosenQuestionIndex = Nothing
+        current = "starter"
     }
