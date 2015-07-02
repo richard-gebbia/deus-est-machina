@@ -174,4 +174,11 @@ chooseQuestion index conversation =
     >>= (\questions -> questions !! index)    
     |?> .children                             
     |?> List.map (getNameFromKey conversation)
-    >>= maybeEvery                            
+    >>= maybeEvery
+
+
+getQuestionText : Int -> Conversation -> Maybe (List String)
+getQuestionText index conversation =
+    asQuestions conversation
+    >>= (\questions -> questions !! index)
+    |?> .text

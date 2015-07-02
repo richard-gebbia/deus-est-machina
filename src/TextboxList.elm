@@ -26,13 +26,16 @@ isReadyForNewTextboxes model =
     |> Maybe.map Textbox.isFinished
     |> Maybe.withDefault True
 
+
 -- Action
 
 type Action = AddTextbox String (List String)
+            | AddFullTextbox String (List String)
             | FinishCurrentTextbox
             | Hide
             | Show
             | Tick Float
+
 
 -- Update
 
@@ -67,6 +70,21 @@ addTextbox name text model =
         Nothing
     )
 
+
+addFullTextbox : String -> List String -> Model -> (Model, Maybe Request)
+addFullTextbox name text model =
+    (
+        { model |
+            animation <- MoveByAnimation.reset model.animation,
+            textboxes <- 
+                Dict.get name model.textboxFrames
+                |> Maybe.map (\frame -> frame text model.enterPosition)
+                |> Maybe.map (\tb -> Textbox.update Textbox.Finish tb |> fst)
+                |> Maybe.map (\tb -> tb :: model.textboxes)
+                |> Maybe.withDefault model.textboxes
+        },
+        Nothing
+    )
 
 onUpdateTextbox : Model -> (Textbox.Model, Maybe Textbox.Request) -> (Model, Maybe Request)
 onUpdateTextbox model (textbox, request) =
@@ -116,6 +134,9 @@ update action model =
         AddTextbox name text -> 
             addTextbox name text model
 
+        AddFullTextbox name text ->
+            addFullTextbox name text model
+
         FinishCurrentTextbox -> 
             finishCurrentTextbox model
 
@@ -128,6 +149,7 @@ update action model =
         Tick dt -> 
             tick dt model
             
+
 -- View
 
 view : Model -> List Collage.Form

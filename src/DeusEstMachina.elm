@@ -156,12 +156,14 @@ showingQuestions : Action -> Model -> Model
 showingQuestions action model =
     let modelData = unwrap model
 
-        respondToChosenQuestion index names =
+        respondToChosenQuestion index (text, names) =
             { modelData | 
                 questionList <- 
                     QuestionList.update QuestionList.Hide modelData.questionList,
                 textboxList <- 
                     TextboxList.update TextboxList.Show modelData.textboxList 
+                    |> fst
+                    |> TextboxList.update (TextboxList.AddFullTextbox "Question" text)
                     |> fst,
                 portraitBox <-
                     PortraitBox.update 
@@ -174,7 +176,14 @@ showingQuestions action model =
     case action of 
         ChooseQuestion index ->
             Conversation.chooseQuestion index modelData.conversation
-            |> Maybe.withDefault []
+            |> (\names -> 
+                    (
+                        Conversation.getQuestionText index modelData.conversation, 
+                        names
+                    )
+                )
+            |> (\(text, responders) -> 
+                    (Maybe.withDefault [] text, Maybe.withDefault [] responders))
             |> respondToChosenQuestion index
             |> Model
 
@@ -183,7 +192,19 @@ showingQuestions action model =
 
 
 waitingForQuestionResponse : Int -> Action -> Model -> Model
-waitingForQuestionResponse index action model = model
+waitingForQuestionResponse index action model = 
+    let modelData = unwrap model
+    in
+    case action of
+        Tick dt -> 
+            { modelData |
+                textboxList <- 
+                    TextboxList.update (TextboxList.Tick dt) modelData.textboxList
+                    |> fst
+            } |> Model
+
+        _ -> 
+            model
 
 
 update : Action -> Model -> Model
