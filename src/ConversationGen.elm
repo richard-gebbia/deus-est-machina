@@ -67,13 +67,13 @@ conversation =
                     "A wizard has turned you into a whale.",
                     "Is this awesome? Y/N"
                 ],
-                "children": []
+                "children": ["gavin1", "sophie1"]
             },
             {
                 "text": [
                     "How stupid can one face get?"
                 ],
-                "children": ["ava3"]
+                "children": ["ava3", "sebastian1"]
             },
             {
                 "text": [
@@ -82,7 +82,15 @@ conversation =
                 ],
                 "children": []
             }
-        ]
+        ],
+        "sebastian1": {
+            "name": "Sebastian",
+            "text": [
+                "Yo momma's so fat, she's embarrassed that",
+                "your face is so stupid."
+            ],
+            "children": []
+        }
     }
     """
 

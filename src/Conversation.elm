@@ -13,6 +13,13 @@ type alias Speech =
     }
 
 
+type alias SpeechInfo =
+    {
+        name: String,
+        text: List String
+    }
+
+
 type alias Question =
     {
         text: List String,
@@ -96,6 +103,10 @@ asSpeech conversation =
     |?> \(Talking speech) -> speech
 
 
+withoutChildren : Speech -> SpeechInfo
+withoutChildren speech = {speech - children}
+
+
 asQuestions : Conversation -> Maybe Questions
 asQuestions conversation =
     Dict.get conversation.current conversation.graph
@@ -114,6 +125,12 @@ questionText questions =
     List.map .text questions
 
 
+questionChildren : Int -> Questions -> Maybe (List String)
+questionChildren index questions =
+    (questions !! index)
+    |?> .children
+
+
 getNameFromKey : Conversation -> String -> Maybe String
 getNameFromKey conversation key =
     Dict.get key conversation.graph
@@ -122,22 +139,22 @@ getNameFromKey conversation key =
     |> Maybe.withDefault Nothing   
 
 
+doesChildHaveRequestedName : Conversation -> String -> String -> Bool
+doesChildHaveRequestedName conversation name key =
+    Dict.get key conversation.graph
+    >>= justNode isSpeech
+    |?> (\(Talking node) -> node.name == name)
+    |> Maybe.withDefault False
+
+
 -- Actual useful functions
 
-chooseSpeaker : String -> Conversation -> Maybe (Conversation, {name: String, text: List String})
+chooseSpeaker : String -> Conversation -> Maybe (Conversation, SpeechInfo)
 chooseSpeaker name conversation =
-    let doesChildHaveRequestedName key =
-            Dict.get key conversation.graph
-            >>= justNode isSpeech
-            |?> (\(Talking node) -> node.name == name)
-            |> Maybe.withDefault False
-        withoutChildren speech = {speech - children}
-    in
     speakerChildren conversation
-    |?> List.filter doesChildHaveRequestedName
+    |?> List.filter (doesChildHaveRequestedName conversation name)
     >>= List.head
-    |?> (\key -> Maybe.Just { conversation | current <- key })
-    |> Maybe.withDefault Nothing
+    |?> (\key -> { conversation | current <- key })
     |> (\conv -> (conv, (conv >>= asSpeech) |?> withoutChildren ))
     |> maybeAnd
 
@@ -182,3 +199,14 @@ getQuestionText index conversation =
     asQuestions conversation
     >>= (\questions -> questions !! index)
     |?> .text
+
+
+chooseQuestionResponder : Int -> String -> Conversation -> Maybe (Conversation, SpeechInfo)
+chooseQuestionResponder index name conversation =
+    asQuestions conversation
+    >>= questionChildren index
+    |?> List.filter (doesChildHaveRequestedName conversation name)
+    >>= List.head
+    |?> (\key -> { conversation | current <- key })
+    |> (\conv -> (conv, (conv >>= asSpeech) |?> withoutChildren ))
+    |> maybeAnd

@@ -46,23 +46,25 @@ type Action
 
 -- Update
 
+advance : ModelData -> String -> (Conversation, Conversation.SpeechInfo) -> ModelData
+advance modelData name (newConversation, speech) =
+    { modelData |
+        conversation <- newConversation,
+        previous <- Just name,
+        portraitBox <- 
+            PortraitBox.update 
+                (PortraitBox.LetThemSpeak name) 
+                modelData.portraitBox,
+        textboxList <- 
+            TextboxList.update
+                (TextboxList.AddTextbox speech.name speech.text)
+                modelData.textboxList |> fst,
+        gameStateUpdate <- waitingForTextboxToFinish
+    }
+
+
 choosingSpeaker : Action -> Model -> Model
 choosingSpeaker action model =
-    let advance modelData name (newConversation, speech) =
-            { modelData |
-                conversation <- newConversation,
-                previous <- Just name,
-                portraitBox <- 
-                    PortraitBox.update 
-                        (PortraitBox.LetThemSpeak name) 
-                        modelData.portraitBox,
-                textboxList <- 
-                    TextboxList.update
-                        (TextboxList.AddTextbox speech.name speech.text)
-                        modelData.textboxList |> fst,
-                gameStateUpdate <- waitingForTextboxToFinish
-            }
-    in
     case action of 
         ChooseSpeaker name ->
             Conversation.chooseSpeaker name (unwrap model).conversation
@@ -131,6 +133,7 @@ waitingToShowQuestions action model =
         onClick (newConversation, questionText) =
             { modelData |
                 conversation <- newConversation,
+                previous <- Nothing,
                 textboxList <-
                     TextboxList.update TextboxList.Hide modelData.textboxList 
                     |> fst,
@@ -202,6 +205,12 @@ waitingForQuestionResponse index action model =
                     TextboxList.update (TextboxList.Tick dt) modelData.textboxList
                     |> fst
             } |> Model
+
+        ChooseSpeaker name ->
+            Conversation.chooseQuestionResponder index name modelData.conversation
+            |> Maybe.map (advance modelData name)
+            |> Maybe.map Model
+            |> Maybe.withDefault model
 
         _ -> 
             model
