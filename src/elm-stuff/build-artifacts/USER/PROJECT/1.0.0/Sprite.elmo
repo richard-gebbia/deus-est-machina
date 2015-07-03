@@ -1,0 +1,39 @@
+Elm.Sprite = Elm.Sprite || {};
+Elm.Sprite.make = function (_elm) {
+   "use strict";
+   _elm.Sprite = _elm.Sprite || {};
+   if (_elm.Sprite.values)
+   return _elm.Sprite.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Sprite",
+   $Basics = Elm.Basics.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm);
+   var draw = function (sprite) {
+      return $Graphics$Collage.move({ctor: "_Tuple2"
+                                    ,_0: sprite.x
+                                    ,_1: sprite.y})($Graphics$Collage.toForm(A3($Graphics$Element.image,
+      sprite.width,
+      sprite.height,
+      sprite.imageName)));
+   };
+   var Sprite = F5(function (a,
+   b,
+   c,
+   d,
+   e) {
+      return {_: {}
+             ,height: d
+             ,imageName: e
+             ,width: c
+             ,x: a
+             ,y: b};
+   });
+   _elm.Sprite.values = {_op: _op
+                        ,Sprite: Sprite
+                        ,draw: draw};
+   return _elm.Sprite.values;
+};

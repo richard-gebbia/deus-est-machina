@@ -1,0 +1,27 @@
+Elm.InterjectionGen = Elm.InterjectionGen || {};
+Elm.InterjectionGen.make = function (_elm) {
+   "use strict";
+   _elm.InterjectionGen = _elm.InterjectionGen || {};
+   if (_elm.InterjectionGen.values)
+   return _elm.InterjectionGen.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "InterjectionGen",
+   $Interjection = Elm.Interjection.make(_elm);
+   var defaultInterjection = F2(function (x,
+   y) {
+      return A7($Interjection.Model,
+      x,
+      y,
+      62,
+      45,
+      $Interjection.Quiet,
+      "img/exclamation.png",
+      "img/dotdotdot.png");
+   });
+   _elm.InterjectionGen.values = {_op: _op
+                                 ,defaultInterjection: defaultInterjection};
+   return _elm.InterjectionGen.values;
+};

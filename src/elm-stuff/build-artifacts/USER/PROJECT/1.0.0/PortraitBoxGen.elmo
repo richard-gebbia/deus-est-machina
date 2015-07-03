@@ -1,0 +1,42 @@
+Elm.PortraitBoxGen = Elm.PortraitBoxGen || {};
+Elm.PortraitBoxGen.make = function (_elm) {
+   "use strict";
+   _elm.PortraitBoxGen = _elm.PortraitBoxGen || {};
+   if (_elm.PortraitBoxGen.values)
+   return _elm.PortraitBoxGen.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "PortraitBoxGen",
+   $Basics = Elm.Basics.make(_elm),
+   $PortraitBox = Elm.PortraitBox.make(_elm),
+   $PortraitGen = Elm.PortraitGen.make(_elm),
+   $Sprite = Elm.Sprite.make(_elm);
+   var genPortraitBox = F2(function (x,
+   y) {
+      return {_: {}
+             ,background: A5($Sprite.Sprite,
+             x,
+             y,
+             1024,
+             168,
+             "img/PortraitHolder.png")
+             ,portraits: _L.fromArray([A2($PortraitGen.sophie,
+                                      x - 384.5,
+                                      y)
+                                      ,A2($PortraitGen.gavin,
+                                      x - 131.5,
+                                      y)
+                                      ,A2($PortraitGen.ava,
+                                      x + 131.5,
+                                      y)
+                                      ,A2($PortraitGen.sebastian,
+                                      x + 384.5,
+                                      y)])
+             ,previous: ""};
+   });
+   _elm.PortraitBoxGen.values = {_op: _op
+                                ,genPortraitBox: genPortraitBox};
+   return _elm.PortraitBoxGen.values;
+};

@@ -1,0 +1,105 @@
+Elm.MoveByAnimation = Elm.MoveByAnimation || {};
+Elm.MoveByAnimation.make = function (_elm) {
+   "use strict";
+   _elm.MoveByAnimation = _elm.MoveByAnimation || {};
+   if (_elm.MoveByAnimation.values)
+   return _elm.MoveByAnimation.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "MoveByAnimation",
+   $Basics = Elm.Basics.make(_elm);
+   var isComplete = function (animation) {
+      return _U.cmp(animation.elapsedTime,
+      animation.duration) > -1;
+   };
+   var reset = function (animation) {
+      return _U.replace([["elapsedTime"
+                         ,0]
+                        ,["prevElapsedTime",0]],
+      animation);
+   };
+   var moveByTotal = function (animation) {
+      return function () {
+         var t = A3($Basics.clamp,
+         0,
+         1,
+         animation.elapsedTime / animation.duration);
+         return {ctor: "_Tuple2"
+                ,_0: t * animation.x
+                ,_1: t * animation.y};
+      }();
+   };
+   var moveByFrame = function (animation) {
+      return function () {
+         var t1 = A3($Basics.clamp,
+         0,
+         1,
+         animation.elapsedTime / animation.duration);
+         var t0 = A3($Basics.clamp,
+         0,
+         1,
+         animation.prevElapsedTime / animation.duration);
+         var t = animation.easing(t1) - animation.easing(t0);
+         return {ctor: "_Tuple2"
+                ,_0: t * animation.x
+                ,_1: t * animation.y};
+      }();
+   };
+   var update = F2(function (animation,
+   dt) {
+      return _U.replace([["elapsedTime"
+                         ,animation.elapsedTime + dt]
+                        ,["prevElapsedTime"
+                         ,animation.elapsedTime]],
+      animation);
+   });
+   var curveAnimation = F4(function (x,
+   y,
+   duration,
+   easing) {
+      return {_: {}
+             ,duration: duration
+             ,easing: easing
+             ,elapsedTime: 0
+             ,prevElapsedTime: 0
+             ,x: x
+             ,y: y};
+   });
+   var linearAnimation = F3(function (x,
+   y,
+   duration) {
+      return {_: {}
+             ,duration: duration
+             ,easing: $Basics.identity
+             ,elapsedTime: 0
+             ,prevElapsedTime: 0
+             ,x: x
+             ,y: y};
+   });
+   var MoveByAnimation = F6(function (a,
+   b,
+   c,
+   d,
+   e,
+   f) {
+      return {_: {}
+             ,duration: c
+             ,easing: d
+             ,elapsedTime: e
+             ,prevElapsedTime: f
+             ,x: a
+             ,y: b};
+   });
+   _elm.MoveByAnimation.values = {_op: _op
+                                 ,MoveByAnimation: MoveByAnimation
+                                 ,linearAnimation: linearAnimation
+                                 ,curveAnimation: curveAnimation
+                                 ,update: update
+                                 ,moveByFrame: moveByFrame
+                                 ,moveByTotal: moveByTotal
+                                 ,reset: reset
+                                 ,isComplete: isComplete};
+   return _elm.MoveByAnimation.values;
+};

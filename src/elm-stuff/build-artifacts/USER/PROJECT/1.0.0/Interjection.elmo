@@ -1,0 +1,90 @@
+Elm.Interjection = Elm.Interjection || {};
+Elm.Interjection.make = function (_elm) {
+   "use strict";
+   _elm.Interjection = _elm.Interjection || {};
+   if (_elm.Interjection.values)
+   return _elm.Interjection.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Interjection",
+   $Basics = Elm.Basics.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm);
+   var viewSprite = F2(function (imageName,
+   model) {
+      return A3($Graphics$Element.image,
+      model.width,
+      model.height,
+      imageName);
+   });
+   var view = function (model) {
+      return function () {
+         var element = function () {
+            var _v0 = model.interjection;
+            switch (_v0.ctor)
+            {case "Continuation":
+               return A2(viewSprite,
+                 model.continuationImageName,
+                 model);
+               case "Exclamation":
+               return A2(viewSprite,
+                 model.exclamationImageName,
+                 model);
+               case "Quiet":
+               return $Graphics$Element.empty;}
+            _U.badCase($moduleName,
+            "between lines 44 and 53");
+         }();
+         return $Graphics$Collage.move({ctor: "_Tuple2"
+                                       ,_0: model.x
+                                       ,_1: model.y})($Graphics$Collage.toForm(element));
+      }();
+   };
+   var update = F2(function (_v1,
+   model) {
+      return function () {
+         switch (_v1.ctor)
+         {case "SetInterjection":
+            return _U.replace([["interjection"
+                               ,_v1._0]],
+              model);}
+         _U.badCase($moduleName,
+         "on line 29, column 13 to 43");
+      }();
+   });
+   var SetInterjection = function (a) {
+      return {ctor: "SetInterjection"
+             ,_0: a};
+   };
+   var Model = F7(function (a,
+   b,
+   c,
+   d,
+   e,
+   f,
+   g) {
+      return {_: {}
+             ,continuationImageName: g
+             ,exclamationImageName: f
+             ,height: d
+             ,interjection: e
+             ,width: c
+             ,x: a
+             ,y: b};
+   });
+   var Quiet = {ctor: "Quiet"};
+   var Continuation = {ctor: "Continuation"};
+   var Exclamation = {ctor: "Exclamation"};
+   _elm.Interjection.values = {_op: _op
+                              ,Exclamation: Exclamation
+                              ,Continuation: Continuation
+                              ,Quiet: Quiet
+                              ,Model: Model
+                              ,SetInterjection: SetInterjection
+                              ,update: update
+                              ,viewSprite: viewSprite
+                              ,view: view};
+   return _elm.Interjection.values;
+};

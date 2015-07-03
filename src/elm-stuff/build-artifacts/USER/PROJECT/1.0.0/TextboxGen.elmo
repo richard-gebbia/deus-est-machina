@@ -1,0 +1,77 @@
+Elm.TextboxGen = Elm.TextboxGen || {};
+Elm.TextboxGen.make = function (_elm) {
+   "use strict";
+   _elm.TextboxGen = _elm.TextboxGen || {};
+   if (_elm.TextboxGen.values)
+   return _elm.TextboxGen.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "TextboxGen",
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Textbox = Elm.Textbox.make(_elm);
+   var genTextbox = F4(function (name,
+   clickable,
+   text,
+   _v0) {
+      return function () {
+         switch (_v0.ctor)
+         {case "_Tuple2": return {_: {}
+                                 ,background: {_: {}
+                                              ,height: 120
+                                              ,imageName: A2($Basics._op["++"],
+                                              "img/Text",
+                                              A2($Basics._op["++"],
+                                              name,
+                                              ".png"))
+                                              ,width: 984
+                                              ,x: -10 + _v0._0
+                                              ,y: _v0._1}
+                                 ,clickable: clickable
+                                 ,elapsedTime: 0
+                                 ,lettersPerSecond: 15
+                                 ,name: name
+                                 ,nameStyle: {_: {}
+                                             ,bold: true
+                                             ,color: $Color.black
+                                             ,height: $Maybe.Just(20)
+                                             ,italic: false
+                                             ,line: $Maybe.Nothing
+                                             ,typeface: _L.fromArray(["Helvetica"
+                                                                     ,"Arial"
+                                                                     ,"sans serif"])}
+                                 ,nameX: -380 + _v0._0
+                                 ,nameY: 50 + _v0._1
+                                 ,portrait: {_: {}
+                                            ,height: 100
+                                            ,imageName: A2($Basics._op["++"],
+                                            "img/",
+                                            A2($Basics._op["++"],
+                                            name,
+                                            ".png"))
+                                            ,width: 100
+                                            ,x: -442 + _v0._0
+                                            ,y: -7 + _v0._1}
+                                 ,text: text
+                                 ,textStyle: {_: {}
+                                             ,bold: false
+                                             ,color: $Color.black
+                                             ,height: $Maybe.Just(18)
+                                             ,italic: false
+                                             ,line: $Maybe.Nothing
+                                             ,typeface: _L.fromArray(["Helvetica"
+                                                                     ,"Arial"
+                                                                     ,"sans serif"])}
+                                 ,textX: -378 + _v0._0
+                                 ,textY: 23 + _v0._1};}
+         _U.badCase($moduleName,
+         "between lines 9 and 51");
+      }();
+   });
+   _elm.TextboxGen.values = {_op: _op
+                            ,genTextbox: genTextbox};
+   return _elm.TextboxGen.values;
+};

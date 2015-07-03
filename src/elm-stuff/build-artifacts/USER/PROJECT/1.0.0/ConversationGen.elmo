@@ -1,0 +1,66 @@
+Elm.ConversationGen = Elm.ConversationGen || {};
+Elm.ConversationGen.make = function (_elm) {
+   "use strict";
+   _elm.ConversationGen = _elm.ConversationGen || {};
+   if (_elm.ConversationGen.values)
+   return _elm.ConversationGen.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "ConversationGen",
+   $Basics = Elm.Basics.make(_elm),
+   $Conversation = Elm.Conversation.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $ParseConversation = Elm.ParseConversation.make(_elm),
+   $Result = Elm.Result.make(_elm);
+   var testConversation = "\n    {\n        \"start\": {\n            \"name\": \"Ava\",\n            \"text\": [\n                \"Test\"\n            ],\n            \"children\": []\n        }\n    }\n    ";
+   var starter = "start";
+   var genConversation = function (conversationString) {
+      return function () {
+         var startName = function (node) {
+            return function () {
+               switch (node.ctor)
+               {case "Talking":
+                  return $Maybe.Just(node._0.name);}
+               return $Maybe.Nothing;
+            }();
+         };
+         var conversationGraph = function (result) {
+            return function () {
+               switch (result.ctor)
+               {case "Err":
+                  return A2($Debug.log,
+                    result._0,
+                    $Dict.empty);
+                  case "Ok": return result._0;}
+               _U.badCase($moduleName,
+               "between lines 35 and 38");
+            }();
+         }(A2($Json$Decode.decodeString,
+         $ParseConversation.conversation,
+         conversationString));
+         var starterNode = $Conversation.Talking({_: {}
+                                                 ,children: _L.fromArray([starter])
+                                                 ,name: $Maybe.withDefault("")(A2($Maybe.andThen,
+                                                 A2($Dict.get,
+                                                 starter,
+                                                 conversationGraph),
+                                                 startName))
+                                                 ,text: _L.fromArray([])});
+         return {_: {}
+                ,current: "starter"
+                ,graph: A2($Dict.insert,
+                "starter",
+                starterNode)(conversationGraph)};
+      }();
+   };
+   _elm.ConversationGen.values = {_op: _op
+                                 ,starter: starter
+                                 ,testConversation: testConversation
+                                 ,genConversation: genConversation};
+   return _elm.ConversationGen.values;
+};

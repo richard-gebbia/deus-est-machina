@@ -1,0 +1,114 @@
+Elm.PortraitBox = Elm.PortraitBox || {};
+Elm.PortraitBox.make = function (_elm) {
+   "use strict";
+   _elm.PortraitBox = _elm.PortraitBox || {};
+   if (_elm.PortraitBox.values)
+   return _elm.PortraitBox.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "PortraitBox",
+   $Basics = Elm.Basics.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Portrait = Elm.Portrait.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Sprite = Elm.Sprite.make(_elm);
+   var OnPortraitClick = function (a) {
+      return {ctor: "OnPortraitClick"
+             ,_0: a};
+   };
+   var view = F2(function (address,
+   model) {
+      return function () {
+         var viewPortrait = function (model) {
+            return A2($Portrait.view,
+            A2($Signal.forwardTo,
+            address,
+            $Basics.always(OnPortraitClick(model.name))),
+            model);
+         };
+         var portraits = $List.concat(A2($List.map,
+         viewPortrait,
+         model.portraits));
+         var bgSprite = $Sprite.draw(model.background);
+         return A2($List._op["::"],
+         bgSprite,
+         portraits);
+      }();
+   });
+   var update = F2(function (action,
+   model) {
+      return function () {
+         var quiet = $Portrait.update($Portrait.Quiet);
+         var actions = function (names) {
+            return A2($List.repeat,
+            $List.length(model.portraits),
+            A2($Portrait.SetResponse,
+            names,
+            model.previous));
+         };
+         return function () {
+            switch (action.ctor)
+            {case "LetThemSpeak":
+               return _U.replace([["portraits"
+                                  ,A2($List.map,
+                                  quiet,
+                                  model.portraits)]
+                                 ,["previous",action._0]],
+                 model);
+               case "SetResponders":
+               return _U.replace([["portraits"
+                                  ,A3($List.map2,
+                                  $Portrait.update,
+                                  actions(action._0),
+                                  model.portraits)]],
+                 model);
+               case "ThePlayerIsSpeaking":
+               return _U.replace([["portraits"
+                                  ,A2($List.map,
+                                  quiet,
+                                  model.portraits)]
+                                 ,["previous",""]],
+                 model);}
+            _U.badCase($moduleName,
+            "between lines 42 and 59");
+         }();
+      }();
+   });
+   var ThePlayerIsSpeaking = {ctor: "ThePlayerIsSpeaking"};
+   var LetThemSpeak = function (a) {
+      return {ctor: "LetThemSpeak"
+             ,_0: a};
+   };
+   var SetResponders = function (a) {
+      return {ctor: "SetResponders"
+             ,_0: a};
+   };
+   var names = function (model) {
+      return A2($List.map,
+      function (_) {
+         return _.name;
+      },
+      model.portraits);
+   };
+   var Model = F3(function (a,
+   b,
+   c) {
+      return {_: {}
+             ,background: a
+             ,portraits: b
+             ,previous: c};
+   });
+   _elm.PortraitBox.values = {_op: _op
+                             ,Model: Model
+                             ,names: names
+                             ,SetResponders: SetResponders
+                             ,LetThemSpeak: LetThemSpeak
+                             ,ThePlayerIsSpeaking: ThePlayerIsSpeaking
+                             ,update: update
+                             ,view: view
+                             ,OnPortraitClick: OnPortraitClick};
+   return _elm.PortraitBox.values;
+};

@@ -1,0 +1,64 @@
+Elm.PortraitGen = Elm.PortraitGen || {};
+Elm.PortraitGen.make = function (_elm) {
+   "use strict";
+   _elm.PortraitGen = _elm.PortraitGen || {};
+   if (_elm.PortraitGen.values)
+   return _elm.PortraitGen.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "PortraitGen",
+   $Basics = Elm.Basics.make(_elm),
+   $InterjectionGen = Elm.InterjectionGen.make(_elm),
+   $Portrait = Elm.Portrait.make(_elm),
+   $Sprite = Elm.Sprite.make(_elm);
+   var model = F3(function (x,
+   y,
+   name) {
+      return function () {
+         var imgPath = A2($Basics._op["++"],
+         "img/",
+         A2($Basics._op["++"],
+         name,
+         "Portrait.png"));
+         return A3($Portrait.Model,
+         name,
+         A2($InterjectionGen.defaultInterjection,
+         x + 32,
+         y + 40),
+         A5($Sprite.Sprite,
+         x,
+         y,
+         155,
+         155,
+         imgPath));
+      }();
+   });
+   var sophie = F2(function (x,y) {
+      return A3(model,
+      x,
+      y,
+      "Sophie");
+   });
+   var gavin = F2(function (x,y) {
+      return A3(model,x,y,"Gavin");
+   });
+   var ava = F2(function (x,y) {
+      return A3(model,x,y,"Ava");
+   });
+   var sebastian = F2(function (x,
+   y) {
+      return A3(model,
+      x,
+      y,
+      "Sebastian");
+   });
+   _elm.PortraitGen.values = {_op: _op
+                             ,model: model
+                             ,sophie: sophie
+                             ,gavin: gavin
+                             ,ava: ava
+                             ,sebastian: sebastian};
+   return _elm.PortraitGen.values;
+};

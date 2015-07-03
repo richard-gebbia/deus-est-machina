@@ -1,0 +1,366 @@
+Elm.Conversation = Elm.Conversation || {};
+Elm.Conversation.make = function (_elm) {
+   "use strict";
+   _elm.Conversation = _elm.Conversation || {};
+   if (_elm.Conversation.values)
+   return _elm.Conversation.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Conversation",
+   $Basics = Elm.Basics.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm);
+   var questionText = function (questions) {
+      return A2($List.map,
+      function (_) {
+         return _.text;
+      },
+      questions);
+   };
+   var withoutChildren = function (speech) {
+      return _U.remove("children",
+      speech);
+   };
+   var isQuestion = function (node) {
+      return function () {
+         switch (node.ctor)
+         {case "Asking": return true;}
+         return false;
+      }();
+   };
+   var isSpeech = function (node) {
+      return function () {
+         switch (node.ctor)
+         {case "Talking": return true;}
+         return false;
+      }();
+   };
+   var justNode = F2(function (pred,
+   node) {
+      return pred(node) ? $Maybe.Just(node) : $Maybe.Nothing;
+   });
+   var maybeEvery = function (ms) {
+      return function () {
+         var allValid = F2(function (m,
+         mlist) {
+            return function () {
+               var _v4 = {ctor: "_Tuple2"
+                         ,_0: m
+                         ,_1: mlist};
+               switch (_v4.ctor)
+               {case "_Tuple2":
+                  switch (_v4._0.ctor)
+                    {case "Just":
+                       switch (_v4._1.ctor)
+                         {case "Just":
+                            return $Maybe.Just(A2($List._op["::"],
+                              _v4._0._0,
+                              _v4._1._0));}
+                         break;}
+                    break;}
+               return $Maybe.Nothing;
+            }();
+         });
+         return A3($List.foldr,
+         allValid,
+         $Maybe.Just(_L.fromArray([])),
+         ms);
+      }();
+   };
+   var maybeAnd = function (m) {
+      return function () {
+         switch (m.ctor)
+         {case "_Tuple2":
+            switch (m._0.ctor)
+              {case "Just": switch (m._1.ctor)
+                   {case "Just":
+                      return $Maybe.Just({ctor: "_Tuple2"
+                                         ,_0: m._0._0
+                                         ,_1: m._1._0});}
+                   break;}
+              break;}
+         return $Maybe.Nothing;
+      }();
+   };
+   _op[">>="] = F2(function (m,f) {
+      return A2($Maybe.andThen,
+      m,
+      f);
+   });
+   _op["|?>"] = F2(function (m,f) {
+      return A2($Maybe.map,f,m);
+   });
+   var asSpeech = function (conversation) {
+      return A2(_op["|?>"],
+      A2(_op[">>="],
+      A2($Dict.get,
+      conversation.current,
+      conversation.graph),
+      justNode(isSpeech)),
+      function (_v14) {
+         return function () {
+            switch (_v14.ctor)
+            {case "Talking":
+               return _v14._0;}
+            _U.badCase($moduleName,
+            "on line 103, column 30 to 36");
+         }();
+      });
+   };
+   var asQuestions = function (conversation) {
+      return A2(_op["|?>"],
+      A2(_op[">>="],
+      A2($Dict.get,
+      conversation.current,
+      conversation.graph),
+      justNode(isQuestion)),
+      function (_v17) {
+         return function () {
+            switch (_v17.ctor)
+            {case "Asking": return _v17._0;}
+            _U.badCase($moduleName,
+            "on line 114, column 32 to 41");
+         }();
+      });
+   };
+   var speakerChildren = function (conversation) {
+      return A2(_op["|?>"],
+      asSpeech(conversation),
+      function (speech) {
+         return speech.children;
+      });
+   };
+   var getNameFromKey = F2(function (conversation,
+   key) {
+      return $Maybe.withDefault($Maybe.Nothing)(A2(_op["|?>"],
+      A2(_op[">>="],
+      A2($Dict.get,
+      key,
+      conversation.graph),
+      justNode(isSpeech)),
+      function (_v20) {
+         return function () {
+            switch (_v20.ctor)
+            {case "Talking":
+               return $Maybe.Just(_v20._0.name);}
+            _U.badCase($moduleName,
+            "on line 138, column 29 to 43");
+         }();
+      }));
+   });
+   var doesChildHaveRequestedName = F3(function (conversation,
+   name,
+   key) {
+      return $Maybe.withDefault(false)(A2(_op["|?>"],
+      A2(_op[">>="],
+      A2($Dict.get,
+      key,
+      conversation.graph),
+      justNode(isSpeech)),
+      function (_v23) {
+         return function () {
+            switch (_v23.ctor)
+            {case "Talking":
+               return _U.eq(_v23._0.name,
+                 name);}
+            _U.badCase($moduleName,
+            "on line 146, column 29 to 46");
+         }();
+      }));
+   });
+   var chooseSpeaker = F2(function (name,
+   conversation) {
+      return maybeAnd(function (conv) {
+         return {ctor: "_Tuple2"
+                ,_0: conv
+                ,_1: A2(_op["|?>"],
+                A2(_op[">>="],conv,asSpeech),
+                withoutChildren)};
+      }(A2(_op["|?>"],
+      A2(_op[">>="],
+      A2(_op["|?>"],
+      speakerChildren(conversation),
+      $List.filter(A2(doesChildHaveRequestedName,
+      conversation,
+      name))),
+      $List.head),
+      function (key) {
+         return _U.replace([["current"
+                            ,key]],
+         conversation);
+      })));
+   });
+   var areQuestionsComingUp = function (conversation) {
+      return $Maybe.withDefault(false)(A2(_op["|?>"],
+      A2(_op[">>="],
+      A2(_op[">>="],
+      speakerChildren(conversation),
+      $List.head),
+      function (key) {
+         return A2($Dict.get,
+         key,
+         conversation.graph);
+      }),
+      isQuestion));
+   };
+   var getResponderNames = function (conversation) {
+      return $Maybe.withDefault($Maybe.Nothing)(A2(_op["|?>"],
+      A2(_op["|?>"],
+      speakerChildren(conversation),
+      $List.map(getNameFromKey(conversation))),
+      maybeEvery));
+   };
+   var getQuestions = function (conversation) {
+      return maybeAnd(function (conv) {
+         return {ctor: "_Tuple2"
+                ,_0: conv
+                ,_1: A2(_op["|?>"],
+                A2(_op[">>="],conv,asQuestions),
+                questionText)};
+      }(A2(_op["|?>"],
+      A2(_op[">>="],
+      speakerChildren(conversation),
+      $List.head),
+      function (key) {
+         return _U.replace([["current"
+                            ,key]],
+         conversation);
+      })));
+   };
+   _op["!!"] = F2(function (list,
+   index) {
+      return $List.head(A2($List.drop,
+      index,
+      list));
+   });
+   var questionChildren = F2(function (index,
+   questions) {
+      return A2(_op["|?>"],
+      A2(_op["!!"],questions,index),
+      function (_) {
+         return _.children;
+      });
+   });
+   var chooseQuestionResponder = F3(function (index,
+   name,
+   conversation) {
+      return maybeAnd(function (conv) {
+         return {ctor: "_Tuple2"
+                ,_0: conv
+                ,_1: A2(_op["|?>"],
+                A2(_op[">>="],conv,asSpeech),
+                withoutChildren)};
+      }(A2(_op["|?>"],
+      A2(_op[">>="],
+      A2(_op["|?>"],
+      A2(_op[">>="],
+      asQuestions(conversation),
+      questionChildren(index)),
+      $List.filter(A2(doesChildHaveRequestedName,
+      conversation,
+      name))),
+      $List.head),
+      function (key) {
+         return _U.replace([["current"
+                            ,key]],
+         conversation);
+      })));
+   });
+   var chooseQuestion = F2(function (index,
+   conversation) {
+      return A2(_op[">>="],
+      A2(_op["|?>"],
+      A2(_op["|?>"],
+      A2(_op[">>="],
+      asQuestions(conversation),
+      function (questions) {
+         return A2(_op["!!"],
+         questions,
+         index);
+      }),
+      function (_) {
+         return _.children;
+      }),
+      $List.map(getNameFromKey(conversation))),
+      maybeEvery);
+   });
+   var getQuestionText = F2(function (index,
+   conversation) {
+      return A2(_op["|?>"],
+      A2(_op[">>="],
+      asQuestions(conversation),
+      function (questions) {
+         return A2(_op["!!"],
+         questions,
+         index);
+      }),
+      function (_) {
+         return _.text;
+      });
+   });
+   var Conversation = F2(function (a,
+   b) {
+      return {_: {}
+             ,current: b
+             ,graph: a};
+   });
+   var Asking = function (a) {
+      return {ctor: "Asking"
+             ,_0: a};
+   };
+   var Talking = function (a) {
+      return {ctor: "Talking"
+             ,_0: a};
+   };
+   var Question = F2(function (a,
+   b) {
+      return {_: {}
+             ,children: b
+             ,text: a};
+   });
+   var SpeechInfo = F2(function (a,
+   b) {
+      return {_: {}
+             ,name: a
+             ,text: b};
+   });
+   var Speech = F3(function (a,
+   b,
+   c) {
+      return {_: {}
+             ,children: c
+             ,name: a
+             ,text: b};
+   });
+   _elm.Conversation.values = {_op: _op
+                              ,Speech: Speech
+                              ,SpeechInfo: SpeechInfo
+                              ,Question: Question
+                              ,Talking: Talking
+                              ,Asking: Asking
+                              ,Conversation: Conversation
+                              ,maybeAnd: maybeAnd
+                              ,maybeEvery: maybeEvery
+                              ,justNode: justNode
+                              ,isSpeech: isSpeech
+                              ,isQuestion: isQuestion
+                              ,asSpeech: asSpeech
+                              ,withoutChildren: withoutChildren
+                              ,asQuestions: asQuestions
+                              ,speakerChildren: speakerChildren
+                              ,questionText: questionText
+                              ,questionChildren: questionChildren
+                              ,getNameFromKey: getNameFromKey
+                              ,doesChildHaveRequestedName: doesChildHaveRequestedName
+                              ,chooseSpeaker: chooseSpeaker
+                              ,areQuestionsComingUp: areQuestionsComingUp
+                              ,getResponderNames: getResponderNames
+                              ,getQuestions: getQuestions
+                              ,chooseQuestion: chooseQuestion
+                              ,getQuestionText: getQuestionText
+                              ,chooseQuestionResponder: chooseQuestionResponder};
+   return _elm.Conversation.values;
+};

@@ -1,0 +1,236 @@
+Elm.TextboxList = Elm.TextboxList || {};
+Elm.TextboxList.make = function (_elm) {
+   "use strict";
+   _elm.TextboxList = _elm.TextboxList || {};
+   if (_elm.TextboxList.values)
+   return _elm.TextboxList.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "TextboxList",
+   $Basics = Elm.Basics.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $MoveByAnimation = Elm.MoveByAnimation.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Textbox = Elm.Textbox.make(_elm);
+   var nullMailbox = $Signal.mailbox({ctor: "_Tuple0"});
+   var view = function (model) {
+      return function () {
+         var address = nullMailbox.address;
+         return model.hidden ? _L.fromArray([]) : A2($List.concatMap,
+         $Textbox.view(A2($Signal.forwardTo,
+         address,
+         $Basics.always({ctor: "_Tuple0"}))),
+         model.textboxes);
+      }();
+   };
+   var moveTextboxes = F2(function (dt,
+   model) {
+      return function () {
+         var updatedAnim = A2($MoveByAnimation.update,
+         model.animation,
+         dt);
+         var moveBy = $Textbox.MoveBy($MoveByAnimation.moveByFrame(updatedAnim));
+         return {ctor: "_Tuple2"
+                ,_0: _U.replace([["animation"
+                                 ,updatedAnim]
+                                ,["textboxes"
+                                 ,A2($List.map,
+                                 function ($) {
+                                    return $Basics.fst($Textbox.update(moveBy)($));
+                                 },
+                                 model.textboxes)]],
+                model)
+                ,_1: $Maybe.Nothing};
+      }();
+   });
+   var addFullTextbox = F3(function (name,
+   text,
+   model) {
+      return {ctor: "_Tuple2"
+             ,_0: _U.replace([["animation"
+                              ,$MoveByAnimation.reset(model.animation)]
+                             ,["textboxes"
+                              ,$Maybe.withDefault(model.textboxes)($Maybe.map(function (tb) {
+                                 return A2($List._op["::"],
+                                 tb,
+                                 model.textboxes);
+                              })($Maybe.map(function (tb) {
+                                 return $Basics.fst(A2($Textbox.update,
+                                 $Textbox.Finish,
+                                 tb));
+                              })($Maybe.map(function (frame) {
+                                 return A2(frame,
+                                 text,
+                                 model.enterPosition);
+                              })(A2($Dict.get,
+                              name,
+                              model.textboxFrames)))))]],
+             model)
+             ,_1: $Maybe.Nothing};
+   });
+   var addTextbox = F3(function (name,
+   text,
+   model) {
+      return {ctor: "_Tuple2"
+             ,_0: _U.replace([["animation"
+                              ,$MoveByAnimation.reset(model.animation)]
+                             ,["textboxes"
+                              ,$Maybe.withDefault(model.textboxes)($Maybe.map(function (tb) {
+                                 return A2($List._op["::"],
+                                 tb,
+                                 model.textboxes);
+                              })($Maybe.map(function (frame) {
+                                 return A2(frame,
+                                 text,
+                                 model.enterPosition);
+                              })(A2($Dict.get,
+                              name,
+                              model.textboxFrames))))]],
+             model)
+             ,_1: $Maybe.Nothing};
+   });
+   var maybeGuard = F2(function (b,
+   m) {
+      return b ? $Maybe.Just(m) : $Maybe.Nothing;
+   });
+   var ReadyForNewTextboxes = {ctor: "ReadyForNewTextboxes"};
+   var bubbleTextboxRequest = function (request) {
+      return function () {
+         switch (request.ctor)
+         {case "Just":
+            switch (request._0.ctor)
+              {case "FinishedShowingText":
+                 return $Maybe.Just(ReadyForNewTextboxes);}
+              break;}
+         return $Maybe.Nothing;
+      }();
+   };
+   var onUpdateTextbox = F2(function (model,
+   _v2) {
+      return function () {
+         switch (_v2.ctor)
+         {case "_Tuple2":
+            return {ctor: "_Tuple2"
+                   ,_0: _U.replace([["textboxes"
+                                    ,A2($List._op["::"],
+                                    _v2._0,
+                                    A2($List.drop,
+                                    1,
+                                    model.textboxes))]],
+                   model)
+                   ,_1: bubbleTextboxRequest(_v2._1)};}
+         _U.badCase($moduleName,
+         "between lines 92 and 95");
+      }();
+   });
+   var finishCurrentTextbox = function (model) {
+      return $Maybe.withDefault({ctor: "_Tuple2"
+                                ,_0: model
+                                ,_1: $Maybe.Nothing})($Maybe.map(onUpdateTextbox(model))($Maybe.map($Textbox.update($Textbox.Finish))(A2($Maybe.andThen,
+      $List.head(model.textboxes),
+      maybeGuard($MoveByAnimation.isComplete(model.animation))))));
+   };
+   var tick = F2(function (dt,
+   model) {
+      return $Maybe.withDefault(A2(moveTextboxes,
+      dt,
+      model))($Maybe.map(onUpdateTextbox(model))($Maybe.map($Textbox.update($Textbox.Tick(dt)))(A2($Maybe.andThen,
+      $List.head(model.textboxes),
+      maybeGuard($MoveByAnimation.isComplete(model.animation))))));
+   });
+   var update = F2(function (action,
+   model) {
+      return function () {
+         switch (action.ctor)
+         {case "AddFullTextbox":
+            return A3(addFullTextbox,
+              action._0,
+              action._1,
+              model);
+            case "AddTextbox":
+            return A3(addTextbox,
+              action._0,
+              action._1,
+              model);
+            case "FinishCurrentTextbox":
+            return finishCurrentTextbox(model);
+            case "Hide":
+            return {ctor: "_Tuple2"
+                   ,_0: _U.replace([["hidden"
+                                    ,true]],
+                   model)
+                   ,_1: $Maybe.Nothing};
+            case "Show":
+            return {ctor: "_Tuple2"
+                   ,_0: _U.replace([["hidden"
+                                    ,false]],
+                   model)
+                   ,_1: $Maybe.Nothing};
+            case "Tick": return A2(tick,
+              action._0,
+              model);}
+         _U.badCase($moduleName,
+         "between lines 133 and 151");
+      }();
+   });
+   var Tick = function (a) {
+      return {ctor: "Tick",_0: a};
+   };
+   var Show = {ctor: "Show"};
+   var Hide = {ctor: "Hide"};
+   var FinishCurrentTextbox = {ctor: "FinishCurrentTextbox"};
+   var AddFullTextbox = F2(function (a,
+   b) {
+      return {ctor: "AddFullTextbox"
+             ,_0: a
+             ,_1: b};
+   });
+   var AddTextbox = F2(function (a,
+   b) {
+      return {ctor: "AddTextbox"
+             ,_0: a
+             ,_1: b};
+   });
+   var isReadyForNewTextboxes = function (model) {
+      return $Maybe.withDefault(true)($Maybe.map($Textbox.isFinished)($List.head(model.textboxes)));
+   };
+   var Model = F5(function (a,
+   b,
+   c,
+   d,
+   e) {
+      return {_: {}
+             ,animation: b
+             ,enterPosition: c
+             ,hidden: e
+             ,textboxFrames: d
+             ,textboxes: a};
+   });
+   _elm.TextboxList.values = {_op: _op
+                             ,Model: Model
+                             ,isReadyForNewTextboxes: isReadyForNewTextboxes
+                             ,AddTextbox: AddTextbox
+                             ,AddFullTextbox: AddFullTextbox
+                             ,FinishCurrentTextbox: FinishCurrentTextbox
+                             ,Hide: Hide
+                             ,Show: Show
+                             ,Tick: Tick
+                             ,ReadyForNewTextboxes: ReadyForNewTextboxes
+                             ,maybeGuard: maybeGuard
+                             ,bubbleTextboxRequest: bubbleTextboxRequest
+                             ,addTextbox: addTextbox
+                             ,addFullTextbox: addFullTextbox
+                             ,onUpdateTextbox: onUpdateTextbox
+                             ,finishCurrentTextbox: finishCurrentTextbox
+                             ,moveTextboxes: moveTextboxes
+                             ,tick: tick
+                             ,update: update
+                             ,view: view
+                             ,nullMailbox: nullMailbox};
+   return _elm.TextboxList.values;
+};

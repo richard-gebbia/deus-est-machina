@@ -1,0 +1,28 @@
+Elm.QuestionListGen = Elm.QuestionListGen || {};
+Elm.QuestionListGen.make = function (_elm) {
+   "use strict";
+   _elm.QuestionListGen = _elm.QuestionListGen || {};
+   if (_elm.QuestionListGen.values)
+   return _elm.QuestionListGen.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "QuestionListGen",
+   $QuestionList = Elm.QuestionList.make(_elm),
+   $TextboxGen = Elm.TextboxGen.make(_elm);
+   var genQuestionList = {_: {}
+                         ,firstQuestionPosition: {ctor: "_Tuple2"
+                                                 ,_0: 10
+                                                 ,_1: 320}
+                         ,questionFrame: A2($TextboxGen.genTextbox,
+                         "Question",
+                         true)
+                         ,questionStride: {ctor: "_Tuple2"
+                                          ,_0: 0
+                                          ,_1: -140}
+                         ,questions: _L.fromArray([])};
+   _elm.QuestionListGen.values = {_op: _op
+                                 ,genQuestionList: genQuestionList};
+   return _elm.QuestionListGen.values;
+};
