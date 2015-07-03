@@ -31,9 +31,17 @@
 </head>
 <body>
     <div id="elmDiv" style="margin-left:auto;margin-right:auto;width:1024px"></div>
+    <script src="src/conversation.js"></script>
     <script src="src/elm.js"></script>
     <script>
-        Elm.embed(Elm.DeusEstMachina, document.getElementById('elmDiv'));
+        var conversationJson = JSON.stringify(conversation);
+        var deusEstMachina = 
+            Elm.embed(Elm.DeusEstMachina, document.getElementById('elmDiv'), {
+                conversationText: conversationJson
+            });
+
+        deusEstMachina.ports.conversationText.send(conversationJson);
+
     </script>
 </body>
 </html>

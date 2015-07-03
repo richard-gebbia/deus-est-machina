@@ -42,6 +42,7 @@ type Action
     | ChooseSpeaker String
     | ChooseQuestion Int
     | Tick Float
+    | NewConversation Conversation
 
 
 -- Update
@@ -218,11 +219,16 @@ waitingForQuestionResponse index action model =
 
 update : Action -> Model -> Model
 update action model =
-    (unwrap model).gameStateUpdate action model
+    case action of
+        NewConversation conversation -> 
+            initModel conversation
+
+        _ ->
+            (unwrap model).gameStateUpdate action model
 
 
 -- View
-{--}
+
 view : Signal.Address Action -> Model -> List Collage.Form
 view address model = 
     let pbEventToAction (PortraitBox.OnPortraitClick name) =
@@ -248,14 +254,14 @@ signals =
     (actions.signal ::
     [
         (always Click) <~ Mouse.clicks,
-        (Time.inSeconds >> Tick) <~ Time.fps 60
+        (Time.inSeconds >> Tick) <~ Time.fps 60,
+        (ConversationGen.genConversation >> NewConversation) <~ conversationText
     ])
 
 
-initModel : Model 
-initModel =
-    let conversation = ConversationGen.genConversation
-        portraitBox = PortraitBoxGen.genPortraitBox 0 -300
+initModel : Conversation -> Model 
+initModel conversation =
+    let portraitBox = PortraitBoxGen.genPortraitBox 0 -300
     in
     Model
     {
@@ -275,7 +281,13 @@ initModel =
 
 main : Signal Element
 main =
-    Signal.foldp update initModel signals
+    let model =
+        ConversationGen.genConversation ConversationGen.testConversation
+        |> initModel
+    in
+    Signal.foldp update model signals
     |> Signal.map (view actions.address)
-    |> Signal.map (Collage.collage 1024 768) 
---}
+    |> Signal.map (Collage.collage 1024 768)
+
+
+port conversationText : Signal String
