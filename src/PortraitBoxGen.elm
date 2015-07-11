@@ -7,13 +7,12 @@ import Sprite exposing (Sprite)
 genPortraitBox : Float -> Float -> PortraitBox.Model
 genPortraitBox x y =
     {
-        background = (Sprite x y 1024 168 "img/PortraitHolder.png"),
         portraits =
             [
-                PortraitGen.sophie      (x - 384.5) y,
-                PortraitGen.gavin       (x - 131.5) y,
-                PortraitGen.ava         (x + 131.5) y,
-                PortraitGen.sebastian   (x + 384.5) y
+                PortraitGen.sophie      (x - 240) y,
+                PortraitGen.gavin       (x - 82) y,
+                PortraitGen.ava         (x + 82) y,
+                PortraitGen.sebastian   (x + 240) y
             ],
         previous = ""
     }

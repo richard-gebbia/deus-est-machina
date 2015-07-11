@@ -7,7 +7,7 @@ genQuestionList : QuestionList.Model
 genQuestionList =
     {
         questions = [],
-        firstQuestionPosition = (10, 320),
-        questionStride = (0, -140),
+        firstQuestionPosition = (0, 200),
+        questionStride = (0, -87),
         questionFrame = TextboxGen.genTextbox "Question" True
     }

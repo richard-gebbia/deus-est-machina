@@ -1310,16 +1310,12 @@ Elm.DeusEstMachina.make = function (_elm) {
    $TextboxList = Elm.TextboxList.make(_elm),
    $TextboxListGen = Elm.TextboxListGen.make(_elm),
    $Time = Elm.Time.make(_elm);
-   var conversationText = Elm.Native.Port.make(_elm).inboundSignal("conversationText",
+   var conversationText = Elm.Native.Port.make(_elm).inbound("conversationText",
    "String",
    function (v) {
       return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",
       v);
    });
-   var NewConversation = function (a) {
-      return {ctor: "NewConversation"
-             ,_0: a};
-   };
    var Tick = function (a) {
       return {ctor: "Tick",_0: a};
    };
@@ -1342,12 +1338,7 @@ Elm.DeusEstMachina.make = function (_elm) {
                 function ($) {
                    return Tick($Time.inSeconds($));
                 },
-                $Time.fps(60))
-                ,A2($Signal._op["<~"],
-                function ($) {
-                   return NewConversation($ConversationGen.genConversation($));
-                },
-                conversationText)])));
+                $Time.fps(60))])));
    var unwrap = function (_v0) {
       return function () {
          switch (_v0.ctor)
@@ -1356,6 +1347,12 @@ Elm.DeusEstMachina.make = function (_elm) {
          "on line 35, column 23 to 27");
       }();
    };
+   var update = F2(function (action,
+   model) {
+      return A2(unwrap(model).gameStateUpdate,
+      action,
+      model);
+   });
    var view = F2(function (address,
    model) {
       return function () {
@@ -1365,7 +1362,7 @@ Elm.DeusEstMachina.make = function (_elm) {
                {case "ChooseQuestion":
                   return ChooseQuestion(_v3._0);}
                _U.badCase($moduleName,
-               "on line 238, column 13 to 36");
+               "on line 232, column 13 to 36");
             }();
          };
          var pbEventToAction = function (_v6) {
@@ -1374,7 +1371,7 @@ Elm.DeusEstMachina.make = function (_elm) {
                {case "OnPortraitClick":
                   return ChooseSpeaker(_v6._0);}
                _U.badCase($moduleName,
-               "on line 235, column 13 to 31");
+               "on line 229, column 13 to 31");
             }();
          };
          return A2($Basics._op["++"],
@@ -1442,7 +1439,7 @@ Elm.DeusEstMachina.make = function (_elm) {
                                ,waitingForTextboxToFinish]],
               modelData);}
          _U.badCase($moduleName,
-         "between lines 52 and 63");
+         "between lines 51 and 62");
       }();
    });
    var waitingForTextboxToFinish = F2(function (action,
@@ -1483,7 +1480,7 @@ Elm.DeusEstMachina.make = function (_elm) {
                           modelData);
                        }();}
                   _U.badCase($moduleName,
-                  "between lines 110 and 118");
+                  "between lines 109 and 117");
                }();
             }(A2($TextboxList.update,
             $TextboxList.Tick(dt),
@@ -1537,7 +1534,7 @@ Elm.DeusEstMachina.make = function (_elm) {
                                      ,showingQuestions]],
                     modelData);}
                _U.badCase($moduleName,
-               "between lines 135 and 145");
+               "between lines 134 and 144");
             }();
          };
          return function () {
@@ -1577,7 +1574,7 @@ Elm.DeusEstMachina.make = function (_elm) {
                                      ,waitingForQuestionResponse(index)]],
                     modelData);}
                _U.badCase($moduleName,
-               "between lines 164 and 177");
+               "between lines 163 and 176");
             }();
          });
          return function () {
@@ -1595,7 +1592,7 @@ Elm.DeusEstMachina.make = function (_elm) {
                                  _L.fromArray([]),
                                  _v37._1)};}
                        _U.badCase($moduleName,
-                       "on line 190, column 22 to 80");
+                       "on line 189, column 22 to 80");
                     }();
                  }(function (names) {
                     return {ctor: "_Tuple2"
@@ -1610,40 +1607,25 @@ Elm.DeusEstMachina.make = function (_elm) {
          }();
       }();
    });
-   var initModel = function (conversation) {
-      return function () {
-         var portraitBox = A2($PortraitBoxGen.genPortraitBox,
-         0,
-         -300);
-         return Model({_: {}
-                      ,conversation: conversation
-                      ,gameStateUpdate: choosingSpeaker
-                      ,portraitBox: $PortraitBox.update($PortraitBox.SetResponders($Maybe.withDefault(_L.fromArray([]))($Conversation.getResponderNames(conversation))))(portraitBox)
-                      ,previous: $Maybe.Nothing
-                      ,questionList: $QuestionListGen.genQuestionList
-                      ,textboxList: $TextboxListGen.genTextboxList});
-      }();
-   };
-   var update = F2(function (action,
-   model) {
-      return function () {
-         switch (action.ctor)
-         {case "NewConversation":
-            return initModel(action._0);}
-         return A2(unwrap(model).gameStateUpdate,
-         action,
-         model);
-      }();
-   });
-   var main = function () {
-      var model = initModel($ConversationGen.genConversation($ConversationGen.testConversation));
-      return $Signal.map(A2($Graphics$Collage.collage,
-      1024,
-      768))($Signal.map(view(actions.address))(A3($Signal.foldp,
-      update,
-      model,
-      signals)));
+   var initModel = function () {
+      var conversation = $ConversationGen.genConversation(conversationText);
+      var portraitBox = A2($PortraitBoxGen.genPortraitBox,
+      0,
+      -187);
+      return Model({_: {}
+                   ,conversation: conversation
+                   ,gameStateUpdate: choosingSpeaker
+                   ,portraitBox: $PortraitBox.update($PortraitBox.SetResponders($Maybe.withDefault(_L.fromArray([]))($Conversation.getResponderNames(conversation))))(portraitBox)
+                   ,previous: $Maybe.Nothing
+                   ,questionList: $QuestionListGen.genQuestionList
+                   ,textboxList: $TextboxListGen.genTextboxList});
    }();
+   var main = $Signal.map(A2($Graphics$Collage.collage,
+   640,
+   480))($Signal.map(view(actions.address))(A3($Signal.foldp,
+   update,
+   initModel,
+   signals)));
    var ModelData = F6(function (a,
    b,
    c,
@@ -1666,7 +1648,6 @@ Elm.DeusEstMachina.make = function (_elm) {
                                 ,ChooseSpeaker: ChooseSpeaker
                                 ,ChooseQuestion: ChooseQuestion
                                 ,Tick: Tick
-                                ,NewConversation: NewConversation
                                 ,advance: advance
                                 ,choosingSpeaker: choosingSpeaker
                                 ,waitingForTextboxToFinish: waitingForTextboxToFinish
@@ -3696,11 +3677,11 @@ Elm.InterjectionGen.make = function (_elm) {
       return A7($Interjection.Model,
       x,
       y,
-      62,
-      45,
+      40,
+      29,
       $Interjection.Quiet,
-      "img/exclamation.png",
-      "img/dotdotdot.png");
+      "img/Exclamation.png",
+      "img/Ellipsis.png");
    });
    _elm.InterjectionGen.values = {_op: _op
                                  ,defaultInterjection: defaultInterjection};
@@ -11479,14 +11460,15 @@ Elm.Portrait.make = function (_elm) {
             var _v0 = model.interjection.interjection;
             switch (_v0.ctor)
             {case "Quiet":
-               return $Sprite.draw(model.sprite);}
+               return $Sprite.draw(model.frame);}
             return A2($ClickForm.spriteButton,
-            model.sprite,
+            model.frame,
             A2($Signal.message,
             address,
             Click));
          }();
          return _L.fromArray([spriteView
+                             ,$Sprite.draw(model.sprite)
                              ,$Interjection.view(model.interjection)]);
       }();
    });
@@ -11528,7 +11510,7 @@ Elm.Portrait.make = function (_elm) {
                                   model.interjection)]],
                  model);}
             _U.badCase($moduleName,
-            "between lines 44 and 59");
+            "between lines 45 and 60");
          }();
       }();
    });
@@ -11539,10 +11521,12 @@ Elm.Portrait.make = function (_elm) {
              ,_0: a
              ,_1: b};
    });
-   var Model = F3(function (a,
+   var Model = F4(function (a,
    b,
-   c) {
+   c,
+   d) {
       return {_: {}
+             ,frame: d
              ,interjection: b
              ,name: a
              ,sprite: c};
@@ -11571,8 +11555,7 @@ Elm.PortraitBox.make = function (_elm) {
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $List = Elm.List.make(_elm),
    $Portrait = Elm.Portrait.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Sprite = Elm.Sprite.make(_elm);
+   $Signal = Elm.Signal.make(_elm);
    var OnPortraitClick = function (a) {
       return {ctor: "OnPortraitClick"
              ,_0: a};
@@ -11587,13 +11570,9 @@ Elm.PortraitBox.make = function (_elm) {
             $Basics.always(OnPortraitClick(model.name))),
             model);
          };
-         var portraits = $List.concat(A2($List.map,
+         return $List.concat(A2($List.map,
          viewPortrait,
          model.portraits));
-         var bgSprite = $Sprite.draw(model.background);
-         return A2($List._op["::"],
-         bgSprite,
-         portraits);
       }();
    });
    var update = F2(function (action,
@@ -11631,7 +11610,7 @@ Elm.PortraitBox.make = function (_elm) {
                                  ,["previous",""]],
                  model);}
             _U.badCase($moduleName,
-            "between lines 42 and 59");
+            "between lines 41 and 58");
          }();
       }();
    });
@@ -11651,13 +11630,10 @@ Elm.PortraitBox.make = function (_elm) {
       },
       model.portraits);
    };
-   var Model = F3(function (a,
-   b,
-   c) {
+   var Model = F2(function (a,b) {
       return {_: {}
-             ,background: a
-             ,portraits: b
-             ,previous: c};
+             ,portraits: a
+             ,previous: b};
    });
    _elm.PortraitBox.values = {_op: _op
                              ,Model: Model
@@ -11683,28 +11659,17 @@ Elm.PortraitBoxGen.make = function (_elm) {
    $moduleName = "PortraitBoxGen",
    $Basics = Elm.Basics.make(_elm),
    $PortraitBox = Elm.PortraitBox.make(_elm),
-   $PortraitGen = Elm.PortraitGen.make(_elm),
-   $Sprite = Elm.Sprite.make(_elm);
+   $PortraitGen = Elm.PortraitGen.make(_elm);
    var genPortraitBox = F2(function (x,
    y) {
       return {_: {}
-             ,background: A5($Sprite.Sprite,
-             x,
-             y,
-             1024,
-             168,
-             "img/PortraitHolder.png")
              ,portraits: _L.fromArray([A2($PortraitGen.sophie,
-                                      x - 384.5,
+                                      x - 240,
                                       y)
-                                      ,A2($PortraitGen.gavin,
-                                      x - 131.5,
-                                      y)
-                                      ,A2($PortraitGen.ava,
-                                      x + 131.5,
-                                      y)
+                                      ,A2($PortraitGen.gavin,x - 82,y)
+                                      ,A2($PortraitGen.ava,x + 82,y)
                                       ,A2($PortraitGen.sebastian,
-                                      x + 384.5,
+                                      x + 240,
                                       y)])
              ,previous: ""};
    });
@@ -11731,22 +11696,33 @@ Elm.PortraitGen.make = function (_elm) {
    y,
    name) {
       return function () {
+         var framePath = A2($Basics._op["++"],
+         "img/",
+         A2($Basics._op["++"],
+         name,
+         "Frame.png"));
          var imgPath = A2($Basics._op["++"],
          "img/",
          A2($Basics._op["++"],
          name,
-         "Portrait.png"));
-         return A3($Portrait.Model,
+         ".png"));
+         return A4($Portrait.Model,
          name,
          A2($InterjectionGen.defaultInterjection,
-         x + 32,
-         y + 40),
+         x + 21,
+         y + 25),
+         A5($Sprite.Sprite,
+         x - 10,
+         y - 11,
+         64,
+         64,
+         imgPath),
          A5($Sprite.Sprite,
          x,
          y,
-         155,
-         155,
-         imgPath));
+         100,
+         100,
+         framePath));
       }();
    });
    var sophie = F2(function (x,y) {
@@ -11912,14 +11888,14 @@ Elm.QuestionListGen.make = function (_elm) {
    $TextboxGen = Elm.TextboxGen.make(_elm);
    var genQuestionList = {_: {}
                          ,firstQuestionPosition: {ctor: "_Tuple2"
-                                                 ,_0: 10
-                                                 ,_1: 320}
+                                                 ,_0: 0
+                                                 ,_1: 200}
                          ,questionFrame: A2($TextboxGen.genTextbox,
                          "Question",
                          true)
                          ,questionStride: {ctor: "_Tuple2"
                                           ,_0: 0
-                                          ,_1: -140}
+                                          ,_1: -87}
                          ,questions: _L.fromArray([])};
    _elm.QuestionListGen.values = {_op: _op
                                  ,genQuestionList: genQuestionList};
@@ -13038,14 +13014,14 @@ Elm.TextboxGen.make = function (_elm) {
          switch (_v0.ctor)
          {case "_Tuple2": return {_: {}
                                  ,background: {_: {}
-                                              ,height: 120
+                                              ,height: 77
                                               ,imageName: A2($Basics._op["++"],
-                                              "img/Text",
+                                              "img/",
                                               A2($Basics._op["++"],
                                               name,
-                                              ".png"))
-                                              ,width: 984
-                                              ,x: -10 + _v0._0
+                                              "DialogueBox.png"))
+                                              ,width: 631
+                                              ,x: _v0._0
                                               ,y: _v0._1}
                                  ,clickable: clickable
                                  ,elapsedTime: 0
@@ -13054,36 +13030,36 @@ Elm.TextboxGen.make = function (_elm) {
                                  ,nameStyle: {_: {}
                                              ,bold: true
                                              ,color: $Color.black
-                                             ,height: $Maybe.Just(20)
+                                             ,height: $Maybe.Just(14)
                                              ,italic: false
                                              ,line: $Maybe.Nothing
                                              ,typeface: _L.fromArray(["Helvetica"
                                                                      ,"Arial"
                                                                      ,"sans serif"])}
-                                 ,nameX: -380 + _v0._0
-                                 ,nameY: 50 + _v0._1
+                                 ,nameX: -237 + _v0._0
+                                 ,nameY: 35 + _v0._1
                                  ,portrait: {_: {}
-                                            ,height: 100
+                                            ,height: 64
                                             ,imageName: A2($Basics._op["++"],
                                             "img/",
                                             A2($Basics._op["++"],
                                             name,
                                             ".png"))
-                                            ,width: 100
-                                            ,x: -442 + _v0._0
-                                            ,y: -7 + _v0._1}
+                                            ,width: 64
+                                            ,x: -276 + _v0._0
+                                            ,y: -3 + _v0._1}
                                  ,text: text
                                  ,textStyle: {_: {}
                                              ,bold: false
                                              ,color: $Color.black
-                                             ,height: $Maybe.Just(18)
+                                             ,height: $Maybe.Just(12)
                                              ,italic: false
                                              ,line: $Maybe.Nothing
                                              ,typeface: _L.fromArray(["Helvetica"
                                                                      ,"Arial"
                                                                      ,"sans serif"])}
-                                 ,textX: -378 + _v0._0
-                                 ,textY: 23 + _v0._1};}
+                                 ,textX: -236 + _v0._0
+                                 ,textY: 19 + _v0._1};}
          _U.badCase($moduleName,
          "between lines 9 and 51");
       }();
@@ -13347,11 +13323,11 @@ Elm.TextboxListGen.make = function (_elm) {
    var genTextboxList = {_: {}
                         ,animation: A3($MoveByAnimation.linearAnimation,
                         0,
-                        140,
+                        87,
                         0.1)
                         ,enterPosition: {ctor: "_Tuple2"
-                                        ,_0: 10
-                                        ,_1: -280}
+                                        ,_0: 0
+                                        ,_1: -175}
                         ,hidden: false
                         ,textboxFrames: A2($Dict.insert,
                         "Question",

@@ -42,7 +42,6 @@ type Action
     | ChooseSpeaker String
     | ChooseQuestion Int
     | Tick Float
-    | NewConversation Conversation
 
 
 -- Update
@@ -219,12 +218,7 @@ waitingForQuestionResponse index action model =
 
 update : Action -> Model -> Model
 update action model =
-    case action of
-        NewConversation conversation -> 
-            initModel conversation
-
-        _ ->
-            (unwrap model).gameStateUpdate action model
+    (unwrap model).gameStateUpdate action model
 
 
 -- View
@@ -254,14 +248,14 @@ signals =
     (actions.signal ::
     [
         (always Click) <~ Mouse.clicks,
-        (Time.inSeconds >> Tick) <~ Time.fps 60,
-        (ConversationGen.genConversation >> NewConversation) <~ conversationText
+        (Time.inSeconds >> Tick) <~ Time.fps 60
     ])
 
 
-initModel : Conversation -> Model 
-initModel conversation =
-    let portraitBox = PortraitBoxGen.genPortraitBox 0 -300
+initModel : Model 
+initModel =
+    let portraitBox = PortraitBoxGen.genPortraitBox 0 -187
+        conversation = ConversationGen.genConversation conversationText
     in
     Model
     {
@@ -281,13 +275,9 @@ initModel conversation =
 
 main : Signal Element
 main =
-    let model =
-        ConversationGen.genConversation ConversationGen.testConversation
-        |> initModel
-    in
-    Signal.foldp update model signals
+    Signal.foldp update initModel signals
     |> Signal.map (view actions.address)
-    |> Signal.map (Collage.collage 1024 768)
+    |> Signal.map (Collage.collage 640 480)
 
 
-port conversationText : Signal String
+port conversationText : String

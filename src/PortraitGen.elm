@@ -8,12 +8,14 @@ import Sprite exposing (Sprite)
 
 model : Float -> Float -> String -> Portrait.Model
 model x y name = 
-    let imgPath = "img/" ++ name ++ "Portrait.png"
+    let imgPath = "img/" ++ name ++ ".png"
+        framePath = "img/" ++ name ++ "Frame.png"
     in
     Portrait.Model 
         name 
-        (InterjectionGen.defaultInterjection (x + 32) (y + 40))
-        (Sprite x y 155 155 imgPath)
+        (InterjectionGen.defaultInterjection (x + 21) (y + 25))
+        (Sprite (x - 10) (y - 11) 64 64 imgPath)
+        (Sprite x y 100 100 framePath)
 
 
 sophie : Float -> Float -> Portrait.Model

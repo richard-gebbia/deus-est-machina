@@ -11,7 +11,6 @@ import Sprite exposing (Sprite)
 
 type alias Model = 
     {
-        background: Sprite,
         portraits: List Portrait.Model,
         previous: String
     }
@@ -58,19 +57,19 @@ update action model =
                 previous <- ""
             }
 
+
 -- View
 
 view : Signal.Address Event -> Model -> List Collage.Form
 view address model = 
-    let bgSprite = Sprite.draw model.background
-        viewPortrait model = 
+    let viewPortrait model = 
             Portrait.view 
                 (Signal.forwardTo address 
                     (always (OnPortraitClick model.name)))
                 model
-        portraits = List.map viewPortrait model.portraits |> List.concat
     in
-    bgSprite :: portraits
+    List.map viewPortrait model.portraits |> List.concat
+
 
 -- Events
 

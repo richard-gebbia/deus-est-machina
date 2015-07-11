@@ -15,7 +15,8 @@ type alias Model =
     {
         name: String,
         interjection: Interjection.Model,
-        sprite: Sprite
+        sprite: Sprite,
+        frame: Sprite
     }
 
 -- Action
@@ -65,15 +66,16 @@ view address model =
     let spriteView = 
         case model.interjection.interjection of
             Interjection.Quiet ->
-                Sprite.draw model.sprite
+                Sprite.draw model.frame
 
             _ ->
                 ClickForm.spriteButton 
-                    model.sprite 
+                    model.frame 
                     (Signal.message address Click)
     in
     [
         spriteView,
+        Sprite.draw model.sprite,
         Interjection.view model.interjection
     ]
 

@@ -10,42 +10,42 @@ genTextbox name clickable text (x, y) =
         text = text,
         background = 
             {
-                x = -10 + x,
+                x = x,
                 y = y,
-                width = 984,
-                height = 120,
-                imageName = "img/Text" ++ name ++ ".png"
+                width = 631,
+                height = 77,
+                imageName = "img/" ++ name ++ "DialogueBox.png"
             },
         portrait = 
             {
-                x = -442 + x,
-                y = -7 + y,
-                width = 100,
-                height = 100,
+                x = -276 + x,
+                y = -3 + y,
+                width = 64,
+                height = 64,
                 imageName = "img/" ++ name ++ ".png"
             },
         nameStyle = 
             {
                 typeface = ["Helvetica", "Arial", "sans serif"],
-                height = Just 20,
+                height = Just 14,
                 color = Color.black,
                 bold = True,
                 italic = False,
                 line = Nothing
             },
-        nameX = -380 + x,
-        nameY = 50 + y,
+        nameX = -237 + x,
+        nameY = 35 + y,
         textStyle = 
             {
                 typeface = ["Helvetica", "Arial", "sans serif"],
-                height = Just 18,
+                height = Just 12,
                 color = Color.black,
                 bold = False,
                 italic = False,
                 line = Nothing
             },
-        textX = -378 + x,
-        textY = 23 + y,
+        textX = -236 + x,
+        textY = 19 + y,
         lettersPerSecond = 15,
         elapsedTime = 0,
         clickable = clickable

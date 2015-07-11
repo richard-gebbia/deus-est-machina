@@ -9,8 +9,8 @@ genTextboxList : TextboxList.Model
 genTextboxList = 
     {
         textboxes = [],
-        animation = MoveByAnimation.linearAnimation 0 140 0.1,
-        enterPosition = (10, -280),
+        animation = MoveByAnimation.linearAnimation 0 87 0.1,
+        enterPosition = (0, -175),
         textboxFrames = Dict.empty 
                         |> Dict.insert "Sophie"    (TextboxGen.genTextbox "Sophie"    False)
                         |> Dict.insert "Gavin"     (TextboxGen.genTextbox "Gavin"     False)
