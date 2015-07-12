@@ -26,6 +26,7 @@ type Action
     = SetResponders (List String)
     | LetThemSpeak String
     | ThePlayerIsSpeaking
+    | Tick Float
 
 -- Update
 
@@ -37,6 +38,8 @@ update action model =
                 (Portrait.SetResponse names model.previous)
         quiet = 
             Portrait.update Portrait.Quiet
+        tick dt =
+            Portrait.update (Portrait.Tick dt)
     in
     case action of 
         SetResponders names ->
@@ -55,6 +58,11 @@ update action model =
             { model |
                 portraits <- List.map quiet model.portraits,
                 previous <- ""
+            }
+
+        Tick dt ->
+            { model |
+                portraits <- List.map (tick dt) model.portraits
             }
 
 

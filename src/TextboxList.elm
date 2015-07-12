@@ -1,5 +1,6 @@
 module TextboxList where
 
+import Animation
 import Dict exposing (Dict)
 import Graphics.Collage as Collage
 import List exposing ((::))
@@ -61,7 +62,7 @@ addTextbox : String -> List String -> Model -> (Model, Maybe Request)
 addTextbox name text model =
     (
         { model |
-            animation <- MoveByAnimation.reset model.animation,
+            animation <- Animation.reset model.animation,
             textboxes <- Dict.get name model.textboxFrames
                          |> Maybe.map (\frame -> frame text model.enterPosition)
                          |> Maybe.map (\tb -> tb :: model.textboxes)
@@ -75,7 +76,7 @@ addFullTextbox : String -> List String -> Model -> (Model, Maybe Request)
 addFullTextbox name text model =
     (
         { model |
-            animation <- MoveByAnimation.reset model.animation,
+            animation <- Animation.reset model.animation,
             textboxes <- 
                 Dict.get name model.textboxFrames
                 |> Maybe.map (\frame -> frame text model.enterPosition)
@@ -99,7 +100,7 @@ onUpdateTextbox model (textbox, request) =
 finishCurrentTextbox : Model -> (Model, Maybe Request)
 finishCurrentTextbox model =
     List.head model.textboxes
-    `andThen` (maybeGuard <| MoveByAnimation.isComplete model.animation)
+    `andThen` (maybeGuard <| Animation.isComplete model.animation)
     |> Maybe.map (Textbox.update Textbox.Finish)
     |> Maybe.map (onUpdateTextbox model)
     |> Maybe.withDefault (model, Nothing)
@@ -107,7 +108,7 @@ finishCurrentTextbox model =
 
 moveTextboxes : Float -> Model -> (Model, Maybe Request)
 moveTextboxes dt model = 
-    let updatedAnim = MoveByAnimation.update model.animation dt
+    let updatedAnim = Animation.update dt model.animation
         moveBy = Textbox.MoveBy (MoveByAnimation.moveByFrame updatedAnim)
     in
     (
@@ -122,7 +123,7 @@ moveTextboxes dt model =
 tick : Float -> Model -> (Model, Maybe Request)
 tick dt model = 
     List.head model.textboxes
-    `andThen` maybeGuard (MoveByAnimation.isComplete model.animation)
+    `andThen` maybeGuard (Animation.isComplete model.animation)
     |> Maybe.map (Textbox.update (Textbox.Tick dt))
     |> Maybe.map (onUpdateTextbox model) 
     |> Maybe.withDefault (moveTextboxes dt model)

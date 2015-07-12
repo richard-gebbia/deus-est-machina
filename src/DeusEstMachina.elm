@@ -65,12 +65,20 @@ advance modelData name (newConversation, speech) =
 
 choosingSpeaker : Action -> Model -> Model
 choosingSpeaker action model =
+    let modelData = unwrap model
+    in
     case action of 
         ChooseSpeaker name ->
             Conversation.chooseSpeaker name (unwrap model).conversation
             |> Maybe.map (advance (unwrap model) name)
             |> Maybe.map Model
             |> Maybe.withDefault model
+
+        Tick dt ->
+            { modelData |
+                portraitBox <- 
+                    PortraitBox.update (PortraitBox.Tick dt) modelData.portraitBox
+            } |> Model
 
         _ -> 
             model 
@@ -203,7 +211,9 @@ waitingForQuestionResponse index action model =
             { modelData |
                 textboxList <- 
                     TextboxList.update (TextboxList.Tick dt) modelData.textboxList
-                    |> fst
+                    |> fst,
+                portraitBox <-
+                    PortraitBox.update (PortraitBox.Tick dt) modelData.portraitBox
             } |> Model
 
         ChooseSpeaker name ->

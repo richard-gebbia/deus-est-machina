@@ -1,5 +1,6 @@
 module Interjection where
 
+import Animation exposing (Animation)
 import Graphics.Collage as Collage
 import Graphics.Element as Element exposing (Element)
 
@@ -15,18 +16,26 @@ type alias Model =
         height: Int,
         interjection: Interjection,
         exclamationImageName: String,
-        continuationImageName: String
+        continuationImageName: String,
+        pulseFade: Animation {}
     }
 
 -- Action
 
-type Action = SetInterjection Interjection
+type Action 
+    = SetInterjection Interjection
+    | Tick Float
 
 -- Update
 
 update : Action -> Model -> Model
-update (SetInterjection interjection) model = 
-    { model | interjection <- interjection }
+update action model = 
+    case action of
+        SetInterjection interjection ->
+            { model | interjection <- interjection }
+
+        Tick dt ->
+            { model | pulseFade <- Animation.update dt model.pulseFade }
 
 -- View
 
@@ -41,17 +50,21 @@ viewSprite imageName model =
 view : Model -> Collage.Form
 view model =
     let element = 
-        case model.interjection of
-            Exclamation -> 
-                viewSprite model.exclamationImageName model
+            case model.interjection of
+                Exclamation -> 
+                    viewSprite model.exclamationImageName model
 
-            Continuation -> 
-                viewSprite model.continuationImageName model
+                Continuation -> 
+                    viewSprite model.continuationImageName model
 
-            Quiet -> 
-                Element.empty
+                Quiet -> 
+                    Element.empty
+
+        opacity = 
+            Animation.tTotal model.pulseFade
     in
-    Collage.toForm element
+    Element.opacity opacity element
+    |> Collage.toForm
     |> Collage.move (model.x, model.y)
 
 -- Events

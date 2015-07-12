@@ -1,4 +1,145 @@
 var Elm = Elm || { Native: {} };
+Elm.Animation = Elm.Animation || {};
+Elm.Animation.make = function (_elm) {
+   "use strict";
+   _elm.Animation = _elm.Animation || {};
+   if (_elm.Animation.values)
+   return _elm.Animation.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Animation",
+   $Basics = Elm.Basics.make(_elm);
+   var isComplete = function (animation) {
+      return animation.isLooping ? false : _U.cmp(animation.elapsedTime,
+      animation.duration) > -1;
+   };
+   var reset = function (animation) {
+      return _U.replace([["elapsedTime"
+                         ,0]
+                        ,["prevElapsedTime",0]],
+      animation);
+   };
+   var tTotal = function (animation) {
+      return animation.easing(A3($Basics.clamp,
+      0,
+      1,
+      animation.elapsedTime / animation.duration));
+   };
+   var tByFrame = function (animation) {
+      return function () {
+         var t1 = A3($Basics.clamp,
+         0,
+         1,
+         animation.elapsedTime / animation.duration);
+         var t0 = A3($Basics.clamp,
+         0,
+         1,
+         animation.prevElapsedTime / animation.duration);
+         return animation.easing(t1) - animation.easing(t0);
+      }();
+   };
+   var update = F2(function (dt,
+   animation) {
+      return function () {
+         var wrapTime = function (anim) {
+            return anim.isLooping && _U.cmp(anim.elapsedTime,
+            anim.duration) > 0 ? _U.replace([["elapsedTime"
+                                             ,anim.elapsedTime - anim.duration]],
+            anim) : anim;
+         };
+         return wrapTime(_U.replace([["elapsedTime"
+                                     ,animation.elapsedTime + dt]
+                                    ,["prevElapsedTime"
+                                     ,animation.elapsedTime]],
+         animation));
+      }();
+   });
+   var oneShot = function (animation) {
+      return _U.replace([["isLooping"
+                         ,false]],
+      animation);
+   };
+   var looping = function (animation) {
+      return _U.replace([["isLooping"
+                         ,true]],
+      animation);
+   };
+   var animate = function (data) {
+      return function (data) {
+         return _U.insert("isLooping",
+         false,
+         data);
+      }(function (data) {
+         return _U.insert("prevElapsedTime",
+         0,
+         data);
+      }(function (data) {
+         return _U.insert("elapsedTime",
+         0,
+         data);
+      }(function (data) {
+         return _U.insert("easing",
+         $Basics.identity,
+         data);
+      }(_U.insert("duration",
+      0,
+      data)))));
+   };
+   var linear = F2(function (duration,
+   data) {
+      return function (animation) {
+         return _U.replace([["duration"
+                            ,duration]
+                           ,["easing",$Basics.identity]
+                           ,["elapsedTime",0]
+                           ,["prevElapsedTime",0]],
+         animation);
+      }(animate(data));
+   });
+   var curve = F3(function (duration,
+   easing,
+   data) {
+      return function (animation) {
+         return _U.replace([["duration"
+                            ,duration]
+                           ,["easing",easing]
+                           ,["elapsedTime",0]
+                           ,["prevElapsedTime",0]],
+         animation);
+      }(animate(data));
+   });
+   var Animation = F6(function (a,
+   b,
+   c,
+   d,
+   e,
+   f) {
+      return _U.insert("isLooping",
+      e,
+      _U.insert("prevElapsedTime",
+      d,
+      _U.insert("elapsedTime",
+      c,
+      _U.insert("easing",
+      b,
+      _U.insert("duration",a,f)))));
+   });
+   _elm.Animation.values = {_op: _op
+                           ,Animation: Animation
+                           ,animate: animate
+                           ,linear: linear
+                           ,curve: curve
+                           ,looping: looping
+                           ,oneShot: oneShot
+                           ,update: update
+                           ,tByFrame: tByFrame
+                           ,tTotal: tTotal
+                           ,reset: reset
+                           ,isComplete: isComplete};
+   return _elm.Animation.values;
+};
 Elm.Array = Elm.Array || {};
 Elm.Array.make = function (_elm) {
    "use strict";
@@ -1362,7 +1503,7 @@ Elm.DeusEstMachina.make = function (_elm) {
                {case "ChooseQuestion":
                   return ChooseQuestion(_v3._0);}
                _U.badCase($moduleName,
-               "on line 232, column 13 to 36");
+               "on line 242, column 13 to 36");
             }();
          };
          var pbEventToAction = function (_v6) {
@@ -1371,7 +1512,7 @@ Elm.DeusEstMachina.make = function (_elm) {
                {case "OnPortraitClick":
                   return ChooseSpeaker(_v6._0);}
                _U.badCase($moduleName,
-               "on line 229, column 13 to 31");
+               "on line 239, column 13 to 31");
             }();
          };
          return A2($Basics._op["++"],
@@ -1410,7 +1551,11 @@ Elm.DeusEstMachina.make = function (_elm) {
                return Model(_U.replace([["textboxList"
                                         ,$Basics.fst(A2($TextboxList.update,
                                         $TextboxList.Tick(action._0),
-                                        modelData.textboxList))]],
+                                        modelData.textboxList))]
+                                       ,["portraitBox"
+                                        ,A2($PortraitBox.update,
+                                        $PortraitBox.Tick(action._0),
+                                        modelData.portraitBox)]],
                  modelData));}
             return model;
          }();
@@ -1480,7 +1625,7 @@ Elm.DeusEstMachina.make = function (_elm) {
                           modelData);
                        }();}
                   _U.badCase($moduleName,
-                  "between lines 109 and 117");
+                  "between lines 117 and 125");
                }();
             }(A2($TextboxList.update,
             $TextboxList.Tick(dt),
@@ -1501,26 +1646,35 @@ Elm.DeusEstMachina.make = function (_elm) {
    var choosingSpeaker = F2(function (action,
    model) {
       return function () {
-         switch (action.ctor)
-         {case "ChooseSpeaker":
-            return $Maybe.withDefault(model)($Maybe.map(Model)($Maybe.map(A2(advance,
-              unwrap(model),
-              action._0))(A2($Conversation.chooseSpeaker,
-              action._0,
-              unwrap(model).conversation))));}
-         return model;
+         var modelData = unwrap(model);
+         return function () {
+            switch (action.ctor)
+            {case "ChooseSpeaker":
+               return $Maybe.withDefault(model)($Maybe.map(Model)($Maybe.map(A2(advance,
+                 unwrap(model),
+                 action._0))(A2($Conversation.chooseSpeaker,
+                 action._0,
+                 unwrap(model).conversation))));
+               case "Tick":
+               return Model(_U.replace([["portraitBox"
+                                        ,A2($PortraitBox.update,
+                                        $PortraitBox.Tick(action._0),
+                                        modelData.portraitBox)]],
+                 modelData));}
+            return model;
+         }();
       }();
    });
    var waitingToShowQuestions = F2(function (action,
    model) {
       return function () {
          var modelData = unwrap(model);
-         var onClick = function (_v26) {
+         var onClick = function (_v27) {
             return function () {
-               switch (_v26.ctor)
+               switch (_v27.ctor)
                {case "_Tuple2":
                   return _U.replace([["conversation"
-                                     ,_v26._0]
+                                     ,_v27._0]
                                     ,["previous",$Maybe.Nothing]
                                     ,["textboxList"
                                      ,$Basics.fst(A2($TextboxList.update,
@@ -1528,13 +1682,13 @@ Elm.DeusEstMachina.make = function (_elm) {
                                      modelData.textboxList))]
                                     ,["questionList"
                                      ,A2($QuestionList.update,
-                                     $QuestionList.ShowQuestions(_v26._1),
+                                     $QuestionList.ShowQuestions(_v27._1),
                                      modelData.questionList)]
                                     ,["gameStateUpdate"
                                      ,showingQuestions]],
                     modelData);}
                _U.badCase($moduleName,
-               "between lines 134 and 144");
+               "between lines 142 and 152");
             }();
          };
          return function () {
@@ -1552,9 +1706,9 @@ Elm.DeusEstMachina.make = function (_elm) {
       return function () {
          var modelData = unwrap(model);
          var respondToChosenQuestion = F2(function (index,
-         _v31) {
+         _v32) {
             return function () {
-               switch (_v31.ctor)
+               switch (_v32.ctor)
                {case "_Tuple2":
                   return _U.replace([["questionList"
                                      ,A2($QuestionList.update,
@@ -1563,36 +1717,36 @@ Elm.DeusEstMachina.make = function (_elm) {
                                     ,["textboxList"
                                      ,$Basics.fst($TextboxList.update(A2($TextboxList.AddFullTextbox,
                                      "Question",
-                                     _v31._0))($Basics.fst(A2($TextboxList.update,
+                                     _v32._0))($Basics.fst(A2($TextboxList.update,
                                      $TextboxList.Show,
                                      modelData.textboxList))))]
                                     ,["portraitBox"
                                      ,A2($PortraitBox.update,
-                                     $PortraitBox.SetResponders(_v31._1),
+                                     $PortraitBox.SetResponders(_v32._1),
                                      modelData.portraitBox)]
                                     ,["gameStateUpdate"
                                      ,waitingForQuestionResponse(index)]],
                     modelData);}
                _U.badCase($moduleName,
-               "between lines 163 and 176");
+               "between lines 171 and 184");
             }();
          });
          return function () {
             switch (action.ctor)
             {case "ChooseQuestion":
-               return Model(respondToChosenQuestion(action._0)(function (_v37) {
+               return Model(respondToChosenQuestion(action._0)(function (_v38) {
                     return function () {
-                       switch (_v37.ctor)
+                       switch (_v38.ctor)
                        {case "_Tuple2":
                           return {ctor: "_Tuple2"
                                  ,_0: A2($Maybe.withDefault,
                                  _L.fromArray([]),
-                                 _v37._0)
+                                 _v38._0)
                                  ,_1: A2($Maybe.withDefault,
                                  _L.fromArray([]),
-                                 _v37._1)};}
+                                 _v38._1)};}
                        _U.badCase($moduleName,
-                       "on line 189, column 22 to 80");
+                       "on line 197, column 22 to 80");
                     }();
                  }(function (names) {
                     return {ctor: "_Tuple2"
@@ -3581,6 +3735,7 @@ Elm.Interjection.make = function (_elm) {
    _U = _N.Utils.make(_elm),
    _L = _N.List.make(_elm),
    $moduleName = "Interjection",
+   $Animation = Elm.Animation.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm);
@@ -3593,6 +3748,7 @@ Elm.Interjection.make = function (_elm) {
    });
    var view = function (model) {
       return function () {
+         var opacity = $Animation.tTotal(model.pulseFade);
          var element = function () {
             var _v0 = model.interjection;
             switch (_v0.ctor)
@@ -3607,41 +3763,54 @@ Elm.Interjection.make = function (_elm) {
                case "Quiet":
                return $Graphics$Element.empty;}
             _U.badCase($moduleName,
-            "between lines 44 and 53");
+            "between lines 53 and 63");
          }();
          return $Graphics$Collage.move({ctor: "_Tuple2"
                                        ,_0: model.x
-                                       ,_1: model.y})($Graphics$Collage.toForm(element));
+                                       ,_1: model.y})($Graphics$Collage.toForm(A2($Graphics$Element.opacity,
+         opacity,
+         element)));
       }();
    };
-   var update = F2(function (_v1,
+   var update = F2(function (action,
    model) {
       return function () {
-         switch (_v1.ctor)
+         switch (action.ctor)
          {case "SetInterjection":
             return _U.replace([["interjection"
-                               ,_v1._0]],
+                               ,action._0]],
+              model);
+            case "Tick":
+            return _U.replace([["pulseFade"
+                               ,A2($Animation.update,
+                               action._0,
+                               model.pulseFade)]],
               model);}
          _U.badCase($moduleName,
-         "on line 29, column 13 to 43");
+         "between lines 33 and 38");
       }();
    });
+   var Tick = function (a) {
+      return {ctor: "Tick",_0: a};
+   };
    var SetInterjection = function (a) {
       return {ctor: "SetInterjection"
              ,_0: a};
    };
-   var Model = F7(function (a,
+   var Model = F8(function (a,
    b,
    c,
    d,
    e,
    f,
-   g) {
+   g,
+   h) {
       return {_: {}
              ,continuationImageName: g
              ,exclamationImageName: f
              ,height: d
              ,interjection: e
+             ,pulseFade: h
              ,width: c
              ,x: a
              ,y: b};
@@ -3655,6 +3824,7 @@ Elm.Interjection.make = function (_elm) {
                               ,Quiet: Quiet
                               ,Model: Model
                               ,SetInterjection: SetInterjection
+                              ,Tick: Tick
                               ,update: update
                               ,viewSprite: viewSprite
                               ,view: view};
@@ -3671,17 +3841,28 @@ Elm.InterjectionGen.make = function (_elm) {
    _U = _N.Utils.make(_elm),
    _L = _N.List.make(_elm),
    $moduleName = "InterjectionGen",
+   $Animation = Elm.Animation.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
    $Interjection = Elm.Interjection.make(_elm);
    var defaultInterjection = F2(function (x,
    y) {
-      return A7($Interjection.Model,
-      x,
-      y,
-      40,
-      29,
-      $Interjection.Quiet,
-      "img/Exclamation.png",
-      "img/Ellipsis.png");
+      return function () {
+         var fadeFormula = function (x) {
+            return ($Basics.cos(x * 2 * $Basics.pi) + 1) / 2;
+         };
+         return {_: {}
+                ,continuationImageName: "img/Ellipsis.png"
+                ,exclamationImageName: "img/Exclamation.png"
+                ,height: 29
+                ,interjection: $Interjection.Quiet
+                ,pulseFade: $Animation.looping(A3($Animation.curve,
+                2,
+                fadeFormula,
+                {_: {}}))
+                ,width: 40
+                ,x: x
+                ,y: y};
+      }();
    });
    _elm.InterjectionGen.values = {_op: _op
                                  ,defaultInterjection: defaultInterjection};
@@ -4305,23 +4486,11 @@ Elm.MoveByAnimation.make = function (_elm) {
    _U = _N.Utils.make(_elm),
    _L = _N.List.make(_elm),
    $moduleName = "MoveByAnimation",
+   $Animation = Elm.Animation.make(_elm),
    $Basics = Elm.Basics.make(_elm);
-   var isComplete = function (animation) {
-      return _U.cmp(animation.elapsedTime,
-      animation.duration) > -1;
-   };
-   var reset = function (animation) {
-      return _U.replace([["elapsedTime"
-                         ,0]
-                        ,["prevElapsedTime",0]],
-      animation);
-   };
    var moveByTotal = function (animation) {
       return function () {
-         var t = A3($Basics.clamp,
-         0,
-         1,
-         animation.elapsedTime / animation.duration);
+         var t = $Animation.tTotal(animation);
          return {ctor: "_Tuple2"
                 ,_0: t * animation.x
                 ,_1: t * animation.y};
@@ -4329,74 +4498,33 @@ Elm.MoveByAnimation.make = function (_elm) {
    };
    var moveByFrame = function (animation) {
       return function () {
-         var t1 = A3($Basics.clamp,
-         0,
-         1,
-         animation.elapsedTime / animation.duration);
-         var t0 = A3($Basics.clamp,
-         0,
-         1,
-         animation.prevElapsedTime / animation.duration);
-         var t = animation.easing(t1) - animation.easing(t0);
+         var t = $Animation.tByFrame(animation);
          return {ctor: "_Tuple2"
                 ,_0: t * animation.x
                 ,_1: t * animation.y};
       }();
    };
-   var update = F2(function (animation,
-   dt) {
-      return _U.replace([["elapsedTime"
-                         ,animation.elapsedTime + dt]
-                        ,["prevElapsedTime"
-                         ,animation.elapsedTime]],
-      animation);
-   });
-   var curveAnimation = F4(function (x,
+   var curve = F4(function (x,
    y,
    duration,
    easing) {
-      return {_: {}
-             ,duration: duration
-             ,easing: easing
-             ,elapsedTime: 0
-             ,prevElapsedTime: 0
-             ,x: x
-             ,y: y};
+      return A3($Animation.curve,
+      duration,
+      easing,
+      {_: {},x: x,y: y});
    });
-   var linearAnimation = F3(function (x,
+   var linear = F3(function (x,
    y,
    duration) {
-      return {_: {}
-             ,duration: duration
-             ,easing: $Basics.identity
-             ,elapsedTime: 0
-             ,prevElapsedTime: 0
-             ,x: x
-             ,y: y};
-   });
-   var MoveByAnimation = F6(function (a,
-   b,
-   c,
-   d,
-   e,
-   f) {
-      return {_: {}
-             ,duration: c
-             ,easing: d
-             ,elapsedTime: e
-             ,prevElapsedTime: f
-             ,x: a
-             ,y: b};
+      return A2($Animation.linear,
+      duration,
+      {_: {},x: x,y: y});
    });
    _elm.MoveByAnimation.values = {_op: _op
-                                 ,MoveByAnimation: MoveByAnimation
-                                 ,linearAnimation: linearAnimation
-                                 ,curveAnimation: curveAnimation
-                                 ,update: update
+                                 ,linear: linear
+                                 ,curve: curve
                                  ,moveByFrame: moveByFrame
-                                 ,moveByTotal: moveByTotal
-                                 ,reset: reset
-                                 ,isComplete: isComplete};
+                                 ,moveByTotal: moveByTotal};
    return _elm.MoveByAnimation.values;
 };
 Elm.Native.Array = {};
@@ -11508,13 +11636,22 @@ Elm.Portrait.make = function (_elm) {
                                   ,A2($Interjection.update,
                                   A2(iAction,action._0,action._1),
                                   model.interjection)]],
+                 model);
+               case "Tick":
+               return _U.replace([["interjection"
+                                  ,A2($Interjection.update,
+                                  $Interjection.Tick(action._0),
+                                  model.interjection)]],
                  model);}
             _U.badCase($moduleName,
-            "between lines 45 and 60");
+            "between lines 46 and 69");
          }();
       }();
    });
    var Quiet = {ctor: "Quiet"};
+   var Tick = function (a) {
+      return {ctor: "Tick",_0: a};
+   };
    var SetResponse = F2(function (a,
    b) {
       return {ctor: "SetResponse"
@@ -11534,6 +11671,7 @@ Elm.Portrait.make = function (_elm) {
    _elm.Portrait.values = {_op: _op
                           ,Model: Model
                           ,SetResponse: SetResponse
+                          ,Tick: Tick
                           ,Quiet: Quiet
                           ,update: update
                           ,view: view
@@ -11578,6 +11716,9 @@ Elm.PortraitBox.make = function (_elm) {
    var update = F2(function (action,
    model) {
       return function () {
+         var tick = function (dt) {
+            return $Portrait.update($Portrait.Tick(dt));
+         };
          var quiet = $Portrait.update($Portrait.Quiet);
          var actions = function (names) {
             return A2($List.repeat,
@@ -11608,12 +11749,21 @@ Elm.PortraitBox.make = function (_elm) {
                                   quiet,
                                   model.portraits)]
                                  ,["previous",""]],
+                 model);
+               case "Tick":
+               return _U.replace([["portraits"
+                                  ,A2($List.map,
+                                  tick(action._0),
+                                  model.portraits)]],
                  model);}
             _U.badCase($moduleName,
-            "between lines 41 and 58");
+            "between lines 44 and 66");
          }();
       }();
    });
+   var Tick = function (a) {
+      return {ctor: "Tick",_0: a};
+   };
    var ThePlayerIsSpeaking = {ctor: "ThePlayerIsSpeaking"};
    var LetThemSpeak = function (a) {
       return {ctor: "LetThemSpeak"
@@ -11641,6 +11791,7 @@ Elm.PortraitBox.make = function (_elm) {
                              ,SetResponders: SetResponders
                              ,LetThemSpeak: LetThemSpeak
                              ,ThePlayerIsSpeaking: ThePlayerIsSpeaking
+                             ,Tick: Tick
                              ,update: update
                              ,view: view
                              ,OnPortraitClick: OnPortraitClick};
@@ -13079,6 +13230,7 @@ Elm.TextboxList.make = function (_elm) {
    _U = _N.Utils.make(_elm),
    _L = _N.List.make(_elm),
    $moduleName = "TextboxList",
+   $Animation = Elm.Animation.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
@@ -13101,9 +13253,9 @@ Elm.TextboxList.make = function (_elm) {
    var moveTextboxes = F2(function (dt,
    model) {
       return function () {
-         var updatedAnim = A2($MoveByAnimation.update,
-         model.animation,
-         dt);
+         var updatedAnim = A2($Animation.update,
+         dt,
+         model.animation);
          var moveBy = $Textbox.MoveBy($MoveByAnimation.moveByFrame(updatedAnim));
          return {ctor: "_Tuple2"
                 ,_0: _U.replace([["animation"
@@ -13123,7 +13275,7 @@ Elm.TextboxList.make = function (_elm) {
    model) {
       return {ctor: "_Tuple2"
              ,_0: _U.replace([["animation"
-                              ,$MoveByAnimation.reset(model.animation)]
+                              ,$Animation.reset(model.animation)]
                              ,["textboxes"
                               ,$Maybe.withDefault(model.textboxes)($Maybe.map(function (tb) {
                                  return A2($List._op["::"],
@@ -13148,7 +13300,7 @@ Elm.TextboxList.make = function (_elm) {
    model) {
       return {ctor: "_Tuple2"
              ,_0: _U.replace([["animation"
-                              ,$MoveByAnimation.reset(model.animation)]
+                              ,$Animation.reset(model.animation)]
                              ,["textboxes"
                               ,$Maybe.withDefault(model.textboxes)($Maybe.map(function (tb) {
                                  return A2($List._op["::"],
@@ -13195,7 +13347,7 @@ Elm.TextboxList.make = function (_elm) {
                    model)
                    ,_1: bubbleTextboxRequest(_v2._1)};}
          _U.badCase($moduleName,
-         "between lines 92 and 95");
+         "between lines 93 and 96");
       }();
    });
    var finishCurrentTextbox = function (model) {
@@ -13203,7 +13355,7 @@ Elm.TextboxList.make = function (_elm) {
                                 ,_0: model
                                 ,_1: $Maybe.Nothing})($Maybe.map(onUpdateTextbox(model))($Maybe.map($Textbox.update($Textbox.Finish))(A2($Maybe.andThen,
       $List.head(model.textboxes),
-      maybeGuard($MoveByAnimation.isComplete(model.animation))))));
+      maybeGuard($Animation.isComplete(model.animation))))));
    };
    var tick = F2(function (dt,
    model) {
@@ -13211,7 +13363,7 @@ Elm.TextboxList.make = function (_elm) {
       dt,
       model))($Maybe.map(onUpdateTextbox(model))($Maybe.map($Textbox.update($Textbox.Tick(dt)))(A2($Maybe.andThen,
       $List.head(model.textboxes),
-      maybeGuard($MoveByAnimation.isComplete(model.animation))))));
+      maybeGuard($Animation.isComplete(model.animation))))));
    });
    var update = F2(function (action,
    model) {
@@ -13245,7 +13397,7 @@ Elm.TextboxList.make = function (_elm) {
               action._0,
               model);}
          _U.badCase($moduleName,
-         "between lines 133 and 151");
+         "between lines 134 and 152");
       }();
    });
    var Tick = function (a) {
@@ -13321,7 +13473,7 @@ Elm.TextboxListGen.make = function (_elm) {
    $TextboxGen = Elm.TextboxGen.make(_elm),
    $TextboxList = Elm.TextboxList.make(_elm);
    var genTextboxList = {_: {}
-                        ,animation: A3($MoveByAnimation.linearAnimation,
+                        ,animation: A3($MoveByAnimation.linear,
                         0,
                         87,
                         0.1)

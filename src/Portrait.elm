@@ -23,6 +23,7 @@ type alias Model =
 
 type Action 
     = SetResponse (List String) String
+    | Tick Float
     | Quiet
 
 -- Update
@@ -49,6 +50,14 @@ update action model =
                     Interjection.update 
                         (iAction names previous) 
                         model.interjection 
+            }
+
+        Tick dt ->
+            { model |
+                interjection <-
+                    Interjection.update
+                        (Interjection.Tick dt)
+                        model.interjection
             }
 
         Quiet -> 

@@ -1,54 +1,24 @@
 module MoveByAnimation where
 
-
-type alias MoveByAnimation = 
-    {
-        x: Float,
-        y: Float,
-        duration: Float,
-        easing: Float -> Float,
-        elapsedTime: Float,
-        prevElapsedTime: Float
-    }
+import Animation exposing (Animation)
 
 
-linearAnimation : Float -> Float -> Float -> MoveByAnimation
-linearAnimation x y duration = 
-    {
-        x = x,
-        y = y,
-        duration = duration,
-        easing = identity,
-        elapsedTime = 0,
-        prevElapsedTime = 0
-    }
+type alias MoveByAnimation = Animation { x: Float, y: Float }
 
 
-curveAnimation : Float -> Float -> Float -> (Float -> Float) -> MoveByAnimation
-curveAnimation x y duration easing =
-    {
-        x = x,
-        y = y,
-        duration = duration,
-        easing = easing,
-        elapsedTime = 0,
-        prevElapsedTime = 0
-    }
+linear : Float -> Float -> Float -> MoveByAnimation
+linear x y duration = 
+    Animation.linear duration { x = x, y = y }
 
 
-update : MoveByAnimation -> Float -> MoveByAnimation
-update animation dt = 
-    { animation |
-        elapsedTime <- animation.elapsedTime + dt,
-        prevElapsedTime <- animation.elapsedTime
-    }
+curve : Float -> Float -> Float -> (Float -> Float) -> MoveByAnimation
+curve x y duration easing =
+    Animation.curve duration easing { x = x, y = y }
 
 
 moveByFrame : MoveByAnimation -> (Float, Float)
 moveByFrame animation =
-    let t0 = clamp 0 1 (animation.prevElapsedTime / animation.duration)
-        t1 = clamp 0 1 (animation.elapsedTime / animation.duration)
-        t = animation.easing t1 - animation.easing t0
+    let t = Animation.tByFrame animation
     in
     (
         t * animation.x,
@@ -58,22 +28,9 @@ moveByFrame animation =
 
 moveByTotal : MoveByAnimation -> (Float, Float)
 moveByTotal animation =
-    let t = clamp 0 1 (animation.elapsedTime / animation.duration)
+    let t = Animation.tTotal animation
     in
     (
         t * animation.x,
         t * animation.y
     )
-
-
-reset : MoveByAnimation -> MoveByAnimation
-reset animation =
-    { animation |
-        elapsedTime <- 0,
-        prevElapsedTime <- 0
-    }
-
-
-isComplete : MoveByAnimation -> Bool
-isComplete animation = 
-    animation.elapsedTime >= animation.duration
