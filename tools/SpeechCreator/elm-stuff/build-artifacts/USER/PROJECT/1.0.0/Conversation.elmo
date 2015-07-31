@@ -1,0 +1,143 @@
+Elm.Conversation = Elm.Conversation || {};
+Elm.Conversation.make = function (_elm) {
+   "use strict";
+   _elm.Conversation = _elm.Conversation || {};
+   if (_elm.Conversation.values)
+   return _elm.Conversation.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Conversation",
+   $Basics = Elm.Basics.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $Json$Encode = Elm.Json.Encode.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Questions = Elm.Questions.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Speech = Elm.Speech.make(_elm);
+   var toJson = function (model) {
+      return function () {
+         var nodeToJson = F2(function (_v0,
+         node) {
+            return function () {
+               return function () {
+                  switch (node.ctor)
+                  {case "Asking":
+                     return $Questions.toJson(node._0);
+                     case "Talking":
+                     return $Speech.toJson(node._0);}
+                  _U.badCase($moduleName,
+                  "between lines 100 and 106");
+               }();
+            }();
+         });
+         return $Json$Encode.object($Dict.toList(A2($Dict.map,
+         nodeToJson,
+         model)));
+      }();
+   };
+   var ModifyQuestions = F2(function (a,
+   b) {
+      return {ctor: "ModifyQuestions"
+             ,_0: a
+             ,_1: b};
+   });
+   var ModifySpeech = F2(function (a,
+   b) {
+      return {ctor: "ModifySpeech"
+             ,_0: a
+             ,_1: b};
+   });
+   var viewNode = F3(function (address,
+   key,
+   node) {
+      return function () {
+         switch (node.ctor)
+         {case "Asking":
+            return A2($Questions.view,
+              A2($Signal.forwardTo,
+              address,
+              ModifyQuestions(key)),
+              node._0);
+            case "Talking":
+            return A2($Speech.view,
+              A2($Signal.forwardTo,
+              address,
+              ModifySpeech(key)),
+              node._0);}
+         _U.badCase($moduleName,
+         "between lines 77 and 86");
+      }();
+   });
+   var view = F2(function (address,
+   model) {
+      return $Html.div(_L.fromArray([]))($Dict.values(A2($Dict.map,
+      viewNode(address),
+      model)));
+   });
+   var Asking = function (a) {
+      return {ctor: "Asking"
+             ,_0: a};
+   };
+   var Talking = function (a) {
+      return {ctor: "Talking"
+             ,_0: a};
+   };
+   var fromJson = $Json$Decode.dict($Json$Decode.oneOf(_L.fromArray([$Json$Decode.map(Talking)($Speech.fromJson)
+                                                                    ,$Json$Decode.map(Asking)($Questions.fromJson)])));
+   var update = F2(function (action,
+   model) {
+      return function () {
+         var modifyQuestions = F2(function (qAction,
+         node) {
+            return function () {
+               switch (node.ctor)
+               {case "Asking":
+                  return Asking(A2($Questions.update,
+                    qAction,
+                    node._0));}
+               return node;
+            }();
+         });
+         var modifySpeech = F2(function (sAction,
+         node) {
+            return function () {
+               switch (node.ctor)
+               {case "Talking":
+                  return Talking(A2($Speech.update,
+                    sAction,
+                    node._0));}
+               return node;
+            }();
+         });
+         return function () {
+            switch (action.ctor)
+            {case "ModifyQuestions":
+               return A3($Dict.update,
+                 action._0,
+                 $Maybe.map(modifyQuestions(action._1)),
+                 model);
+               case "ModifySpeech":
+               return A3($Dict.update,
+                 action._0,
+                 $Maybe.map(modifySpeech(action._1)),
+                 model);}
+            return model;
+         }();
+      }();
+   });
+   _elm.Conversation.values = {_op: _op
+                              ,Talking: Talking
+                              ,Asking: Asking
+                              ,fromJson: fromJson
+                              ,ModifySpeech: ModifySpeech
+                              ,ModifyQuestions: ModifyQuestions
+                              ,update: update
+                              ,viewNode: viewNode
+                              ,view: view
+                              ,toJson: toJson};
+   return _elm.Conversation.values;
+};

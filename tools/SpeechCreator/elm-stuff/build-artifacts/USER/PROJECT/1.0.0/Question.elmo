@@ -1,0 +1,184 @@
+Elm.Question = Elm.Question || {};
+Elm.Question.make = function (_elm) {
+   "use strict";
+   _elm.Question = _elm.Question || {};
+   if (_elm.Question.values)
+   return _elm.Question.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Question",
+   $Basics = Elm.Basics.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $HtmlUtils = Elm.HtmlUtils.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $Json$Encode = Elm.Json.Encode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var toJson = function (model) {
+      return function () {
+         var text = A2($List.map,
+         $Json$Encode.string,
+         _L.fromArray([model.line1
+                      ,model.line2
+                      ,model.line3]));
+         return $Json$Encode.object(_L.fromArray([{ctor: "_Tuple2"
+                                                  ,_0: "text"
+                                                  ,_1: $Json$Encode.list(text)}
+                                                 ,{ctor: "_Tuple2"
+                                                  ,_0: "children"
+                                                  ,_1: $Json$Encode.list(A2($List.map,
+                                                  $Json$Encode.string,
+                                                  model.children))}]));
+      }();
+   };
+   var Context = F2(function (a,
+   b) {
+      return {_: {}
+             ,actions: a
+             ,remove: b};
+   });
+   var update = F2(function (action,
+   model) {
+      return function () {
+         switch (action.ctor)
+         {case "SetText":
+            return _U.replace([["line1"
+                               ,_U.eq(action._0,
+                               1) ? action._1 : model.line1]
+                              ,["line2"
+                               ,_U.eq(action._0,
+                               2) ? action._1 : model.line2]
+                              ,["line3"
+                               ,_U.eq(action._0,
+                               3) ? action._1 : model.line3]],
+              model);}
+         return model;
+      }();
+   });
+   var SetText = F2(function (a,
+   b) {
+      return {ctor: "SetText"
+             ,_0: a
+             ,_1: b};
+   });
+   var view = F2(function (context,
+   model) {
+      return function () {
+         var setTextMessage = function (lineNum) {
+            return function ($) {
+               return $Signal.message(context.actions)(SetText(lineNum)($));
+            };
+         };
+         var textLine = F2(function (txt,
+         lineNum) {
+            return A2($Html.input,
+            _L.fromArray([$Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
+                                                               ,_0: "width"
+                                                               ,_1: "243px"}]))
+                         ,$Html$Attributes.value(txt)
+                         ,A3($Html$Events.on,
+                         "input",
+                         $Html$Events.targetValue,
+                         setTextMessage(lineNum))]),
+            _L.fromArray([]));
+         });
+         return A2($Html.div,
+         _L.fromArray([$Html$Attributes.style(A2($Basics._op["++"],
+         _L.fromArray([{ctor: "_Tuple2"
+                       ,_0: "backgroundColor"
+                       ,_1: "rgb(200,200,255)"}
+                      ,{ctor: "_Tuple2"
+                       ,_0: "width"
+                       ,_1: "250px"}
+                      ,{ctor: "_Tuple2"
+                       ,_0: "padding"
+                       ,_1: "2px"}
+                      ,{ctor: "_Tuple2"
+                       ,_0: "textAlign"
+                       ,_1: "center"}]),
+         $HtmlUtils.bordered))]),
+         _L.fromArray([$Html.text("Question")
+                      ,A2($Html.br,
+                      _L.fromArray([]),
+                      _L.fromArray([]))
+                      ,A2(textLine,model.line1,1)
+                      ,A2($Html.br,
+                      _L.fromArray([]),
+                      _L.fromArray([]))
+                      ,A2(textLine,model.line2,2)
+                      ,A2($Html.br,
+                      _L.fromArray([]),
+                      _L.fromArray([]))
+                      ,A2(textLine,model.line3,3)
+                      ,A2($Html.br,
+                      _L.fromArray([]),
+                      _L.fromArray([]))
+                      ,A2($Html.button,
+                      _L.fromArray([A2($Html$Events.onClick,
+                      context.remove,
+                      {ctor: "_Tuple0"})]),
+                      _L.fromArray([$Html.text("Delete")]))]));
+      }();
+   });
+   var Intermediate = F2(function (a,
+   b) {
+      return {_: {}
+             ,children: b
+             ,text: a};
+   });
+   var fromJson = function () {
+      var intermediateToModel = function (intermediate) {
+         return {_: {}
+                ,children: intermediate.children
+                ,line1: $Maybe.withDefault("")($List.head(intermediate.text))
+                ,line2: $Maybe.withDefault("")($List.head(A2($List.drop,
+                1,
+                intermediate.text)))
+                ,line3: $Maybe.withDefault("")($List.head(A2($List.drop,
+                2,
+                intermediate.text)))};
+      };
+      var toIntermediate = A3($Json$Decode.object2,
+      Intermediate,
+      A2($Json$Decode._op[":="],
+      "text",
+      $Json$Decode.list($Json$Decode.string)),
+      A2($Json$Decode._op[":="],
+      "children",
+      $Json$Decode.list($Json$Decode.string)));
+      return A2($Json$Decode.map,
+      intermediateToModel,
+      toIntermediate);
+   }();
+   var init = {_: {}
+              ,children: _L.fromArray([])
+              ,line1: ""
+              ,line2: ""
+              ,line3: ""};
+   var Model = F4(function (a,
+   b,
+   c,
+   d) {
+      return {_: {}
+             ,children: d
+             ,line1: a
+             ,line2: b
+             ,line3: c};
+   });
+   _elm.Question.values = {_op: _op
+                          ,Model: Model
+                          ,init: init
+                          ,Intermediate: Intermediate
+                          ,fromJson: fromJson
+                          ,SetText: SetText
+                          ,update: update
+                          ,Context: Context
+                          ,view: view
+                          ,toJson: toJson};
+   return _elm.Question.values;
+};

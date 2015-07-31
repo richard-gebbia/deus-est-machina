@@ -1,0 +1,226 @@
+Elm.Speech = Elm.Speech || {};
+Elm.Speech.make = function (_elm) {
+   "use strict";
+   _elm.Speech = _elm.Speech || {};
+   if (_elm.Speech.values)
+   return _elm.Speech.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Speech",
+   $Basics = Elm.Basics.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $HtmlUtils = Elm.HtmlUtils.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $Json$Encode = Elm.Json.Encode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var toJson = function (model) {
+      return function () {
+         var text = A2($List.map,
+         $Json$Encode.string,
+         _L.fromArray([model.line1
+                      ,model.line2
+                      ,model.line3]));
+         return $Json$Encode.object(_L.fromArray([{ctor: "_Tuple2"
+                                                  ,_0: "name"
+                                                  ,_1: $Json$Encode.string(model.speaker)}
+                                                 ,{ctor: "_Tuple2"
+                                                  ,_0: "text"
+                                                  ,_1: $Json$Encode.list(text)}
+                                                 ,{ctor: "_Tuple2"
+                                                  ,_0: "children"
+                                                  ,_1: $Json$Encode.list(A2($List.map,
+                                                  $Json$Encode.string,
+                                                  model.children))}]));
+      }();
+   };
+   var debugDraw = function (model) {
+      return A2($Html.div,
+      _L.fromArray([]),
+      _L.fromArray([$Html.text(A2($Basics._op["++"],
+                   "Speaker: ",
+                   model.speaker))
+                   ,A2($Html.br,
+                   _L.fromArray([]),
+                   _L.fromArray([]))
+                   ,$Html.text(A2($Basics._op["++"],
+                   "Line 1: ",
+                   model.line1))
+                   ,A2($Html.br,
+                   _L.fromArray([]),
+                   _L.fromArray([]))
+                   ,$Html.text(A2($Basics._op["++"],
+                   "Line 2: ",
+                   model.line2))
+                   ,A2($Html.br,
+                   _L.fromArray([]),
+                   _L.fromArray([]))
+                   ,$Html.text(A2($Basics._op["++"],
+                   "Line 3: ",
+                   model.line3))]));
+   };
+   var update = F2(function (action,
+   model) {
+      return function () {
+         switch (action.ctor)
+         {case "SetSpeaker":
+            return _U.replace([["speaker"
+                               ,action._0]],
+              model);
+            case "SetText":
+            return _U.replace([["line1"
+                               ,_U.eq(action._0,
+                               1) ? action._1 : model.line1]
+                              ,["line2"
+                               ,_U.eq(action._0,
+                               2) ? action._1 : model.line2]
+                              ,["line3"
+                               ,_U.eq(action._0,
+                               3) ? action._1 : model.line3]],
+              model);}
+         return model;
+      }();
+   });
+   var SetText = F2(function (a,
+   b) {
+      return {ctor: "SetText"
+             ,_0: a
+             ,_1: b};
+   });
+   var SetSpeaker = function (a) {
+      return {ctor: "SetSpeaker"
+             ,_0: a};
+   };
+   var Intermediate = F3(function (a,
+   b,
+   c) {
+      return {_: {}
+             ,children: c
+             ,name: a
+             ,text: b};
+   });
+   var fromJson = function () {
+      var intermediateToModel = function (intermediate) {
+         return {_: {}
+                ,children: intermediate.children
+                ,line1: $Maybe.withDefault("")($List.head(intermediate.text))
+                ,line2: $Maybe.withDefault("")($List.head(A2($List.drop,
+                1,
+                intermediate.text)))
+                ,line3: $Maybe.withDefault("")($List.head(A2($List.drop,
+                2,
+                intermediate.text)))
+                ,speaker: intermediate.name};
+      };
+      var toIntermediate = A4($Json$Decode.object3,
+      Intermediate,
+      A2($Json$Decode._op[":="],
+      "name",
+      $Json$Decode.string),
+      A2($Json$Decode._op[":="],
+      "text",
+      $Json$Decode.list($Json$Decode.string)),
+      A2($Json$Decode._op[":="],
+      "children",
+      $Json$Decode.list($Json$Decode.string)));
+      return A2($Json$Decode.map,
+      intermediateToModel,
+      toIntermediate);
+   }();
+   var speakers = _L.fromArray(["Sophie"
+                               ,"Gavin"
+                               ,"Ava"
+                               ,"Sebastian"]);
+   var view = F2(function (address,
+   model) {
+      return function () {
+         var setSpeakerMessage = function ($) {
+            return $Signal.message(address)(SetSpeaker($));
+         };
+         var setTextMessage = function (lineNum) {
+            return function ($) {
+               return $Signal.message(address)(SetText(lineNum)($));
+            };
+         };
+         var textLine = F2(function (txt,
+         lineNum) {
+            return A2($Html.input,
+            _L.fromArray([$Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
+                                                               ,_0: "width"
+                                                               ,_1: "243px"}]))
+                         ,$Html$Attributes.value(txt)
+                         ,A3($Html$Events.on,
+                         "input",
+                         $Html$Events.targetValue,
+                         setTextMessage(lineNum))]),
+            _L.fromArray([]));
+         });
+         return A2($Html.div,
+         _L.fromArray([$Html$Attributes.style(A2($Basics._op["++"],
+         _L.fromArray([{ctor: "_Tuple2"
+                       ,_0: "backgroundColor"
+                       ,_1: "rgb(255,255,200)"}
+                      ,{ctor: "_Tuple2"
+                       ,_0: "width"
+                       ,_1: "250px"}
+                      ,{ctor: "_Tuple2"
+                       ,_0: "padding"
+                       ,_1: "2px"}
+                      ,{ctor: "_Tuple2"
+                       ,_0: "textAlign"
+                       ,_1: "center"}]),
+         $HtmlUtils.bordered))]),
+         _L.fromArray([$HtmlUtils.title("Speech")
+                      ,$Html.text("Speaker ")
+                      ,A3($HtmlUtils.selection,
+                      speakers,
+                      model.speaker,
+                      setSpeakerMessage)
+                      ,A2($Html.br,
+                      _L.fromArray([]),
+                      _L.fromArray([]))
+                      ,$Html.text("Text")
+                      ,A2($Html.br,
+                      _L.fromArray([]),
+                      _L.fromArray([]))
+                      ,A2(textLine,model.line1,1)
+                      ,A2($Html.br,
+                      _L.fromArray([]),
+                      _L.fromArray([]))
+                      ,A2(textLine,model.line2,2)
+                      ,A2($Html.br,
+                      _L.fromArray([]),
+                      _L.fromArray([]))
+                      ,A2(textLine,model.line3,3)]));
+      }();
+   });
+   var Model = F5(function (a,
+   b,
+   c,
+   d,
+   e) {
+      return {_: {}
+             ,children: e
+             ,line1: b
+             ,line2: c
+             ,line3: d
+             ,speaker: a};
+   });
+   _elm.Speech.values = {_op: _op
+                        ,Model: Model
+                        ,speakers: speakers
+                        ,Intermediate: Intermediate
+                        ,fromJson: fromJson
+                        ,SetSpeaker: SetSpeaker
+                        ,SetText: SetText
+                        ,update: update
+                        ,view: view
+                        ,debugDraw: debugDraw
+                        ,toJson: toJson};
+   return _elm.Speech.values;
+};

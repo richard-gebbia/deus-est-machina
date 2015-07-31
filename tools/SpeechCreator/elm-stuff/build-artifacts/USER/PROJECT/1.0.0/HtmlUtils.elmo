@@ -1,0 +1,63 @@
+Elm.HtmlUtils = Elm.HtmlUtils || {};
+Elm.HtmlUtils.make = function (_elm) {
+   "use strict";
+   _elm.HtmlUtils = _elm.HtmlUtils || {};
+   if (_elm.HtmlUtils.values)
+   return _elm.HtmlUtils.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "HtmlUtils",
+   $Basics = Elm.Basics.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var selection = F3(function (list,
+   selectedStr,
+   onChange) {
+      return function () {
+         var attrs = function (str) {
+            return A2($List._op["::"],
+            $Html$Attributes.value(str),
+            _U.eq(str,
+            selectedStr) ? _L.fromArray([$Html$Attributes.selected(true)]) : _L.fromArray([]));
+         };
+         return $Html.select(_L.fromArray([A3($Html$Events.on,
+         "change",
+         $Html$Events.targetValue,
+         onChange)]))(A2($List.map,
+         function (str) {
+            return A2($Html.option,
+            attrs(str),
+            _L.fromArray([$Html.text(str)]));
+         },
+         list));
+      }();
+   });
+   var title = function (str) {
+      return A2($Html.div,
+      _L.fromArray([$Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
+                                                         ,_0: "textAlign"
+                                                         ,_1: "center"}]))]),
+      _L.fromArray([A2($Html.b,
+      _L.fromArray([]),
+      _L.fromArray([$Html.text(str)]))]));
+   };
+   var bordered = _L.fromArray([{ctor: "_Tuple2"
+                                ,_0: "border"
+                                ,_1: "solid"}
+                               ,{ctor: "_Tuple2"
+                                ,_0: "borderColor"
+                                ,_1: "black"}
+                               ,{ctor: "_Tuple2"
+                                ,_0: "borderWidth"
+                                ,_1: "1px"}]);
+   _elm.HtmlUtils.values = {_op: _op
+                           ,bordered: bordered
+                           ,title: title
+                           ,selection: selection};
+   return _elm.HtmlUtils.values;
+};
