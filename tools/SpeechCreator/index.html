@@ -1,9 +1,21 @@
 <!DOCTYPE html>
 <html>
+<style type="text/css">
+div {
+    font-family: sans-serif;
+}
+body {
+    background-color: #cccccc;
+}
+</style>
 <body>
     <script src="elm.js"></script>
     <script>
-        Elm.fullscreen(Elm.Main);
+        var speechCreator = Elm.fullscreen(Elm.Main);
+
+        speechCreator.ports.backgroundColor.subscribe(function (color) {
+            document.body.style.backgroundColor = color;
+        });
     </script>
 </body>
 </html>

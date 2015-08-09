@@ -1,4 +1,4 @@
 *.DS_Store
 # ignore the elm generated stuff
 */elm-stuff/
-*/elm-package.json
+*elm.js

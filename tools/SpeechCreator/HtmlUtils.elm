@@ -2,8 +2,9 @@ module HtmlUtils where
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, targetValue)
+import Html.Events exposing (on, targetValue, onClick)
 import List exposing ((::))
+import Signal
 
 
 bordered : List (String, String)
@@ -19,7 +20,14 @@ title str =
     div
         [ style [("textAlign", "center")] ]
         [ b [] [text str] ]
-    
+
+
+closeButton : Signal.Address () -> Html
+closeButton address =
+    div 
+        [ style [("textAlign", "right")] ]
+        [ button address () "x" ]
+
 
 selection : List String -> String -> (String -> Signal.Message) -> Html
 selection list selectedStr onChange = 
@@ -29,3 +37,23 @@ selection list selectedStr onChange =
     in
     select [on "change" targetValue onChange]
         <| List.map (\str -> option (attrs str) [ text str ]) list
+
+
+button : Signal.Address a -> a -> String -> Html
+button address action btnText =
+    Html.button [onClick address action] [text btnText]
+
+
+textarea : Int -> Int -> Signal.Address a -> (String -> a) -> String -> Html
+textarea width height address onInput str =
+    Html.textarea
+        [ value str
+        , style 
+            [ ("width", toString width ++ "px")
+            , ("height", toString height ++ "px")
+            ]
+        , onInput >> Signal.message address 
+          |> on "input" targetValue
+        ]
+        []
+

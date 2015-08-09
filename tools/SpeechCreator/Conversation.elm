@@ -33,6 +33,7 @@ fromJson =
 type Action 
     = ModifySpeech String Speech.Action
     | ModifyQuestions String Questions.Action
+    | RemoveNode String
 
 
 -- Update
@@ -66,29 +67,44 @@ update action model =
         ModifyQuestions key qAction ->
             Dict.update key (Maybe.map (modifyQuestions qAction)) model
 
+        RemoveNode key ->
+            Dict.remove key model
+
         _ ->
             model
 
 
 -- View
 
-viewNode : Signal.Address Action -> String -> Node -> Html
-viewNode address key node =
+type alias Context =
+    { actions: Signal.Address Action
+    , focus: Signal.Address Bool
+    }
+
+
+viewNode : Context -> String -> Node -> Html
+viewNode context key node =
     case node of 
         Talking speech ->
             Speech.view 
-                (Signal.forwardTo address (ModifySpeech key)) 
+                (Speech.Context 
+                    (Signal.forwardTo context.actions (ModifySpeech key)) 
+                    (Signal.forwardTo context.focus identity)
+                    (Signal.forwardTo context.actions (always (RemoveNode key))))
                 speech
 
         Asking questions ->
             Questions.view 
-                (Signal.forwardTo address (ModifyQuestions key)) 
+                (Questions.Context
+                    (Signal.forwardTo context.actions (ModifyQuestions key)) 
+                    (Signal.forwardTo context.focus identity)
+                    (Signal.forwardTo context.actions (always (RemoveNode key))))
                 questions
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
-    Dict.map (viewNode address) model
+view : Context -> Model -> Html
+view context model =
+    Dict.map (viewNode context) model
     |> Dict.values
     |> Html.div []
 

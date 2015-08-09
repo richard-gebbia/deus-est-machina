@@ -19,6 +19,8 @@ type alias Model =
     , line2: String
     , line3: String
     , children: List String
+    , x: Int
+    , y: Int
     }
   
   
@@ -62,6 +64,8 @@ fromJson =
                 |> List.head
                 |> Maybe.withDefault ""
             , children = intermediate.children
+            , x = 0
+            , y = 0
             }
     in
     Decode.map intermediateToModel toIntermediate
@@ -95,33 +99,77 @@ update action model =
 
 -- View
 
-view : Signal.Address Action -> Model -> Html
-view address model = 
+type alias Context = 
+    { actions: Signal.Address Action
+    , focus: Signal.Address Bool
+    , remove: Signal.Address ()
+    }
+
+
+view : Context -> Model -> Html
+view context model = 
     let textLine : String -> Int -> Html
         textLine txt lineNum = 
             input 
                 [ style [("width", "243px")]
                 , value txt 
                 , on "input" targetValue (setTextMessage lineNum)
+                , onFocus context.focus True
+                , onBlur context.focus False
                 ] []
 
         setTextMessage : Int -> String -> Signal.Message
         setTextMessage lineNum =
-            SetText lineNum >> Signal.message address
+            SetText lineNum >> Signal.message context.actions
 
         setSpeakerMessage : String -> Signal.Message
         setSpeakerMessage =
-            SetSpeaker >> Signal.message address
+            SetSpeaker >> Signal.message context.actions
+
+        -- width of the div
+        width : Int
+        width = 250
+
+        -- amound of vertical distance between each child link button
+        childBtnStride : Int
+        childBtnStride = 25
+
+        childBtnXPadding : Int
+        childBtnXPadding = 5
+
+        childBtnYPadding : Int
+        childBtnYPadding = 25
+
+        childButton : Int -> Html
+        childButton y =
+            button
+                [ style
+                    [ ("position", "absolute")
+                    , ("left", toString (width + childBtnXPadding) ++ "px")
+                    , ("top", toString (childBtnYPadding + y) ++ "px")
+                    ]
+                ]
+                [ text "+" ]
+
+        childButtons : List Html
+        childButtons =
+            List.map 
+                ((*) childBtnStride >> childButton) 
+                [0..List.length model.children]
     in
     div 
         [ style 
             ([ ("backgroundColor", "rgb(255,255,200)")
-            , ("width", "250px")
+            , ("width", toString width ++ "px")
             , ("padding", "2px")
             , ("textAlign", "center")
+            , ("position", "absolute")
+            , ("left", toString model.x ++ "px")
+            , ("top", toString model.y ++ "px")
             ] ++ HtmlUtils.bordered)
         ]
-        [ HtmlUtils.title "Speech"
+        ([ HtmlUtils.closeButton context.remove
+        , HtmlUtils.title "Speech"
         , text "Speaker "
         , HtmlUtils.selection speakers model.speaker setSpeakerMessage
         , br [] []
@@ -132,7 +180,7 @@ view address model =
         , textLine model.line2 2
         , br [] []
         , textLine model.line3 3
-        ]
+        ] ++ childButtons)
     
 
 debugDraw : Model -> Html

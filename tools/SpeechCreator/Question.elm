@@ -87,6 +87,7 @@ update action model =
 type alias Context =
     { actions : Signal.Address Action
     , remove : Signal.Address ()
+    , focus : Signal.Address Bool
     }
 
 
@@ -98,6 +99,8 @@ view context model =
                 [ style [("width", "243px")]
                 , value txt 
                 , on "input" targetValue (setTextMessage lineNum)
+                , onFocus context.focus True
+                , onBlur context.focus False
                 ] []
 
         setTextMessage : Int -> String -> Signal.Message
@@ -112,15 +115,14 @@ view context model =
             , ("textAlign", "center")
             ] ++ HtmlUtils.bordered)
         ]
-        [ text "Question"
+        [ HtmlUtils.closeButton context.remove
+        , text "Question"
         , br [] []
         , textLine model.line1 1
         , br [] []
         , textLine model.line2 2
         , br [] []
         , textLine model.line3 3
-        , br [] []
-        , button [onClick context.remove ()] [text "Delete"]
         ]
 
 

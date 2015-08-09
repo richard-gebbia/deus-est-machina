@@ -15,6 +15,8 @@ import Question
 
 type alias Model =
     { questions: Array Question.Model
+    , x: Int
+    , y: Int
     }
 
 
@@ -22,7 +24,7 @@ fromJson : Decode.Decoder Model
 fromJson =
     Decode.list Question.fromJson
     |> Decode.map Array.fromList
-    |> Decode.map Model
+    |> Decode.map (\questions -> Model questions 0 0)
 
 
 -- Action
@@ -68,31 +70,45 @@ update action model =
 
 -- View
 
-view : Signal.Address Action -> Model -> Html
-view address model =
-    let context i = 
-            { actions = Signal.forwardTo address (ModifyQuestion i)
-            , remove = Signal.forwardTo address (always (DeleteQuestion i))
+type alias Context =
+    { actions: Signal.Address Action
+    , focus: Signal.Address Bool
+    , remove: Signal.Address ()
+    }
+
+
+view : Context -> Model -> Html
+view context model =
+    let subContext i = 
+            { actions = Signal.forwardTo context.actions (ModifyQuestion i)
+            , remove = Signal.forwardTo context.actions (always (DeleteQuestion i))
+            , focus = Signal.forwardTo context.focus identity
             }
 
         questionViews = 
             Array.indexedMap 
-                (\i question -> Question.view (context i) question) 
+                (\i question -> Question.view (subContext i) question) 
                 model.questions
             |> Array.toList
     
         addButton =
-            button [onClick address NewQuestion] [text "Add"]
+            button [onClick context.actions NewQuestion] [text "Add"]
     in
     div 
         [ style 
             ([ ("backgroundColor", "rgb(200,255,200)")
             , ("width", "250px")
             , ("padding", "2px")
+            , ("position", "absolute")
+            , ("left", toString model.x ++ "px")
+            , ("top", toString model.y ++ "px")
             , ("textAlign", "center")
             ] ++ HtmlUtils.bordered)
         ]
-        ((HtmlUtils.title "Questions" :: questionViews) ++ [addButton])
+        ((  HtmlUtils.closeButton context.remove 
+        ::  HtmlUtils.title "Questions" 
+        ::  questionViews) 
+        ++  [addButton])
 
 
 toJson : Model -> Encode.Value
