@@ -33,6 +33,18 @@ speakers =
     ]
 
 
+init : Int -> Int -> Model
+init x y =
+    { speaker = "Sophie"
+    , line1 = ""
+    , line2 = ""
+    , line3 = ""
+    , children = []
+    , x = x
+    , y = y 
+    }
+
+
 type alias Intermediate =
     { name: String
     , text: List String

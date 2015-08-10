@@ -20,6 +20,14 @@ type alias Model =
     }
 
 
+init : Int -> Int -> Model
+init x y =
+    { questions = Array.empty
+    , x = x
+    , y = y
+    }
+
+
 fromJson : Decode.Decoder Model
 fromJson =
     Decode.list Question.fromJson

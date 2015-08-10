@@ -5,6 +5,7 @@ import Char
 import Conversation
 import Debug
 import Dict
+import GraphView
 import Html exposing (Html)
 import Html.Attributes as HtmlAttrs
 import Html.Events as HtmlEvents
@@ -17,7 +18,6 @@ import Mouse
 import Questions
 import Result
 import Signal exposing (Signal)
-import StartApp
 import Speech
 import String
 
@@ -27,32 +27,24 @@ import String
 type Mode
     = ViewingJson
     | ViewingGraph
-    | AddingSpeech
-    | AddingQuestions
 
 
 type alias Model =
-    { conversation: Conversation.Model
+    { graphView: GraphView.Model
     , jsonView: JsonView.Model
     , mode: Mode
-    , inputText: String
-    , errorText: String
-    , nextKey: Int
-    , canMakeNewNodes: Bool
     }
 
 
 -- Action
 
 type Action 
-    = ModifyConversation Conversation.Action
+    = ModifyGraphView GraphView.Action
     | ModifyJsonView JsonView.Action
     | ParseConversation String
     | ViewGraph
     | ViewJson
-    | IntentNewSpeech
-    | IntentNewQuestions
-    | EnableNodeCreation Bool
+    | IntentToggleViews
     | Click (Int, Int)
     | NoOp
 
@@ -62,36 +54,33 @@ type Action
 updateViewingGraph : Action -> Model -> Model
 updateViewingGraph action model =
     case action of
-        ModifyConversation cAction ->
+        ModifyGraphView gvAction ->
             { model |
-                conversation <-
-                    Conversation.update cAction model.conversation
+                graphView <-
+                    GraphView.update gvAction model.graphView
             }
 
         ViewJson ->
             { model | 
                 mode <- ViewingJson,
                 jsonView <- 
-                    Conversation.toJson model.conversation
+                    Conversation.toJson model.graphView.conversation
                     |> Encode.encode 4
                     |> JsonView.EditInput
                     |> flip JsonView.update model.jsonView
             }
 
-        EnableNodeCreation isDisabled ->
-            { model | canMakeNewNodes <- not isDisabled }
-
-        IntentNewSpeech ->
-            if model.canMakeNewNodes then
-                { model | mode <- AddingSpeech }
+        IntentToggleViews ->
+            if model.graphView.focus then
+                updateViewingGraph ViewJson model
             else
                 model
 
-        IntentNewQuestions ->
-            if model.canMakeNewNodes then
-                { model | mode <- AddingQuestions }
-            else
-                model
+        Click (x, y) ->
+            { model |
+                graphView <-
+                    GraphView.update (GraphView.Click (x, y)) model.graphView
+            }
 
         _ ->
             model
@@ -108,7 +97,12 @@ updateViewingJson action model =
             |> (\result -> 
                     case result of
                         Result.Ok conversation ->
-                            { model | conversation <- conversation }
+                            { model | 
+                                graphView <-
+                                    GraphView.update 
+                                        (GraphView.SetConversation conversation)
+                                        model.graphView
+                            }
 
                         Result.Err message ->
                             { model | 
@@ -122,65 +116,11 @@ updateViewingJson action model =
         ViewGraph ->
             { model | mode <- ViewingGraph }
 
-        _ ->
-            model
-
-
-updateAddingSpeech : Action -> Model -> Model
-updateAddingSpeech action model =
-    let newSpeech : Int -> Int -> Conversation.Node
-        newSpeech x y = 
-            Conversation.Talking
-                { speaker = "Ava"
-                , line1 = ""
-                , line2 = ""
-                , line3 = ""
-                , children = []
-                , x = x
-                , y = y
-                }
-    in
-    case action of 
-        Click (x, y) ->
-            { model |
-                conversation <-
-                    Dict.insert 
-                        (toString model.nextKey) 
-                        (newSpeech x y) 
-                        model.conversation,
-
-                mode <- ViewingGraph,
-
-                nextKey <- model.nextKey + 1
-            }
-
-        _ -> 
-            model
-
-
-updateAddingQuestions : Action -> Model -> Model
-updateAddingQuestions action model =
-    let newQuestions : Int -> Int -> Conversation.Node
-        newQuestions x y = 
-            Conversation.Asking
-                { questions = Array.empty
-                , x = x
-                , y = y
-                }
-    in
-    case action of 
-        Click (x, y) ->
-            { model | 
-                conversation <-
-                    Dict.insert 
-                        (toString model.nextKey)
-                        (newQuestions x y)
-                        model.conversation,
-
-                mode <- ViewingGraph,
-
-                nextKey <- model.nextKey + 1
-            }
+        IntentToggleViews ->
+            if model.jsonView.focus then
+                { model | mode <- ViewingGraph }
+            else 
+                model
 
         _ ->
             model
@@ -195,13 +135,8 @@ update action model =
         ViewingJson -> 
             updateViewingJson action model
 
-        AddingSpeech -> 
-            updateAddingSpeech action model
-
-        AddingQuestions ->
-            updateAddingQuestions action model
-
-        _ -> model
+        _ -> 
+            model
 
 
 
@@ -216,11 +151,9 @@ viewViewingGraph : Signal.Address Action -> Model -> Html
 viewViewingGraph address model =
     Html.div []
         [ button address ViewJson "Json"
-        , Conversation.view 
-            (Conversation.Context
-                (Signal.forwardTo address ModifyConversation)
-                (Signal.forwardTo address EnableNodeCreation))
-            model.conversation
+        , GraphView.view 
+            (Signal.forwardTo address ModifyGraphView)
+            model.graphView
         ]
 
 
@@ -236,18 +169,6 @@ viewViewingJson address model =
     JsonView.view context model.jsonView
 
 
-viewAddingSpeech : Signal.Address Action -> Model -> Html
-viewAddingSpeech address model =
-    Html.div []
-        [ viewViewingGraph address model ]
-
-
-viewAddingQuestions : Signal.Address Action -> Model -> Html
-viewAddingQuestions address model =
-    Html.div []
-        [ viewViewingGraph address model ]
-
-
 view : Signal.Address Action -> Model -> Html
 view address model =
     case model.mode of
@@ -257,49 +178,45 @@ view address model =
         ViewingJson ->
             viewViewingJson address model
 
-        AddingSpeech ->
-            viewAddingSpeech address model
-
-        AddingQuestions ->
-            viewAddingQuestions address model
-
 
 -- Main
 
 init : Model
 init = 
-    { conversation =
-        Dict.singleton "ava1" 
-            (Conversation.Talking 
-                { speaker = "Ava"
-                , line1 = "Hello"
-                , line2 = "My name is Ava"
-                , line3 = ""
-                , children = ["lol", "wut", "idk"]
-                , x = 300
-                , y = 50
-                })
-        |> Dict.insert "questions1"
-            (Conversation.Asking
-                { questions =
-                    [ { line1 = "How can she slap?!"
-                      , line2 = ""
-                      , line3 = ""
-                      , children = []
-                      }
-                    ] |> Array.fromList
-                , x = 40
-                , y = 100
-                })
+    { graphView =
+        { conversation = 
+            Dict.singleton "ava1" 
+                (Conversation.Talking 
+                    { speaker = "Ava"
+                    , line1 = "Hello"
+                    , line2 = "My name is Ava"
+                    , line3 = ""
+                    , children = ["lol", "wut", "idk"]
+                    , x = 500
+                    , y = 50
+                    })
+            |> Dict.insert "questions1"
+                (Conversation.Asking
+                    { questions =
+                        [ { line1 = "How can she slap?!"
+                          , line2 = ""
+                          , line3 = ""
+                          , children = []
+                          }
+                        ] |> Array.fromList
+                    , x = 40
+                    , y = 100
+                    })
+        , mode = GraphView.ViewingGraph
+        , nextKey = 0
+        , focus = True
+        }
     , jsonView = 
         { json = ""
         , errorText = ""
+        , focus = True
         }
     , mode = ViewingGraph
-    , inputText = ""
-    , errorText = ""
-    , nextKey = 0
-    , canMakeNewNodes = True
     }
 
 
@@ -322,10 +239,13 @@ extraSignals : List (Signal Action)
 extraSignals =
     [ Char.toCode 'Q' 
       |> KeyboardUtils.keyPresses 
-      |> Signal.map (always IntentNewSpeech) 
+      |> Signal.map (always (ModifyGraphView GraphView.IntentAddSpeech))
     , Char.toCode 'W'
       |> KeyboardUtils.keyPresses
-      |> Signal.map (always IntentNewQuestions)
+      |> Signal.map (always (ModifyGraphView GraphView.IntentAddQuestions))
+    , Char.toCode '\t'
+      |> KeyboardUtils.keyPresses
+      |> Signal.map (always IntentToggleViews)
     , Signal.sampleOn Mouse.clicks Mouse.position
       |> Signal.map Click
     ]
@@ -347,11 +267,11 @@ appModel =
 
 port backgroundColor : Signal String
 port backgroundColor =
-    let color : Mode -> String
+    let color : GraphView.Mode -> String
         color mode =
             case mode of
-                AddingSpeech -> "#ffcccc"
-                AddingQuestions -> "#ccccff"
+                GraphView.AddingSpeech -> "rgb(255,255,200)"
+                GraphView.AddingQuestions -> "rgb(200,255,200)"
                 _ -> "#cccccc"
     in
-    Signal.map (.mode >> color) appModel
+    Signal.map (.graphView >> .mode >> color) appModel
