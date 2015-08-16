@@ -191,7 +191,7 @@ init =
                     , line1 = "Hello"
                     , line2 = "My name is Ava"
                     , line3 = ""
-                    , children = ["lol", "wut", "idk"]
+                    , children = ["lol", "wut", "test"]
                     , x = 500
                     , y = 50
                     })
@@ -202,14 +202,29 @@ init =
                           , line2 = ""
                           , line3 = ""
                           , children = []
+                          , x = 0
+                          , y = Questions.initQuestionYStart
                           }
                         ] |> Array.fromList
                     , x = 40
                     , y = 100
+                    , questionYStart = Questions.initQuestionYStart
+                    , questionYStride = Questions.initQuestionYStride
+                    })
+            |> Dict.insert "lol"
+                (Conversation.Talking 
+                    { speaker = "Sophie"
+                    , line1 = "Hello"
+                    , line2 = "My name is lol"
+                    , line3 = ""
+                    , children = []
+                    , x = 800
+                    , y = 500
                     })
         , mode = GraphView.ViewingGraph
         , nextKey = 0
         , focus = True
+        , currentlyParenting = Nothing
         }
     , jsonView = 
         { json = ""

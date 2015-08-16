@@ -1,5 +1,6 @@
 module Speech where
 
+import Debug
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -8,6 +9,7 @@ import Json.Decode as Decode exposing ((:=))
 import Json.Encode as Encode
 import List
 import Maybe
+import Parentable
 import Signal
 
 
@@ -88,6 +90,7 @@ fromJson =
 type Action 
     = SetSpeaker String
     | SetText Int String
+    | ModifyParentable Parentable.Action
 
 
 -- Update
@@ -105,6 +108,9 @@ update action model =
                 line3 <- if lineNum == 3 then line else model.line3
             }
 
+        ModifyParentable pAction ->
+            Parentable.update pAction model
+
         _ ->
             model
 
@@ -115,7 +121,34 @@ type alias Context =
     { actions: Signal.Address Action
     , focus: Signal.Address Bool
     , remove: Signal.Address ()
+    , startParenting: Signal.Address ()
+    , parentThis: Signal.Address ()
     }
+
+
+ -- width of the div
+width : Int
+width = 250
+
+-- amound of vertical distance between each child link button
+childBtnStride : Int
+childBtnStride = 18
+
+
+childBtnXPadding : Int
+childBtnXPadding = 5
+
+
+childBtnYPadding : Int
+childBtnYPadding = 25
+
+
+childBtnPosition : Model -> Int -> (Int, Int)
+childBtnPosition model index =
+    (
+        width + childBtnXPadding + model.x, 
+        (index * childBtnStride + childBtnYPadding) + model.y
+    )
 
 
 view : Context -> Model -> Html
@@ -137,37 +170,6 @@ view context model =
         setSpeakerMessage : String -> Signal.Message
         setSpeakerMessage =
             SetSpeaker >> Signal.message context.actions
-
-        -- width of the div
-        width : Int
-        width = 250
-
-        -- amound of vertical distance between each child link button
-        childBtnStride : Int
-        childBtnStride = 25
-
-        childBtnXPadding : Int
-        childBtnXPadding = 5
-
-        childBtnYPadding : Int
-        childBtnYPadding = 25
-
-        childButton : Int -> Html
-        childButton y =
-            button
-                [ style
-                    [ ("position", "absolute")
-                    , ("left", toString (width + childBtnXPadding) ++ "px")
-                    , ("top", toString (childBtnYPadding + y) ++ "px")
-                    ]
-                ]
-                [ text "+" ]
-
-        childButtons : List Html
-        childButtons =
-            List.map 
-                ((*) childBtnStride >> childButton) 
-                [0..List.length model.children]
     in
     div 
         [ style 
@@ -180,7 +182,11 @@ view context model =
             , ("top", toString model.y ++ "px")
             ] ++ HtmlUtils.bordered)
         ]
-        ([ HtmlUtils.closeButton context.remove
+        [ button 
+            [ style [ ("float", "left" ) ]
+            , onClick context.parentThis () 
+            ] [ text "child"]
+        , HtmlUtils.closeButton context.remove
         , HtmlUtils.title "Speech"
         , text "Speaker "
         , HtmlUtils.selection speakers model.speaker setSpeakerMessage
@@ -192,7 +198,16 @@ view context model =
         , textLine model.line2 2
         , br [] []
         , textLine model.line3 3
-        ] ++ childButtons)
+        , Parentable.view 
+            width
+            childBtnXPadding
+            childBtnYPadding
+            childBtnStride
+            (Parentable.Context
+                (Signal.forwardTo context.actions ModifyParentable)
+                (Signal.forwardTo context.startParenting (always ())))
+            model
+        ]
     
 
 debugDraw : Model -> Html

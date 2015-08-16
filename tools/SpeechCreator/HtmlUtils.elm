@@ -25,7 +25,7 @@ title str =
 closeButton : Signal.Address () -> Html
 closeButton address =
     div 
-        [ style [("textAlign", "right")] ]
+        [ style [("float", "right")] ]
         [ button address () "x" ]
 
 
@@ -56,4 +56,3 @@ textarea width height address onInput str =
           |> on "input" targetValue
         ]
         []
-

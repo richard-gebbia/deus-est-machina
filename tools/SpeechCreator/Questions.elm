@@ -9,6 +9,7 @@ import HtmlUtils
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Maybe
+import Parentable
 import Question
 
 -- Model 
@@ -17,7 +18,17 @@ type alias Model =
     { questions: Array Question.Model
     , x: Int
     , y: Int
+    , questionYStride: Int
+    , questionYStart: Int
     }
+
+
+initQuestionYStart : Int
+initQuestionYStart = 37
+
+
+initQuestionYStride : Int
+initQuestionYStride = 102
 
 
 init : Int -> Int -> Model
@@ -25,6 +36,8 @@ init x y =
     { questions = Array.empty
     , x = x
     , y = y
+    , questionYStart = initQuestionYStart
+    , questionYStride = initQuestionYStride
     }
 
 
@@ -32,7 +45,16 @@ fromJson : Decode.Decoder Model
 fromJson =
     Decode.list Question.fromJson
     |> Decode.map Array.fromList
-    |> Decode.map (\questions -> Model questions 0 0)
+    |> Decode.map 
+        (\questions -> 
+            Model questions 0 0 
+                initQuestionYStart
+                initQuestionYStride)
+
+
+toParentSpace : Model -> (Int, Int) -> (Int, Int)
+toParentSpace model (x, y) =
+    (x + model.x, y + model.y)
 
 
 -- Action
@@ -41,12 +63,17 @@ type Action
     = ModifyQuestion Int Question.Action
     | NewQuestion
     | DeleteQuestion Int
+    | ParentQuestion Int String
 
 
 -- Update
 
 update : Action -> Model -> Model
 update action model =
+    let questionY : Int -> Int
+        questionY index =
+            index * model.questionYStride + model.questionYStart
+    in
     case action of
         ModifyQuestion questionIndex qAction ->
             { model |
@@ -61,7 +88,10 @@ update action model =
         NewQuestion ->
             { model |
                 questions <-
-                    Array.push Question.init model.questions
+                    Array.push 
+                        (Question.init 0 
+                            (questionY (Array.length model.questions))) 
+                        model.questions
             }
 
         DeleteQuestion questionIndex ->
@@ -73,7 +103,17 @@ update action model =
                             (questionIndex + 1) 
                             (Array.length model.questions) 
                             model.questions)
+                    |> Array.indexedMap 
+                        (\index question -> 
+                            { question | y <- questionY index })
             }
+
+        ParentQuestion questionIndex childKey ->
+            update 
+                (ModifyQuestion questionIndex 
+                    (Question.ModifyParentable 
+                        (Parentable.AddChild childKey)))
+                model
 
 
 -- View
@@ -82,6 +122,8 @@ type alias Context =
     { actions: Signal.Address Action
     , focus: Signal.Address Bool
     , remove: Signal.Address ()
+    , startParenting: Signal.Address Int
+    , parentThis: Signal.Address ()
     }
 
 
@@ -91,6 +133,7 @@ view context model =
             { actions = Signal.forwardTo context.actions (ModifyQuestion i)
             , remove = Signal.forwardTo context.actions (always (DeleteQuestion i))
             , focus = Signal.forwardTo context.focus identity
+            , startParenting = Signal.forwardTo context.startParenting (always i)
             }
 
         questionViews = 
@@ -101,22 +144,38 @@ view context model =
     
         addButton =
             button [onClick context.actions NewQuestion] [text "Add"]
+
+        questionGap =
+            div
+                [ style
+                    [ ("width", "250px")
+                    , ("height", 
+                        toString (model.questionYStride * 
+                            Array.length model.questions) ++ "px")
+                    ]
+                ] []
     in
     div 
         [ style 
             ([ ("backgroundColor", "rgb(200,255,200)")
-            , ("width", "250px")
             , ("padding", "2px")
             , ("position", "absolute")
             , ("left", toString model.x ++ "px")
             , ("top", toString model.y ++ "px")
             , ("textAlign", "center")
+            , ("width", "250px")
             ] ++ HtmlUtils.bordered)
         ]
-        ((  HtmlUtils.closeButton context.remove 
-        ::  HtmlUtils.title "Questions" 
-        ::  questionViews) 
-        ++  [addButton])
+        (  button 
+            [ style [ ("float", "left") ]
+            , onClick context.parentThis () 
+            ] [ text "child" ]
+        :: HtmlUtils.closeButton context.remove 
+        :: HtmlUtils.title "Questions" 
+        :: questionGap
+        :: addButton
+        :: questionViews
+        ) 
 
 
 toJson : Model -> Encode.Value

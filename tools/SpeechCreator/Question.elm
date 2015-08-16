@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import HtmlUtils
 import Json.Decode as Decode exposing ((:=))
 import Json.Encode as Encode
+import Parentable
 import Signal
 
 -- Model
@@ -15,15 +16,19 @@ type alias Model =
     , line2: String
     , line3: String
     , children: List String
+    , x: Int
+    , y: Int
     }
 
 
-init : Model
-init =
+init : Int -> Int -> Model
+init x y =
     { line1 = ""
     , line2 = ""
     , line3 = ""
     , children = [] 
+    , x = x
+    , y = y
     }
 
 
@@ -55,15 +60,42 @@ fromJson =
                 |> List.head
                 |> Maybe.withDefault ""
             , children = intermediate.children
+            , x = 0
+            , y = 0
             }
     in
     Decode.map intermediateToModel toIntermediate
+
+
+width : Int
+width = 250
+
+
+childBtnXPadding : Int
+childBtnXPadding = 5
+
+
+childBtnYPadding : Int
+childBtnYPadding = 8
+
+
+childBtnStride : Int
+childBtnStride = 18
+
+
+childBtnPosition : Model -> Int -> (Int, Int)
+childBtnPosition model index =
+    (
+        width + childBtnXPadding + model.x, 
+        (index * childBtnStride + childBtnYPadding) + model.y
+    )
 
 
 -- Action
 
 type Action
     = SetText Int String
+    | ModifyParentable Parentable.Action
 
 
 -- Update
@@ -78,6 +110,9 @@ update action model =
                 line3 <- if lineNum == 3 then line else model.line3
             }
 
+        ModifyParentable pAction ->
+            Parentable.update pAction model
+
         _ ->
             model
 
@@ -88,6 +123,7 @@ type alias Context =
     { actions : Signal.Address Action
     , remove : Signal.Address ()
     , focus : Signal.Address Bool
+    , startParenting: Signal.Address ()
     }
 
 
@@ -110,9 +146,12 @@ view context model =
     div 
         [ style 
             ([ ("backgroundColor", "rgb(200,200,255)")
-            , ("width", "250px")
+            , ("width", toString width ++ "px")
             , ("padding", "2px")
             , ("textAlign", "center")
+            , ("position", "absolute")
+            , ("left", toString model.x ++ "px")
+            , ("top", toString model.y ++ "px")
             ] ++ HtmlUtils.bordered)
         ]
         [ HtmlUtils.closeButton context.remove
@@ -123,6 +162,15 @@ view context model =
         , textLine model.line2 2
         , br [] []
         , textLine model.line3 3
+        , Parentable.view 
+            width
+            childBtnXPadding
+            childBtnYPadding
+            childBtnStride
+            (Parentable.Context
+                (Signal.forwardTo context.actions ModifyParentable)
+                (Signal.forwardTo context.startParenting (always ())))
+            model
         ]
 
 
