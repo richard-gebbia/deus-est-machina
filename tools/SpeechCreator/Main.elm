@@ -41,7 +41,6 @@ type alias Model =
 type Action 
     = ModifyGraphView GraphView.Action
     | ModifyJsonView JsonView.Action
-    | ParseConversation String
     | ViewGraph
     | ViewJson
     | IntentToggleViews
@@ -64,9 +63,12 @@ updateViewingGraph action model =
             { model | 
                 mode <- ViewingJson,
                 jsonView <- 
-                    Conversation.toJson model.graphView.conversation
-                    |> Encode.encode 4
-                    |> JsonView.EditInput
+                    ( Conversation.toJson model.graphView.conversation
+                        |> Encode.encode 4
+                    , Conversation.save model.graphView.conversation
+                        |> Encode.encode 4
+                    )
+                    |> uncurry JsonView.SupplyJsonAndSaveData 
                     |> flip JsonView.update model.jsonView
             }
 
@@ -91,27 +93,6 @@ updateViewingJson action model =
     case action of
         ModifyJsonView mjwAction ->
             { model | jsonView <- JsonView.update mjwAction model.jsonView }
-
-        ParseConversation json ->
-            Decode.decodeString Conversation.fromJson json
-            |> (\result -> 
-                    case result of
-                        Result.Ok conversation ->
-                            { model | 
-                                graphView <-
-                                    GraphView.update 
-                                        (GraphView.SetConversation conversation)
-                                        model.graphView
-                            }
-
-                        Result.Err message ->
-                            { model | 
-                                jsonView <- 
-                                    JsonView.update 
-                                        (JsonView.SetErrorText message)
-                                        model.jsonView
-                            }
-                )
 
         ViewGraph ->
             { model | mode <- ViewingGraph }
@@ -162,7 +143,6 @@ viewViewingJson address model =
     let context : JsonView.Context
         context =
             { actions = Signal.forwardTo address ModifyJsonView
-            , submit = Signal.forwardTo address ParseConversation
             , viewGraph = Signal.forwardTo address (always ViewGraph)
             }
     in
@@ -203,13 +183,11 @@ init =
                           , line3 = ""
                           , children = []
                           , x = 0
-                          , y = Questions.initQuestionYStart
+                          , y = Questions.yStart
                           }
                         ] |> Array.fromList
                     , x = 40
                     , y = 100
-                    , questionYStart = Questions.initQuestionYStart
-                    , questionYStride = Questions.initQuestionYStride
                     })
             |> Dict.insert "lol"
                 (Conversation.Talking 
@@ -228,7 +206,8 @@ init =
         }
     , jsonView = 
         { json = ""
-        , errorText = ""
+        , saveData = ""
+        , loadData = ""
         , focus = True
         }
     , mode = ViewingGraph

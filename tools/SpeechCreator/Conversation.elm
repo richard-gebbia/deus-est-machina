@@ -1,6 +1,8 @@
 module Conversation where
 
-import Array
+import Array exposing (Array)
+import ArrayUtils
+import Debug
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Json.Decode as Decode
@@ -9,6 +11,7 @@ import JsonView
 import Maybe
 import Question
 import Questions
+import Set exposing (Set)
 import Signal
 import Speech
 
@@ -21,13 +24,11 @@ type Node
 type alias Model = Dict String Node
 
 
-fromJson : Decode.Decoder Model
-fromJson =
-    Decode.oneOf
-        [ Speech.fromJson |> Decode.map Talking
-        , Questions.fromJson |> Decode.map Asking 
-        ]
-    |> Decode.dict
+genericToJson : (String -> Node -> Encode.Value) -> Model -> Encode.Value
+genericToJson nodeToValue model =
+    Dict.map nodeToValue model
+    |> Dict.toList
+    |> Encode.object
 
 
 toJson : Model -> Encode.Value
@@ -41,9 +42,21 @@ toJson model =
                 Asking questions ->
                     Questions.toJson questions
     in
-    Dict.map nodeToJson model
-    |> Dict.toList
-    |> Encode.object
+    genericToJson nodeToJson model
+
+
+save : Model -> Encode.Value
+save model =
+    let nodeToJson : String -> Node -> Encode.Value
+        nodeToJson _ node =
+            case node of
+                Talking speech -> 
+                    Speech.save speech
+
+                Asking questions ->
+                    Questions.save questions
+    in
+    genericToJson nodeToJson model
 
 
 removeNode : String -> Model -> Model
@@ -74,3 +87,4 @@ removeNode key model =
     in
     Dict.remove key model
     |> Dict.map (removeFromChildren key)
+

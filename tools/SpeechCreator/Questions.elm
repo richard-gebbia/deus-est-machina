@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import HtmlUtils
-import Json.Decode as Decode
+import Json.Decode as Decode exposing ((:=))
 import Json.Encode as Encode
 import Maybe
 import Parentable
@@ -18,17 +18,15 @@ type alias Model =
     { questions: Array Question.Model
     , x: Int
     , y: Int
-    , questionYStride: Int
-    , questionYStart: Int
     }
 
 
-initQuestionYStart : Int
-initQuestionYStart = 37
+yStart : Int
+yStart = 37
 
 
-initQuestionYStride : Int
-initQuestionYStride = 102
+yStride : Int
+yStride = 102
 
 
 init : Int -> Int -> Model
@@ -36,25 +34,29 @@ init x y =
     { questions = Array.empty
     , x = x
     , y = y
-    , questionYStart = initQuestionYStart
-    , questionYStride = initQuestionYStride
     }
-
-
-fromJson : Decode.Decoder Model
-fromJson =
-    Decode.list Question.fromJson
-    |> Decode.map Array.fromList
-    |> Decode.map 
-        (\questions -> 
-            Model questions 0 0 
-                initQuestionYStart
-                initQuestionYStride)
 
 
 toParentSpace : Model -> (Int, Int) -> (Int, Int)
 toParentSpace model (x, y) =
     (x + model.x, y + model.y)
+
+
+save : Model -> Encode.Value
+save model =
+    Encode.object
+        [ ("questions", Encode.array (Array.map Question.save model.questions))
+        , ("x", Encode.int model.x)
+        , ("y", Encode.int model.y)
+        ]
+
+
+load : Decode.Decoder Model
+load =
+    Decode.object3 Model
+        ("questions" := Decode.array Question.load)
+        ("x" := Decode.int)
+        ("y" := Decode.int)
 
 
 -- Action
@@ -72,7 +74,7 @@ update : Action -> Model -> Model
 update action model =
     let questionY : Int -> Int
         questionY index =
-            index * model.questionYStride + model.questionYStart
+            index * yStride + yStart
     in
     case action of
         ModifyQuestion questionIndex qAction ->
@@ -150,7 +152,7 @@ view context model =
                 [ style
                     [ ("width", "250px")
                     , ("height", 
-                        toString (model.questionYStride * 
+                        toString (yStride * 
                             Array.length model.questions) ++ "px")
                     ]
                 ] []

@@ -54,35 +54,29 @@ type alias Intermediate =
     }
 
 
-fromJson : Decode.Decoder Model
-fromJson =
-    let toIntermediate : Decode.Decoder Intermediate
-        toIntermediate = 
-            Decode.object3 Intermediate
-                ("name" := Decode.string)
-                ("text" := Decode.list Decode.string)
-                ("children" := Decode.list Decode.string)
+save : Model -> Encode.Value
+save model =
+    Encode.object
+        [ ("speaker", Encode.string model.speaker)
+        , ("line1", Encode.string model.line1)
+        , ("line2", Encode.string model.line2)
+        , ("line3", Encode.string model.line3)
+        , ("children", Encode.list (List.map Encode.string model.children))
+        , ("x", Encode.int model.x)
+        , ("y", Encode.int model.y)
+        ]
 
-        intermediateToModel : Intermediate -> Model
-        intermediateToModel intermediate =
-            { speaker = intermediate.name
-            , line1 = 
-                List.head intermediate.text 
-                |> Maybe.withDefault ""
-            , line2 = 
-                List.drop 1 intermediate.text 
-                |> List.head 
-                |> Maybe.withDefault ""
-            , line3 =
-                List.drop 2 intermediate.text
-                |> List.head
-                |> Maybe.withDefault ""
-            , children = intermediate.children
-            , x = 0
-            , y = 0
-            }
-    in
-    Decode.map intermediateToModel toIntermediate
+
+load : Decode.Decoder Model
+load = 
+    Decode.object7 Model
+        ("speaker" := Decode.string)
+        ("line1" := Decode.string)
+        ("line2" := Decode.string)
+        ("line3" := Decode.string)
+        ("children" := Decode.list Decode.string)
+        ("x" := Decode.int)
+        ("y" := Decode.int)
 
 
 -- Action
