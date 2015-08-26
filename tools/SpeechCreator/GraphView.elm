@@ -175,7 +175,7 @@ updateAddingSpeech action model =
                 conversation <-
                     Dict.insert 
                         (toString model.nextKey) 
-                        (Conversation.Talking <| Speech.init (Debug.log "x: " x) (Debug.log "y: " y))
+                        (Conversation.Talking <| Speech.init x y)
                         model.conversation,
 
                 nextKey <-

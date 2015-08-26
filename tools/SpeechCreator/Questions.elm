@@ -158,26 +158,32 @@ view context model =
                 ] []
     in
     div 
-        [ style 
-            ([ ("backgroundColor", "rgb(200,255,200)")
-            , ("padding", "2px")
-            , ("position", "absolute")
+        [ style
+            [ ("position", "absolute")
             , ("left", toString model.x ++ "px")
             , ("top", toString model.y ++ "px")
-            , ("textAlign", "center")
-            , ("width", "250px")
-            ] ++ HtmlUtils.bordered)
+            , ("width", "750px")
+            , ("height", toString (Array.length model.questions * yStride + 600) ++ "px" )
+            ]
         ]
-        (  button 
-            [ style [ ("float", "left") ]
-            , onClick context.parentThis () 
-            ] [ text "child" ]
-        :: HtmlUtils.closeButton context.remove 
-        :: HtmlUtils.title "Questions" 
-        :: questionGap
-        :: addButton
-        :: questionViews
-        ) 
+        [ div 
+            [ style 
+                ([ ("backgroundColor", "rgb(200,255,200)")
+                , ("padding", "2px")
+                , ("textAlign", "center")
+                , ("width", "250px")
+                ] ++ HtmlUtils.bordered)
+            ]
+            (  button 
+                [ style [ ("float", "left") ]
+                , onClick context.parentThis () 
+                ] [ text "child" ]
+            :: HtmlUtils.closeButton context.remove 
+            :: HtmlUtils.title "Questions" 
+            :: questionGap
+            :: addButton
+            :: questionViews
+            ) ]
 
 
 toJson : Model -> Encode.Value

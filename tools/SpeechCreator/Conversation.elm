@@ -59,6 +59,18 @@ save model =
     genericToJson nodeToJson model
 
 
+load : Decode.Decoder Model 
+load =
+    let loadNode : Decode.Decoder Node
+        loadNode =
+            Decode.oneOf
+                [ Speech.load |> Decode.map Talking
+                , Questions.load |> Decode.map Asking
+                ]
+    in
+    Decode.dict loadNode
+
+
 removeNode : String -> Model -> Model
 removeNode key model =
     let removeFromQuestion : String -> Question.Model -> Question.Model

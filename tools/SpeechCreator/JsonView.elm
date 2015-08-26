@@ -13,6 +13,7 @@ type alias Model =
     , saveData: String
     , loadData: String
     , focus: Bool
+    , errorText: String
     }
 
 
@@ -21,6 +22,7 @@ type alias Model =
 type Action 
     = SupplyJsonAndSaveData String String
     | EditLoadData String
+    | SetErrorText String
     | SetFocus Bool
 
 
@@ -39,6 +41,9 @@ update action model =
         EditLoadData loadData ->
             { model | loadData <- loadData }
 
+        SetErrorText errorText ->
+            { model | errorText <- errorText }
+
         SetFocus focus ->
             { model | focus <- focus }
 
@@ -49,6 +54,7 @@ update action model =
 
 type alias Context =
     { actions: Signal.Address Action 
+    , submit: Signal.Address String
     , viewGraph: Signal.Address ()
     }
 
@@ -59,30 +65,51 @@ view context model =
         width = 400
 
         height : Int
-        height = 600
+        height = 500
 
-        jsonTextArea : String -> String -> List Html.Attribute -> Html
-        jsonTextArea title content attrs =
+        jsonTextArea : String -> String -> String -> Html
+        jsonTextArea title desc content =
             Html.div [ HtmlAttrs.style [("display", "inline-block")] ]
                 [ Html.h3 [] [Html.text title]
+                , Html.div [] [Html.text desc]
                 , Html.textarea
-                    ([ HtmlAttrs.value content
+                    [ HtmlAttrs.value content
                     , HtmlAttrs.style 
                         [ ("width", toString width ++ "px")
                         , ("height", toString height ++ "px")
                         ]
                     , HtmlEvents.onFocus context.actions (SetFocus False)
                     , HtmlEvents.onFocus context.actions (SetFocus True)
-                    ] ++ attrs) []
+                    ] []
                 ]
     in
     Html.div []  
         [ HtmlUtils.button context.viewGraph () "Graph"
         , Html.div []
-            [ jsonTextArea "Conversation" model.json []
-            , jsonTextArea "Save" model.saveData []
-            , jsonTextArea "Load" model.loadData 
-                [ EditLoadData >> Signal.message context.actions |>
-                  HtmlEvents.on "input" HtmlEvents.targetValue ]
+            [ jsonTextArea "Conversation" "Replace conversation.js with this" model.json
+            , jsonTextArea "Save" "Copy this into a separate file" model.saveData
+            , Html.div [ HtmlAttrs.style [("display", "inline-block")] ]
+                [ Html.h3 [] [Html.text "Load"]
+                , Html.div [] 
+                    [ Html.div []
+                        [ Html.text "Put what you \"save\"d here and press " 
+                        , HtmlUtils.button context.submit model.loadData "Submit"
+                        ]
+                    ]
+                , Html.textarea
+                    [ HtmlAttrs.value model.loadData
+                    , HtmlAttrs.style
+                        [ ("width", toString width ++ "px")
+                        , ("height", toString height ++ "px")
+                        ]
+                    , HtmlEvents.onFocus context.actions (SetFocus False)
+                    , HtmlEvents.onBlur context.actions (SetFocus True)
+                    , EditLoadData >> Signal.message context.actions |>
+                        HtmlEvents.on "input" HtmlEvents.targetValue
+                    ] []
+                , Html.div 
+                    [ HtmlAttrs.style [("color", "red")] ]
+                    [ Html.text model.errorText ]
+                ]
             ]
         ]

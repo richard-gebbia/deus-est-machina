@@ -43,6 +43,7 @@ type Action
     | ModifyJsonView JsonView.Action
     | ViewGraph
     | ViewJson
+    | LoadConversation String
     | IntentToggleViews
     | Click (Int, Int)
     | NoOp
@@ -90,9 +91,18 @@ updateViewingGraph action model =
 
 updateViewingJson : Action -> Model -> Model
 updateViewingJson action model =
+    let branchResult : (a -> b) -> (x -> b) -> Result x a -> b
+        branchResult onSuccess onError result =
+            case result of 
+                Result.Ok ok ->
+                    onSuccess ok
+
+                Result.Err err ->
+                    onError err
+    in
     case action of
-        ModifyJsonView mjwAction ->
-            { model | jsonView <- JsonView.update mjwAction model.jsonView }
+        ModifyJsonView mjvAction ->
+            { model | jsonView <- JsonView.update mjvAction model.jsonView }
 
         ViewGraph ->
             { model | mode <- ViewingGraph }
@@ -102,6 +112,30 @@ updateViewingJson action model =
                 { model | mode <- ViewingGraph }
             else 
                 model
+
+        LoadConversation json ->
+            Decode.decodeString Conversation.load json
+            |> branchResult 
+                (\conversation -> 
+                    { model |
+                        graphView <-
+                            GraphView.update 
+                                (GraphView.SetConversation conversation)
+                                model.graphView,
+                        jsonView <-
+                            JsonView.update
+                                (JsonView.SetErrorText "")
+                                model.jsonView
+                    }
+                )
+                (\errorMessage ->
+                    { model |
+                        jsonView <-
+                            JsonView.update
+                                (JsonView.SetErrorText errorMessage)
+                                model.jsonView
+                    }
+                )
 
         _ ->
             model
@@ -143,6 +177,7 @@ viewViewingJson address model =
     let context : JsonView.Context
         context =
             { actions = Signal.forwardTo address ModifyJsonView
+            , submit = Signal.forwardTo address LoadConversation
             , viewGraph = Signal.forwardTo address (always ViewGraph)
             }
     in
@@ -209,6 +244,7 @@ init =
         , saveData = ""
         , loadData = ""
         , focus = True
+        , errorText = ""
         }
     , mode = ViewingGraph
     }

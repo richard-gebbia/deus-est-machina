@@ -165,44 +165,50 @@ view context model =
         setSpeakerMessage =
             SetSpeaker >> Signal.message context.actions
     in
-    div 
-        [ style 
-            ([ ("backgroundColor", "rgb(255,255,200)")
-            , ("width", toString width ++ "px")
-            , ("padding", "2px")
-            , ("textAlign", "center")
-            , ("position", "absolute")
+    div [ style
+            [ ("position", "absolute")
             , ("left", toString model.x ++ "px")
             , ("top", toString model.y ++ "px")
-            ] ++ HtmlUtils.bordered)
+            , ("width", toString (3 * width) ++ "px")
+            , ("height", "600px")
+            ]
         ]
-        [ button 
-            [ style [ ("float", "left" ) ]
-            , onClick context.parentThis () 
-            ] [ text "child"]
-        , HtmlUtils.closeButton context.remove
-        , HtmlUtils.title "Speech"
-        , text "Speaker "
-        , HtmlUtils.selection speakers model.speaker setSpeakerMessage
-        , br [] []
-        , text "Text"
-        , br [] []
-        , textLine model.line1 1
-        , br [] []
-        , textLine model.line2 2
-        , br [] []
-        , textLine model.line3 3
-        , Parentable.view 
-            width
-            childBtnXPadding
-            childBtnYPadding
-            childBtnStride
-            (Parentable.Context
-                (Signal.forwardTo context.actions ModifyParentable)
-                (Signal.forwardTo context.startParenting (always ())))
-            model
+        [ div 
+            [ style 
+                ([ ("backgroundColor", "rgb(255,255,200)")
+                , ("width", toString width ++ "px")
+                , ("padding", "2px")
+                , ("textAlign", "center")
+                ] ++ HtmlUtils.bordered)
+            ]
+            [ button 
+                [ style [ ("float", "left" ) ]
+                , onClick context.parentThis () 
+                ] [ text "child"]
+            , HtmlUtils.closeButton context.remove
+            , HtmlUtils.title "Speech"
+            , text "Speaker "
+            , HtmlUtils.selection speakers model.speaker setSpeakerMessage
+            , br [] []
+            , text "Text"
+            , br [] []
+            , textLine model.line1 1
+            , br [] []
+            , textLine model.line2 2
+            , br [] []
+            , textLine model.line3 3
+            , Parentable.view 
+                width
+                childBtnXPadding
+                childBtnYPadding
+                childBtnStride
+                (Parentable.Context
+                    (Signal.forwardTo context.actions ModifyParentable)
+                    (Signal.forwardTo context.startParenting (always ())))
+                model
+            ]
         ]
-    
+        
 
 debugDraw : Model -> Html
 debugDraw model =
