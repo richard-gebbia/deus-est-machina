@@ -33,7 +33,7 @@ update action model =
     case action of
         SupplyJsonAndSaveData json saveData ->
             { model | 
-                json <- json,
+                json <- "conversation = " ++ json,
                 saveData <- saveData,
                 loadData <- ""
             }

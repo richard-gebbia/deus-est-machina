@@ -10,7 +10,7 @@ import ParseConversation
 import Result
 
 starter : String
-starter = "start"
+starter = "0"
 
 testConversation : String
 testConversation = 

@@ -2005,10 +2005,10 @@ Elm.GraphView.make = function (_elm) {
                                {case "_Tuple2":
                                   return $Basics.round($Basics.sqrt($Basics.toFloat((_v5._0 - _v4._0) * (_v5._0 - _v4._0) + (_v5._1 - _v4._1) * (_v5._1 - _v4._1))));}
                                _U.badCase($moduleName,
-                               "between lines 244 and 247");
+                               "between lines 257 and 260");
                             }();}
                        _U.badCase($moduleName,
-                       "between lines 244 and 247");
+                       "between lines 257 and 260");
                     }();
                  });
                  var angle = F2(function (_v12,
@@ -2025,10 +2025,10 @@ Elm.GraphView.make = function (_elm) {
                                     $Basics.toFloat(_v13._1 - _v12._1),
                                     $Basics.toFloat(_v13._0 - _v12._0)));}
                                _U.badCase($moduleName,
-                               "between lines 239 and 240");
+                               "between lines 252 and 253");
                             }();}
                        _U.badCase($moduleName,
-                       "between lines 239 and 240");
+                       "between lines 252 and 253");
                     }();
                  });
                  var drawLine = F4(function (color,
@@ -2106,10 +2106,10 @@ Elm.GraphView.make = function (_elm) {
                                        _L.fromArray([]));
                                     }();}
                                _U.badCase($moduleName,
-                               "between lines 251 and 274");
+                               "between lines 264 and 287");
                             }();}
                        _U.badCase($moduleName,
-                       "between lines 251 and 274");
+                       "between lines 264 and 287");
                     }();
                  });
                  var childPos = function (node) {
@@ -2124,7 +2124,7 @@ Elm.GraphView.make = function (_elm) {
                                  ,_0: node._0.x - 5
                                  ,_1: node._0.y};}
                        _U.badCase($moduleName,
-                       "between lines 233 and 237");
+                       "between lines 246 and 250");
                     }();
                  };
                  return $Maybe.withDefault(_L.fromArray([]))($Maybe.map(function (html) {
@@ -2139,8 +2139,35 @@ Elm.GraphView.make = function (_elm) {
                  model.conversation)))));
               }();}
          _U.badCase($moduleName,
-         "between lines 231 and 280");
+         "between lines 244 and 293");
       }();
+   });
+   var nextPossible = F3(function (pred,
+   generator,
+   val) {
+      return pred(val) ? val : A3(nextPossible,
+      pred,
+      generator,
+      generator(val));
+   });
+   var nextKey = function (conversation) {
+      return A3(nextPossible,
+      function (val) {
+         return $Basics.not(A2($Dict.member,
+         $Basics.toString(val),
+         conversation));
+      },
+      F2(function (x,y) {
+         return x + y;
+      })(1),
+      0);
+   };
+   var addNode = F2(function (node,
+   conversation) {
+      return A3($Dict.insert,
+      $Basics.toString(nextKey(conversation)),
+      node,
+      conversation);
    });
    var SetChild = function (a) {
       return {ctor: "SetChild"
@@ -2179,17 +2206,15 @@ Elm.GraphView.make = function (_elm) {
              ,_0: a
              ,_1: b};
    });
-   var Model = F5(function (a,
+   var Model = F4(function (a,
    b,
    c,
-   d,
-   e) {
+   d) {
       return {_: {}
              ,conversation: a
-             ,currentlyParenting: e
-             ,focus: d
-             ,mode: c
-             ,nextKey: b};
+             ,currentlyParenting: d
+             ,focus: c
+             ,mode: b};
    });
    var PQuestion = F2(function (a,
    b) {
@@ -2251,7 +2276,7 @@ Elm.GraphView.make = function (_elm) {
               $Basics.always(SetChild(key)))),
               node._0);}
          _U.badCase($moduleName,
-         "between lines 285 and 304");
+         "between lines 298 and 317");
       }();
    });
    var view = F2(function (address,
@@ -2447,13 +2472,11 @@ Elm.GraphView.make = function (_elm) {
             switch (action._0.ctor)
               {case "_Tuple2":
                  return _U.replace([["conversation"
-                                    ,A3($Dict.insert,
-                                    $Basics.toString(model.nextKey),
+                                    ,A2(addNode,
                                     $Conversation.Talking(A2($Speech.init,
                                     action._0._0,
                                     action._0._1)),
                                     model.conversation)]
-                                   ,["nextKey",model.nextKey + 1]
                                    ,["mode",ViewingGraph]],
                    model);}
               break;}
@@ -2468,13 +2491,11 @@ Elm.GraphView.make = function (_elm) {
             switch (action._0.ctor)
               {case "_Tuple2":
                  return _U.replace([["conversation"
-                                    ,A3($Dict.insert,
-                                    $Basics.toString(model.nextKey),
+                                    ,A2(addNode,
                                     $Conversation.Asking(A2($Questions.init,
                                     action._0._0,
                                     action._0._1)),
                                     model.conversation)]
-                                   ,["nextKey",model.nextKey + 1]
                                    ,["mode",ViewingGraph]],
                    model);}
               break;}
@@ -2499,7 +2520,7 @@ Elm.GraphView.make = function (_elm) {
               action,
               model);}
          _U.badCase($moduleName,
-         "between lines 216 and 224");
+         "between lines 229 and 237");
       }();
    });
    _elm.GraphView.values = {_op: _op
@@ -2520,6 +2541,9 @@ Elm.GraphView.make = function (_elm) {
                            ,StartParenting: StartParenting
                            ,SetChild: SetChild
                            ,updateViewingGraph: updateViewingGraph
+                           ,nextPossible: nextPossible
+                           ,addNode: addNode
+                           ,nextKey: nextKey
                            ,updateAddingSpeech: updateAddingSpeech
                            ,updateAddingQuestions: updateAddingQuestions
                            ,update: update
@@ -4667,7 +4691,9 @@ Elm.JsonView.make = function (_elm) {
               model);
             case "SupplyJsonAndSaveData":
             return _U.replace([["json"
-                               ,action._0]
+                               ,A2($Basics._op["++"],
+                               "conversation = ",
+                               action._0)]
                               ,["saveData",action._1]
                               ,["loadData",""]],
               model);}
@@ -5469,6 +5495,7 @@ Elm.Main.make = function (_elm) {
                    address,
                    ViewJson,
                    "Json")
+                   ,$Html.text("Q - Make Speech, W - Make Questions")
                    ,A2($GraphView.view,
                    A2($Signal.forwardTo,
                    address,
@@ -5489,7 +5516,7 @@ Elm.Main.make = function (_elm) {
               address,
               model);}
          _U.badCase($moduleName,
-         "between lines 189 and 194");
+         "between lines 204 and 209");
       }();
    });
    var extraSignals = _L.fromArray([$Signal.map($Basics.always(ModifyGraphView($GraphView.IntentAddSpeech)))($KeyboardUtils.keyPresses($Char.toCode(_U.chr("Q"))))
@@ -5525,7 +5552,7 @@ Elm.Main.make = function (_elm) {
                   case "Ok":
                   return onSuccess(result._0);}
                _U.badCase($moduleName,
-               "between lines 96 and 102");
+               "between lines 110 and 116");
             }();
          });
          return function () {
@@ -5575,8 +5602,7 @@ Elm.Main.make = function (_elm) {
                           ,conversation: $Dict.empty
                           ,currentlyParenting: $Maybe.Nothing
                           ,focus: true
-                          ,mode: $GraphView.ViewingGraph
-                          ,nextKey: 0}
+                          ,mode: $GraphView.ViewingGraph}
               ,jsonView: {_: {}
                          ,errorText: ""
                          ,focus: true
@@ -5588,39 +5614,61 @@ Elm.Main.make = function (_elm) {
    var updateViewingGraph = F2(function (action,
    model) {
       return function () {
-         switch (action.ctor)
-         {case "Click":
-            switch (action._0.ctor)
-              {case "_Tuple2":
-                 return _U.replace([["graphView"
-                                    ,A2($GraphView.update,
-                                    $GraphView.Click({ctor: "_Tuple2"
-                                                     ,_0: action._0._0
-                                                     ,_1: action._0._1}),
-                                    model.graphView)]],
-                   model);}
-              break;
-            case "IntentToggleViews":
-            return model.graphView.focus ? A2(updateViewingGraph,
-              ViewJson,
-              model) : model;
-            case "ModifyGraphView":
-            return _U.replace([["graphView"
-                               ,A2($GraphView.update,
-                               action._0,
-                               model.graphView)]],
-              model);
-            case "ViewJson":
-            return _U.replace([["mode"
-                               ,ViewingJson]
-                              ,["jsonView"
-                               ,A2($Basics.flip,
-                               $JsonView.update,
-                               model.jsonView)($Basics.uncurry($JsonView.SupplyJsonAndSaveData)({ctor: "_Tuple2"
-                                                                                                ,_0: $Json$Encode.encode(4)($Conversation.toJson(model.graphView.conversation))
-                                                                                                ,_1: $Json$Encode.encode(4)($Conversation.save(model.graphView.conversation))}))]],
-              model);}
-         return model;
+         var snapToAux = F3(function (amount,
+         base,
+         multiple) {
+            return _U.cmp(base * (multiple + 1),
+            amount) > 0 ? base * multiple : A3(snapToAux,
+            amount,
+            base,
+            multiple + 1);
+         });
+         var snapTo = F2(function (snap,
+         amount) {
+            return A3(snapToAux,
+            amount,
+            snap,
+            0);
+         });
+         return function () {
+            switch (action.ctor)
+            {case "Click":
+               switch (action._0.ctor)
+                 {case "_Tuple2":
+                    return _U.replace([["graphView"
+                                       ,A2($GraphView.update,
+                                       $GraphView.Click({ctor: "_Tuple2"
+                                                        ,_0: A2(snapTo,
+                                                        320,
+                                                        action._0._0)
+                                                        ,_1: A2(snapTo,
+                                                        130,
+                                                        action._0._1)}),
+                                       model.graphView)]],
+                      model);}
+                 break;
+               case "IntentToggleViews":
+               return model.graphView.focus ? A2(updateViewingGraph,
+                 ViewJson,
+                 model) : model;
+               case "ModifyGraphView":
+               return _U.replace([["graphView"
+                                  ,A2($GraphView.update,
+                                  action._0,
+                                  model.graphView)]],
+                 model);
+               case "ViewJson":
+               return _U.replace([["mode"
+                                  ,ViewingJson]
+                                 ,["jsonView"
+                                  ,A2($Basics.flip,
+                                  $JsonView.update,
+                                  model.jsonView)($Basics.uncurry($JsonView.SupplyJsonAndSaveData)({ctor: "_Tuple2"
+                                                                                                   ,_0: $Json$Encode.encode(4)($Conversation.toJson(model.graphView.conversation))
+                                                                                                   ,_1: $Json$Encode.encode(4)($Conversation.save(model.graphView.conversation))}))]],
+                 model);}
+            return model;
+         }();
       }();
    });
    var update = F2(function (action,
@@ -5647,7 +5695,7 @@ Elm.Main.make = function (_elm) {
               _v13._0,
               model);}
          _U.badCase($moduleName,
-         "on line 259, column 34 to 53");
+         "on line 273, column 34 to 53");
       }();
    }),
    init,
@@ -13784,7 +13832,7 @@ Elm.Question.make = function (_elm) {
          _L.fromArray([$Html$Attributes.style(A2($Basics._op["++"],
          _L.fromArray([{ctor: "_Tuple2"
                        ,_0: "backgroundColor"
-                       ,_1: "rgb(200,200,255)"}
+                       ,_1: "rgb(180,180,180)"}
                       ,{ctor: "_Tuple2"
                        ,_0: "width"
                        ,_1: A2($Basics._op["++"],
@@ -14085,7 +14133,7 @@ Elm.Questions.make = function (_elm) {
          _L.fromArray([$Html$Attributes.style(A2($Basics._op["++"],
          _L.fromArray([{ctor: "_Tuple2"
                        ,_0: "backgroundColor"
-                       ,_1: "rgb(200,255,200)"}
+                       ,_1: "rgb(150,150,150)"}
                       ,{ctor: "_Tuple2"
                        ,_0: "padding"
                        ,_1: "2px"}
@@ -14880,6 +14928,20 @@ Elm.Speech.make = function (_elm) {
    var view = F2(function (context,
    model) {
       return function () {
+         var backgroundColor = function () {
+            var _v5 = model.speaker;
+            switch (_v5)
+            {case "Ava":
+               return "rgb(200,255,200)";
+               case "Gavin":
+               return "rgb(255,200,200)";
+               case "Sebastian":
+               return "rgb(255,255,200)";
+               case "Sophie":
+               return "rgb(200,200,255)";}
+            _U.badCase($moduleName,
+            "between lines 170 and 175");
+         }();
          var setSpeakerMessage = function ($) {
             return $Signal.message(context.actions)(SetSpeaker($));
          };
@@ -14924,7 +14986,7 @@ Elm.Speech.make = function (_elm) {
                                                            ,{ctor: "_Tuple2"
                                                             ,_0: "width"
                                                             ,_1: A2($Basics._op["++"],
-                                                            $Basics.toString(3 * width),
+                                                            $Basics.toString(6 * width),
                                                             "px")}
                                                            ,{ctor: "_Tuple2"
                                                             ,_0: "height"
@@ -14933,7 +14995,7 @@ Elm.Speech.make = function (_elm) {
          _L.fromArray([$Html$Attributes.style(A2($Basics._op["++"],
          _L.fromArray([{ctor: "_Tuple2"
                        ,_0: "backgroundColor"
-                       ,_1: "rgb(255,255,200)"}
+                       ,_1: backgroundColor}
                       ,{ctor: "_Tuple2"
                        ,_0: "width"
                        ,_1: A2($Basics._op["++"],

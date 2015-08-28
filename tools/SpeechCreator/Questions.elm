@@ -168,7 +168,7 @@ view context model =
         ]
         [ div 
             [ style 
-                ([ ("backgroundColor", "rgb(200,255,200)")
+                ([ ("backgroundColor", "rgb(150,150,150)")
                 , ("padding", "2px")
                 , ("textAlign", "center")
                 , ("width", "250px")

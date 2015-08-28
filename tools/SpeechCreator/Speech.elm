@@ -164,18 +164,26 @@ view context model =
         setSpeakerMessage : String -> Signal.Message
         setSpeakerMessage =
             SetSpeaker >> Signal.message context.actions
+
+        backgroundColor : String
+        backgroundColor =
+            case model.speaker of
+                "Sophie" -> "rgb(200,200,255)"
+                "Gavin" -> "rgb(255,200,200)"
+                "Ava" -> "rgb(200,255,200)"
+                "Sebastian" -> "rgb(255,255,200)"
     in
     div [ style
             [ ("position", "absolute")
             , ("left", toString model.x ++ "px")
             , ("top", toString model.y ++ "px")
-            , ("width", toString (3 * width) ++ "px")
+            , ("width", toString (6 * width) ++ "px")
             , ("height", "600px")
             ]
         ]
         [ div 
             [ style 
-                ([ ("backgroundColor", "rgb(255,255,200)")
+                ([ ("backgroundColor", backgroundColor)
                 , ("width", toString width ++ "px")
                 , ("padding", "2px")
                 , ("textAlign", "center")

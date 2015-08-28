@@ -2,7 +2,6 @@ module GraphView where
 
 import Array
 import Conversation
-import Debug
 import Dict
 import Html exposing (Html)
 import Html.Attributes as HtmlAttrs
@@ -29,7 +28,6 @@ type Parent
 
 type alias Model = 
     { conversation: Conversation.Model
-    , nextKey: Int
     , mode: Mode
     , focus: Bool
     , currentlyParenting: Maybe Parent
@@ -167,19 +165,38 @@ updateViewingGraph action model =
             model
 
 
+nextPossible : (a -> Bool) -> (a -> a) -> a -> a
+nextPossible pred generator val =
+    if pred val then 
+        val 
+    else 
+        nextPossible pred generator (generator val)
+
+addNode : Conversation.Node -> Conversation.Model -> Conversation.Model
+addNode node conversation =
+    Dict.insert 
+        (toString (nextKey conversation))
+        node
+        conversation
+
+nextKey : Conversation.Model -> Int
+nextKey conversation =
+    nextPossible 
+        (\val -> 
+            not <| Dict.member (toString val) conversation)
+        ((+) 1)
+        0
+
+
 updateAddingSpeech : Action -> Model -> Model
 updateAddingSpeech action model =
     case action of
         Click (x, y) ->
             { model |
-                conversation <-
-                    Dict.insert 
-                        (toString model.nextKey) 
-                        (Conversation.Talking <| Speech.init x y)
+                conversation <- 
+                    addNode 
+                        (Conversation.Talking <| Speech.init x y) 
                         model.conversation,
-
-                nextKey <-
-                    model.nextKey + 1,
 
                 mode <-
                     ViewingGraph
@@ -195,13 +212,9 @@ updateAddingQuestions action model =
         Click (x, y) ->
             { model |
                 conversation <-
-                    Dict.insert 
-                        (toString model.nextKey)
-                        (Conversation.Asking <| Questions.init x y)
+                    addNode 
+                        (Conversation.Asking <| Questions.init x y) 
                         model.conversation,
-
-                nextKey <-
-                    model.nextKey + 1,
 
                 mode <-
                     ViewingGraph

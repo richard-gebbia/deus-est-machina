@@ -53,6 +53,18 @@ type Action
 
 updateViewingGraph : Action -> Model -> Model
 updateViewingGraph action model =
+    let snapTo : Int -> Int -> Int
+        snapTo snap amount =
+            snapToAux amount snap 0
+        
+        snapToAux : Int -> Int -> Int -> Int
+        snapToAux amount base multiple =
+            if base * (multiple + 1) > amount then
+                base * multiple
+            else
+                snapToAux amount base (multiple + 1)
+
+    in
     case action of
         ModifyGraphView gvAction ->
             { model |
@@ -82,7 +94,9 @@ updateViewingGraph action model =
         Click (x, y) ->
             { model |
                 graphView <-
-                    GraphView.update (GraphView.Click (x, y)) model.graphView
+                    GraphView.update 
+                        (GraphView.Click (snapTo 320 x, snapTo 130 y)) 
+                        model.graphView
             }
 
         _ ->
@@ -166,6 +180,7 @@ viewViewingGraph : Signal.Address Action -> Model -> Html
 viewViewingGraph address model =
     Html.div []
         [ button address ViewJson "Json"
+        , Html.text "Q - Make Speech, W - Make Questions"
         , GraphView.view 
             (Signal.forwardTo address ModifyGraphView)
             model.graphView
@@ -201,7 +216,6 @@ init =
     { graphView =
         { conversation = Dict.empty
         , mode = GraphView.ViewingGraph
-        , nextKey = 0
         , focus = True
         , currentlyParenting = Nothing
         }

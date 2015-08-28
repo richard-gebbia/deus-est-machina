@@ -1352,7 +1352,7 @@ Elm.ConversationGen.make = function (_elm) {
    $ParseConversation = Elm.ParseConversation.make(_elm),
    $Result = Elm.Result.make(_elm);
    var testConversation = "\n    {\n        \"start\": {\n            \"name\": \"Ava\",\n            \"text\": [\n                \"Test\"\n            ],\n            \"children\": []\n        }\n    }\n    ";
-   var starter = "start";
+   var starter = "0";
    var genConversation = function (conversationString) {
       return function () {
          var startName = function (node) {
