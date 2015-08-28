@@ -5395,7 +5395,6 @@ Elm.Main.make = function (_elm) {
    _U = _N.Utils.make(_elm),
    _L = _N.List.make(_elm),
    $moduleName = "Main",
-   $Array = Elm.Array.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Char = Elm.Char.make(_elm),
    $Conversation = Elm.Conversation.make(_elm),
@@ -5410,7 +5409,6 @@ Elm.Main.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Mouse = Elm.Mouse.make(_elm),
-   $Questions = Elm.Questions.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var actions = $Signal.mailbox($Maybe.Nothing);
@@ -5574,38 +5572,7 @@ Elm.Main.make = function (_elm) {
    });
    var init = {_: {}
               ,graphView: {_: {}
-                          ,conversation: A2($Dict.insert,
-                          "lol",
-                          $Conversation.Talking({_: {}
-                                                ,children: _L.fromArray([])
-                                                ,line1: "Hello"
-                                                ,line2: "My name is lol"
-                                                ,line3: ""
-                                                ,speaker: "Sophie"
-                                                ,x: 800
-                                                ,y: 500}))(A2($Dict.insert,
-                          "questions1",
-                          $Conversation.Asking({_: {}
-                                               ,questions: $Array.fromList(_L.fromArray([{_: {}
-                                                                                         ,children: _L.fromArray([])
-                                                                                         ,line1: "How can she slap?!"
-                                                                                         ,line2: ""
-                                                                                         ,line3: ""
-                                                                                         ,x: 0
-                                                                                         ,y: $Questions.yStart}]))
-                                               ,x: 40
-                                               ,y: 100}))(A2($Dict.singleton,
-                          "ava1",
-                          $Conversation.Talking({_: {}
-                                                ,children: _L.fromArray(["lol"
-                                                                        ,"wut"
-                                                                        ,"test"])
-                                                ,line1: "Hello"
-                                                ,line2: "My name is Ava"
-                                                ,line3: ""
-                                                ,speaker: "Ava"
-                                                ,x: 500
-                                                ,y: 50}))))
+                          ,conversation: $Dict.empty
                           ,currentlyParenting: $Maybe.Nothing
                           ,focus: true
                           ,mode: $GraphView.ViewingGraph
@@ -5680,7 +5647,7 @@ Elm.Main.make = function (_elm) {
               _v13._0,
               model);}
          _U.badCase($moduleName,
-         "on line 293, column 34 to 53");
+         "on line 259, column 34 to 53");
       }();
    }),
    init,
