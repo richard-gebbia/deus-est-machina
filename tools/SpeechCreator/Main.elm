@@ -189,14 +189,14 @@ viewViewingGraph address model =
 
 viewViewingJson : Signal.Address Action -> Model -> Html
 viewViewingJson address model =
-    let context : JsonView.Context
-        context =
+    let events : JsonView.Events
+        events =
             { actions = Signal.forwardTo address ModifyJsonView
             , submit = Signal.forwardTo address LoadConversation
             , viewGraph = Signal.forwardTo address (always ViewGraph)
             }
     in
-    JsonView.view context model.jsonView
+    JsonView.view events model.jsonView
 
 
 view : Signal.Address Action -> Model -> Html

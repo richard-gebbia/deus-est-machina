@@ -172,12 +172,14 @@ nextPossible pred generator val =
     else 
         nextPossible pred generator (generator val)
 
+
 addNode : Conversation.Node -> Conversation.Model -> Conversation.Model
 addNode node conversation =
     Dict.insert 
         (toString (nextKey conversation))
         node
         conversation
+
 
 nextKey : Conversation.Model -> Int
 nextKey conversation =
@@ -298,7 +300,7 @@ viewNode address key node =
     case node of 
         Conversation.Talking speech ->
             Speech.view 
-                (Speech.Context 
+                (Speech.Events 
                     (Signal.forwardTo address (ModifySpeech key)) 
                     (Signal.forwardTo address (not >> SetFocus))
                     (Signal.forwardTo address (always (RemoveNode key)))
@@ -308,7 +310,7 @@ viewNode address key node =
 
         Conversation.Asking questions ->
             Questions.view 
-                (Questions.Context
+                (Questions.Events
                     (Signal.forwardTo address (ModifyQuestions key)) 
                     (Signal.forwardTo address (not >> SetFocus))
                     (Signal.forwardTo address (always (RemoveNode key)))

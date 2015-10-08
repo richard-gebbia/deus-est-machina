@@ -105,7 +105,10 @@ Elm.ArrayUtils.make = function (_elm) {
    $moduleName = "ArrayUtils",
    $Array = Elm.Array.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm);
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
    var update = F3(function (index,
    f,
    array) {
@@ -538,7 +541,7 @@ Elm.Color.make = function (_elm) {
                         ,saturation: s};
               }();}
          _U.badCase($moduleName,
-         "between lines 114 and 121");
+         "between lines 114 and 118");
       }();
    };
    var HSLA = F4(function (a,
@@ -594,7 +597,7 @@ Elm.Color.make = function (_elm) {
                  color._3);
               }();}
          _U.badCase($moduleName,
-         "between lines 105 and 111");
+         "between lines 105 and 108");
       }();
    };
    var grayscale = function (p) {
@@ -832,8 +835,11 @@ Elm.Conversation.make = function (_elm) {
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $Json$Encode = Elm.Json.Encode.make(_elm),
    $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
    $Question = Elm.Question.make(_elm),
    $Questions = Elm.Questions.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
    $Speech = Elm.Speech.make(_elm);
    var genericToJson = F2(function (nodeToValue,
    model) {
@@ -1008,7 +1014,7 @@ Elm.Dict.make = function (_elm) {
               A3(foldr,f,acc,t._4)),
               t._3);}
          _U.badCase($moduleName,
-         "between lines 417 and 425");
+         "between lines 417 and 421");
       }();
    });
    var keys = function (dict) {
@@ -1064,7 +1070,7 @@ Elm.Dict.make = function (_elm) {
               A3(foldl,f,acc,dict._3)),
               dict._4);}
          _U.badCase($moduleName,
-         "between lines 406 and 414");
+         "between lines 406 and 410");
       }();
    });
    var isBBlack = function (dict) {
@@ -1088,7 +1094,7 @@ Elm.Dict.make = function (_elm) {
             case "Remove": return "Remove";
             case "Same": return "Same";}
          _U.badCase($moduleName,
-         "between lines 182 and 188");
+         "between lines 182 and 185");
       }();
    };
    var Same = {ctor: "Same"};
@@ -1118,10 +1124,10 @@ Elm.Dict.make = function (_elm) {
                       targetKey,
                       dict._3);}
                  _U.badCase($moduleName,
-                 "between lines 129 and 135");
+                 "between lines 129 and 132");
               }();}
          _U.badCase($moduleName,
-         "between lines 124 and 135");
+         "between lines 124 and 132");
       }();
    });
    var member = F2(function (key,
@@ -1132,7 +1138,7 @@ Elm.Dict.make = function (_elm) {
          {case "Just": return true;
             case "Nothing": return false;}
          _U.badCase($moduleName,
-         "between lines 138 and 146");
+         "between lines 138 and 140");
       }();
    });
    var max = function (dict) {
@@ -1148,7 +1154,7 @@ Elm.Dict.make = function (_elm) {
                         ,_1: dict._2};}
               return max(dict._4);}
          _U.badCase($moduleName,
-         "between lines 100 and 121");
+         "between lines 100 and 108");
       }();
    };
    var min = function (dict) {
@@ -1220,7 +1226,7 @@ Elm.Dict.make = function (_elm) {
               A2(map,f,dict._3),
               A2(map,f,dict._4));}
          _U.badCase($moduleName,
-         "between lines 394 and 403");
+         "between lines 394 and 399");
       }();
    });
    var showNColor = function (c) {
@@ -1269,7 +1275,7 @@ Elm.Dict.make = function (_elm) {
                    dict._4);}
               break;}
          _U.badCase($moduleName,
-         "between lines 154 and 166");
+         "between lines 154 and 162");
       }();
    };
    var blackish = function (t) {
@@ -1353,7 +1359,7 @@ Elm.Dict.make = function (_elm) {
               t._3,
               t._4);}
          _U.badCase($moduleName,
-         "between lines 386 and 391");
+         "between lines 386 and 388");
       }();
    };
    var balance_node = function (t) {
@@ -1820,7 +1826,7 @@ Elm.Dict.make = function (_elm) {
                case "Same":
                return updatedDict;}
             _U.badCase($moduleName,
-            "between lines 222 and 228");
+            "between lines 222 and 225");
          }();
       }();
    });
@@ -1986,6 +1992,7 @@ Elm.GraphView.make = function (_elm) {
    $Parentable = Elm.Parentable.make(_elm),
    $Question = Elm.Question.make(_elm),
    $Questions = Elm.Questions.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Speech = Elm.Speech.make(_elm);
    var viewConnection = F3(function (model,
@@ -2005,10 +2012,10 @@ Elm.GraphView.make = function (_elm) {
                                {case "_Tuple2":
                                   return $Basics.round($Basics.sqrt($Basics.toFloat((_v5._0 - _v4._0) * (_v5._0 - _v4._0) + (_v5._1 - _v4._1) * (_v5._1 - _v4._1))));}
                                _U.badCase($moduleName,
-                               "between lines 257 and 260");
+                               "between lines 259 and 262");
                             }();}
                        _U.badCase($moduleName,
-                       "between lines 257 and 260");
+                       "between lines 259 and 262");
                     }();
                  });
                  var angle = F2(function (_v12,
@@ -2025,10 +2032,10 @@ Elm.GraphView.make = function (_elm) {
                                     $Basics.toFloat(_v13._1 - _v12._1),
                                     $Basics.toFloat(_v13._0 - _v12._0)));}
                                _U.badCase($moduleName,
-                               "between lines 252 and 253");
+                               "between lines 254 and 255");
                             }();}
                        _U.badCase($moduleName,
-                       "between lines 252 and 253");
+                       "between lines 254 and 255");
                     }();
                  });
                  var drawLine = F4(function (color,
@@ -2106,10 +2113,10 @@ Elm.GraphView.make = function (_elm) {
                                        _L.fromArray([]));
                                     }();}
                                _U.badCase($moduleName,
-                               "between lines 264 and 287");
+                               "between lines 266 and 289");
                             }();}
                        _U.badCase($moduleName,
-                       "between lines 264 and 287");
+                       "between lines 266 and 289");
                     }();
                  });
                  var childPos = function (node) {
@@ -2124,7 +2131,7 @@ Elm.GraphView.make = function (_elm) {
                                  ,_0: node._0.x - 5
                                  ,_1: node._0.y};}
                        _U.badCase($moduleName,
-                       "between lines 246 and 250");
+                       "between lines 248 and 252");
                     }();
                  };
                  return $Maybe.withDefault(_L.fromArray([]))($Maybe.map(function (html) {
@@ -2139,7 +2146,7 @@ Elm.GraphView.make = function (_elm) {
                  model.conversation)))));
               }();}
          _U.badCase($moduleName,
-         "between lines 244 and 293");
+         "between lines 246 and 295");
       }();
    });
    var nextPossible = F3(function (pred,
@@ -2233,7 +2240,7 @@ Elm.GraphView.make = function (_elm) {
          switch (node.ctor)
          {case "Asking":
             return A2($Questions.view,
-              A5($Questions.Context,
+              A5($Questions.Events,
               A2($Signal.forwardTo,
               address,
               ModifyQuestions(key)),
@@ -2256,7 +2263,7 @@ Elm.GraphView.make = function (_elm) {
               node._0);
             case "Talking":
             return A2($Speech.view,
-              A5($Speech.Context,
+              A5($Speech.Events,
               A2($Signal.forwardTo,
               address,
               ModifySpeech(key)),
@@ -2276,7 +2283,7 @@ Elm.GraphView.make = function (_elm) {
               $Basics.always(SetChild(key)))),
               node._0);}
          _U.badCase($moduleName,
-         "between lines 298 and 317");
+         "between lines 300 and 319");
       }();
    });
    var view = F2(function (address,
@@ -2520,7 +2527,7 @@ Elm.GraphView.make = function (_elm) {
               action,
               model);}
          _U.badCase($moduleName,
-         "between lines 229 and 237");
+         "between lines 231 and 239");
       }();
    });
    _elm.GraphView.values = {_op: _op
@@ -2669,7 +2676,7 @@ Elm.Graphics.Collage.make = function (_elm) {
                               ,["y",f.y + _v0._1]],
               f);}
          _U.badCase($moduleName,
-         "on line 226, column 7 to 35");
+         "on line 226, column 3 to 37");
       }();
    });
    var form = function (f) {
@@ -3352,7 +3359,7 @@ Elm.Graphics.Element.make = function (_elm) {
                  maxOrZero(ws),
                  $List.sum(hs));}
             _U.badCase($moduleName,
-            "between lines 362 and 373");
+            "between lines 362 and 368");
          }();
       }();
    });
@@ -3451,7 +3458,12 @@ Elm.Html.make = function (_elm) {
    _U = _N.Utils.make(_elm),
    _L = _N.List.make(_elm),
    $moduleName = "Html",
+   $Basics = Elm.Basics.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
    $VirtualDom = Elm.VirtualDom.make(_elm);
    var fromElement = $VirtualDom.fromElement;
    var toElement = $VirtualDom.toElement;
@@ -3679,6 +3691,9 @@ Elm.Html.Attributes.make = function (_elm) {
    $Html = Elm.Html.make(_elm),
    $Json$Encode = Elm.Json.Encode.make(_elm),
    $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm),
    $VirtualDom = Elm.VirtualDom.make(_elm);
    var attribute = $VirtualDom.attribute;
@@ -4301,8 +4316,12 @@ Elm.Html.Events.make = function (_elm) {
    _U = _N.Utils.make(_elm),
    _L = _N.List.make(_elm),
    $moduleName = "Html.Events",
+   $Basics = Elm.Basics.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $VirtualDom = Elm.VirtualDom.make(_elm);
    var keyCode = A2($Json$Decode._op[":="],
@@ -4407,6 +4426,8 @@ Elm.HtmlUtils.make = function (_elm) {
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
    $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var textarea = F5(function (width,
    height,
@@ -4664,8 +4685,11 @@ Elm.JsonView.make = function (_elm) {
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
    $HtmlUtils = Elm.HtmlUtils.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
-   var Context = F3(function (a,
+   var Events = F3(function (a,
    b,
    c) {
       return {_: {}
@@ -4712,7 +4736,7 @@ Elm.JsonView.make = function (_elm) {
       return {ctor: "EditLoadData"
              ,_0: a};
    };
-   var view = F2(function (context,
+   var view = F2(function (events,
    model) {
       return function () {
          var height = 500;
@@ -4743,17 +4767,17 @@ Elm.JsonView.make = function (_elm) {
                                                                             $Basics.toString(height),
                                                                             "px")}]))
                                       ,A2($Html$Events.onFocus,
-                                      context.actions,
+                                      events.actions,
                                       SetFocus(false))
                                       ,A2($Html$Events.onFocus,
-                                      context.actions,
+                                      events.actions,
                                       SetFocus(true))]),
                          _L.fromArray([]))]));
          });
          return A2($Html.div,
          _L.fromArray([]),
          _L.fromArray([A3($HtmlUtils.button,
-                      context.viewGraph,
+                      events.viewGraph,
                       {ctor: "_Tuple0"},
                       "Graph")
                       ,A2($Html.div,
@@ -4779,7 +4803,7 @@ Elm.JsonView.make = function (_elm) {
                                                 _L.fromArray([]),
                                                 _L.fromArray([$Html.text("Put what you \"save\"d here and press ")
                                                              ,A3($HtmlUtils.button,
-                                                             context.submit,
+                                                             events.submit,
                                                              model.loadData,
                                                              "Submit")]))]))
                                                 ,A2($Html.textarea,
@@ -4795,15 +4819,15 @@ Elm.JsonView.make = function (_elm) {
                                                                                                    $Basics.toString(height),
                                                                                                    "px")}]))
                                                              ,A2($Html$Events.onFocus,
-                                                             context.actions,
+                                                             events.actions,
                                                              SetFocus(false))
                                                              ,A2($Html$Events.onBlur,
-                                                             context.actions,
+                                                             events.actions,
                                                              SetFocus(true))
                                                              ,A2($Html$Events.on,
                                                              "input",
                                                              $Html$Events.targetValue)(function ($) {
-                                                                return $Signal.message(context.actions)(EditLoadData($));
+                                                                return $Signal.message(events.actions)(EditLoadData($));
                                                              })]),
                                                 _L.fromArray([]))
                                                 ,A2($Html.div,
@@ -4838,8 +4862,8 @@ Elm.JsonView.make = function (_elm) {
                           ,SetErrorText: SetErrorText
                           ,SetFocus: SetFocus
                           ,update: update
-                          ,Context: Context
-                          ,view: view};
+                          ,view: view
+                          ,Events: Events};
    return _elm.JsonView.values;
 };
 Elm.Keyboard = Elm.Keyboard || {};
@@ -5020,6 +5044,9 @@ Elm.KeyboardUtils.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Char = Elm.Char.make(_elm),
    $Keyboard = Elm.Keyboard.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var isTriggered = function (pressState) {
       return pressState.current && $Basics.not(pressState.previous);
@@ -5172,7 +5199,7 @@ Elm.List.make = function (_elm) {
             case "[]":
             return $Maybe.Nothing;}
          _U.badCase($moduleName,
-         "between lines 87 and 95");
+         "between lines 87 and 89");
       }();
    };
    var head = function (list) {
@@ -5183,7 +5210,7 @@ Elm.List.make = function (_elm) {
             case "[]":
             return $Maybe.Nothing;}
          _U.badCase($moduleName,
-         "between lines 75 and 84");
+         "between lines 75 and 77");
       }();
    };
    _op["::"] = $Native$List.cons;
@@ -5222,7 +5249,7 @@ Elm.List.make = function (_elm) {
             return A2(_op["::"],_v15._0,xs);
             case "Nothing": return xs;}
          _U.badCase($moduleName,
-         "between lines 179 and 186");
+         "between lines 179 and 181");
       }();
    });
    var filterMap = F2(function (f,
@@ -5369,7 +5396,7 @@ Elm.List.make = function (_elm) {
             case "[]":
             return _L.fromArray([]);}
          _U.badCase($moduleName,
-         "between lines 350 and 361");
+         "between lines 350 and 356");
       }();
    });
    _elm.List.values = {_op: _op
@@ -5468,18 +5495,18 @@ Elm.Main.make = function (_elm) {
    var viewViewingJson = F2(function (address,
    model) {
       return function () {
-         var context = {_: {}
-                       ,actions: A2($Signal.forwardTo,
-                       address,
-                       ModifyJsonView)
-                       ,submit: A2($Signal.forwardTo,
-                       address,
-                       LoadConversation)
-                       ,viewGraph: A2($Signal.forwardTo,
-                       address,
-                       $Basics.always(ViewGraph))};
+         var events = {_: {}
+                      ,actions: A2($Signal.forwardTo,
+                      address,
+                      ModifyJsonView)
+                      ,submit: A2($Signal.forwardTo,
+                      address,
+                      LoadConversation)
+                      ,viewGraph: A2($Signal.forwardTo,
+                      address,
+                      $Basics.always(ViewGraph))};
          return A2($JsonView.view,
-         context,
+         events,
          model.jsonView);
       }();
    });
@@ -5775,7 +5802,7 @@ Elm.Maybe.make = function (_elm) {
             case "Nothing":
             return $default;}
          _U.badCase($moduleName,
-         "between lines 45 and 56");
+         "between lines 45 and 47");
       }();
    });
    var Nothing = {ctor: "Nothing"};
@@ -5788,11 +5815,11 @@ Elm.Maybe.make = function (_elm) {
                     case "Nothing":
                     return oneOf(maybes._1);}
                  _U.badCase($moduleName,
-                 "between lines 64 and 73");
+                 "between lines 64 and 66");
               }();
             case "[]": return Nothing;}
          _U.badCase($moduleName,
-         "between lines 59 and 73");
+         "between lines 59 and 66");
       }();
    };
    var andThen = F2(function (maybeValue,
@@ -5817,7 +5844,7 @@ Elm.Maybe.make = function (_elm) {
             return Just(f(maybe._0));
             case "Nothing": return Nothing;}
          _U.badCase($moduleName,
-         "between lines 76 and 107");
+         "between lines 76 and 78");
       }();
    });
    _elm.Maybe.values = {_op: _op
@@ -13598,9 +13625,10 @@ Elm.Parentable.make = function (_elm) {
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
    $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
-   var Context = F2(function (a,
-   b) {
+   var Events = F2(function (a,b) {
       return {_: {}
              ,actions: a
              ,startParenting: b};
@@ -13637,7 +13665,7 @@ Elm.Parentable.make = function (_elm) {
    xPadding,
    yPadding,
    yStride,
-   context,
+   events,
    model) {
       return function () {
          var addChildButton = function (index) {
@@ -13651,7 +13679,7 @@ Elm.Parentable.make = function (_elm) {
                                                                $Basics.toString(index * yStride),
                                                                "px")}]))
                          ,A2($Html$Events.onClick,
-                         context.startParenting,
+                         events.startParenting,
                          {ctor: "_Tuple0"})]),
             _L.fromArray([$Html.text("+")]));
          };
@@ -13666,7 +13694,7 @@ Elm.Parentable.make = function (_elm) {
                                                                $Basics.toString(index * yStride),
                                                                "px")}]))
                          ,A2($Html$Events.onClick,
-                         context.actions,
+                         events.actions,
                          RemoveChild(index))]),
             _L.fromArray([$Html.text("-")]));
          };
@@ -13707,8 +13735,8 @@ Elm.Parentable.make = function (_elm) {
                             ,AddChild: AddChild
                             ,RemoveChild: RemoveChild
                             ,update: update
-                            ,Context: Context
-                            ,view: view};
+                            ,view: view
+                            ,Events: Events};
    return _elm.Parentable.values;
 };
 Elm.Question = Elm.Question || {};
@@ -13730,8 +13758,20 @@ Elm.Question.make = function (_elm) {
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $Json$Encode = Elm.Json.Encode.make(_elm),
    $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
    $Parentable = Elm.Parentable.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
+   var Events = F4(function (a,
+   b,
+   c,
+   d) {
+      return {_: {}
+             ,actions: a
+             ,focus: c
+             ,remove: b
+             ,startParenting: d};
+   });
    var toJson = function (model) {
       return function () {
          var text = A2($List.map,
@@ -13749,16 +13789,6 @@ Elm.Question.make = function (_elm) {
                                                   model.children))}]));
       }();
    };
-   var Context = F4(function (a,
-   b,
-   c,
-   d) {
-      return {_: {}
-             ,actions: a
-             ,focus: c
-             ,remove: b
-             ,startParenting: d};
-   });
    var update = F2(function (action,
    model) {
       return function () {
@@ -13801,12 +13831,12 @@ Elm.Question.make = function (_elm) {
              ,_0: width + childBtnXPadding + model.x
              ,_1: index * childBtnStride + childBtnYPadding + model.y};
    });
-   var view = F2(function (context,
+   var view = F2(function (events,
    model) {
       return function () {
          var setTextMessage = function (lineNum) {
             return function ($) {
-               return $Signal.message(context.actions)(SetText(lineNum)($));
+               return $Signal.message(events.actions)(SetText(lineNum)($));
             };
          };
          var textLine = F2(function (txt,
@@ -13821,10 +13851,10 @@ Elm.Question.make = function (_elm) {
                          $Html$Events.targetValue,
                          setTextMessage(lineNum))
                          ,A2($Html$Events.onFocus,
-                         context.focus,
+                         events.focus,
                          true)
                          ,A2($Html$Events.onBlur,
-                         context.focus,
+                         events.focus,
                          false)]),
             _L.fromArray([]));
          });
@@ -13858,7 +13888,7 @@ Elm.Question.make = function (_elm) {
                        $Basics.toString(model.y),
                        "px")}]),
          $HtmlUtils.bordered))]),
-         _L.fromArray([$HtmlUtils.closeButton(context.remove)
+         _L.fromArray([$HtmlUtils.closeButton(events.remove)
                       ,$Html.text("Question")
                       ,A2($Html.br,
                       _L.fromArray([]),
@@ -13877,12 +13907,12 @@ Elm.Question.make = function (_elm) {
                       childBtnXPadding,
                       childBtnYPadding,
                       childBtnStride,
-                      A2($Parentable.Context,
+                      A2($Parentable.Events,
                       A2($Signal.forwardTo,
-                      context.actions,
+                      events.actions,
                       ModifyParentable),
                       A2($Signal.forwardTo,
-                      context.startParenting,
+                      events.startParenting,
                       $Basics.always({ctor: "_Tuple0"}))),
                       model)]));
       }();
@@ -13972,9 +14002,9 @@ Elm.Question.make = function (_elm) {
                           ,SetText: SetText
                           ,ModifyParentable: ModifyParentable
                           ,update: update
-                          ,Context: Context
                           ,view: view
-                          ,toJson: toJson};
+                          ,toJson: toJson
+                          ,Events: Events};
    return _elm.Question.values;
 };
 Elm.Questions = Elm.Questions || {};
@@ -14000,13 +14030,9 @@ Elm.Questions.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Parentable = Elm.Parentable.make(_elm),
    $Question = Elm.Question.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
-   var toJson = function (model) {
-      return $Json$Encode.list($Array.toList(A2($Array.map,
-      $Question.toJson,
-      model.questions)));
-   };
-   var Context = F5(function (a,
+   var Events = F5(function (a,
    b,
    c,
    d,
@@ -14018,6 +14044,11 @@ Elm.Questions.make = function (_elm) {
              ,remove: c
              ,startParenting: d};
    });
+   var toJson = function (model) {
+      return $Json$Encode.list($Array.toList(A2($Array.map,
+      $Question.toJson,
+      model.questions)));
+   };
    var ParentQuestion = F2(function (a,
    b) {
       return {ctor: "ParentQuestion"
@@ -14067,7 +14098,7 @@ Elm.Questions.make = function (_elm) {
              ,y: y};
    });
    var yStride = 102;
-   var view = F2(function (context,
+   var view = F2(function (events,
    model) {
       return function () {
          var questionGap = A2($Html.div,
@@ -14082,28 +14113,28 @@ Elm.Questions.make = function (_elm) {
          _L.fromArray([]));
          var addButton = A2($Html.button,
          _L.fromArray([A2($Html$Events.onClick,
-         context.actions,
+         events.actions,
          NewQuestion)]),
          _L.fromArray([$Html.text("Add")]));
-         var subContext = function (i) {
+         var qEvents = function (i) {
             return {_: {}
                    ,actions: A2($Signal.forwardTo,
-                   context.actions,
+                   events.actions,
                    ModifyQuestion(i))
                    ,focus: A2($Signal.forwardTo,
-                   context.focus,
+                   events.focus,
                    $Basics.identity)
                    ,remove: A2($Signal.forwardTo,
-                   context.actions,
+                   events.actions,
                    $Basics.always(DeleteQuestion(i)))
                    ,startParenting: A2($Signal.forwardTo,
-                   context.startParenting,
+                   events.startParenting,
                    $Basics.always(i))};
          };
          var questionViews = $Array.toList(A2($Array.indexedMap,
          F2(function (i,question) {
             return A2($Question.view,
-            subContext(i),
+            qEvents(i),
             question);
          }),
          model.questions));
@@ -14150,11 +14181,11 @@ Elm.Questions.make = function (_elm) {
                                                             ,_0: "float"
                                                             ,_1: "left"}]))
                       ,A2($Html$Events.onClick,
-                      context.parentThis,
+                      events.parentThis,
                       {ctor: "_Tuple0"})]),
          _L.fromArray([$Html.text("child")])),
          A2($List._op["::"],
-         $HtmlUtils.closeButton(context.remove),
+         $HtmlUtils.closeButton(events.remove),
          A2($List._op["::"],
          $HtmlUtils.title("Questions"),
          A2($List._op["::"],
@@ -14252,9 +14283,9 @@ Elm.Questions.make = function (_elm) {
                            ,DeleteQuestion: DeleteQuestion
                            ,ParentQuestion: ParentQuestion
                            ,update: update
-                           ,Context: Context
                            ,view: view
-                           ,toJson: toJson};
+                           ,toJson: toJson
+                           ,Events: Events};
    return _elm.Questions.values;
 };
 Elm.Result = Elm.Result || {};
@@ -14277,7 +14308,7 @@ Elm.Result.make = function (_elm) {
             case "Ok":
             return $Maybe.Just(result._0);}
          _U.badCase($moduleName,
-         "between lines 164 and 177");
+         "between lines 164 and 166");
       }();
    };
    var Err = function (a) {
@@ -14292,7 +14323,7 @@ Elm.Result.make = function (_elm) {
             case "Ok":
             return callback(result._0);}
          _U.badCase($moduleName,
-         "between lines 126 and 145");
+         "between lines 126 and 128");
       }();
    });
    var Ok = function (a) {
@@ -14306,7 +14337,7 @@ Elm.Result.make = function (_elm) {
             case "Ok":
             return Ok(func(ra._0));}
          _U.badCase($moduleName,
-         "between lines 41 and 52");
+         "between lines 41 and 43");
       }();
    });
    var map2 = F3(function (func,
@@ -14460,7 +14491,7 @@ Elm.Result.make = function (_elm) {
                  return Err(_v39._4._0);}
               break;}
          _U.badCase($moduleName,
-         "between lines 82 and 123");
+         "between lines 82 and 88");
       }();
    });
    var formatError = F2(function (f,
@@ -14472,7 +14503,7 @@ Elm.Result.make = function (_elm) {
             case "Ok":
             return Ok(result._0);}
          _U.badCase($moduleName,
-         "between lines 148 and 161");
+         "between lines 148 and 150");
       }();
    });
    var fromMaybe = F2(function (err,
@@ -14708,7 +14739,7 @@ Elm.Signal.make = function (_elm) {
             case "[]":
             return $Debug.crash("mergeMany was given an empty list!");}
          _U.badCase($moduleName,
-         "between lines 177 and 197");
+         "between lines 177 and 182");
       }();
    };
    var foldp = $Native$Signal.foldp;
@@ -14769,8 +14800,22 @@ Elm.Speech.make = function (_elm) {
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $Json$Encode = Elm.Json.Encode.make(_elm),
    $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
    $Parentable = Elm.Parentable.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
+   var Events = F5(function (a,
+   b,
+   c,
+   d,
+   e) {
+      return {_: {}
+             ,actions: a
+             ,focus: b
+             ,parentThis: e
+             ,remove: c
+             ,startParenting: d};
+   });
    var toJson = function (model) {
       return function () {
          var text = A2($List.map,
@@ -14825,18 +14870,6 @@ Elm.Speech.make = function (_elm) {
       return {ctor: "_Tuple2"
              ,_0: width + childBtnXPadding + model.x
              ,_1: index * childBtnStride + childBtnYPadding + model.y};
-   });
-   var Context = F5(function (a,
-   b,
-   c,
-   d,
-   e) {
-      return {_: {}
-             ,actions: a
-             ,focus: b
-             ,parentThis: e
-             ,remove: c
-             ,startParenting: d};
    });
    var update = F2(function (action,
    model) {
@@ -14925,7 +14958,7 @@ Elm.Speech.make = function (_elm) {
                                ,"Gavin"
                                ,"Ava"
                                ,"Sebastian"]);
-   var view = F2(function (context,
+   var view = F2(function (events,
    model) {
       return function () {
          var backgroundColor = function () {
@@ -14940,14 +14973,14 @@ Elm.Speech.make = function (_elm) {
                case "Sophie":
                return "rgb(200,200,255)";}
             _U.badCase($moduleName,
-            "between lines 170 and 175");
+            "between lines 161 and 166");
          }();
          var setSpeakerMessage = function ($) {
-            return $Signal.message(context.actions)(SetSpeaker($));
+            return $Signal.message(events.actions)(SetSpeaker($));
          };
          var setTextMessage = function (lineNum) {
             return function ($) {
-               return $Signal.message(context.actions)(SetText(lineNum)($));
+               return $Signal.message(events.actions)(SetText(lineNum)($));
             };
          };
          var textLine = F2(function (txt,
@@ -14962,10 +14995,10 @@ Elm.Speech.make = function (_elm) {
                          $Html$Events.targetValue,
                          setTextMessage(lineNum))
                          ,A2($Html$Events.onFocus,
-                         context.focus,
+                         events.focus,
                          true)
                          ,A2($Html$Events.onBlur,
-                         context.focus,
+                         events.focus,
                          false)]),
             _L.fromArray([]));
          });
@@ -15013,10 +15046,10 @@ Elm.Speech.make = function (_elm) {
                                                                          ,_0: "float"
                                                                          ,_1: "left"}]))
                                    ,A2($Html$Events.onClick,
-                                   context.parentThis,
+                                   events.parentThis,
                                    {ctor: "_Tuple0"})]),
                       _L.fromArray([$Html.text("child")]))
-                      ,$HtmlUtils.closeButton(context.remove)
+                      ,$HtmlUtils.closeButton(events.remove)
                       ,$HtmlUtils.title("Speech")
                       ,$Html.text("Speaker ")
                       ,A3($HtmlUtils.selection,
@@ -15044,12 +15077,12 @@ Elm.Speech.make = function (_elm) {
                       childBtnXPadding,
                       childBtnYPadding,
                       childBtnStride,
-                      A2($Parentable.Context,
+                      A2($Parentable.Events,
                       A2($Signal.forwardTo,
-                      context.actions,
+                      events.actions,
                       ModifyParentable),
                       A2($Signal.forwardTo,
-                      context.startParenting,
+                      events.startParenting,
                       $Basics.always({ctor: "_Tuple0"}))),
                       model)]))]));
       }();
@@ -15104,7 +15137,6 @@ Elm.Speech.make = function (_elm) {
                         ,SetText: SetText
                         ,ModifyParentable: ModifyParentable
                         ,update: update
-                        ,Context: Context
                         ,width: width
                         ,childBtnStride: childBtnStride
                         ,childBtnXPadding: childBtnXPadding
@@ -15112,7 +15144,8 @@ Elm.Speech.make = function (_elm) {
                         ,childBtnPosition: childBtnPosition
                         ,view: view
                         ,debugDraw: debugDraw
-                        ,toJson: toJson};
+                        ,toJson: toJson
+                        ,Events: Events};
    return _elm.Speech.values;
 };
 Elm.String = Elm.String || {};
@@ -15603,9 +15636,13 @@ Elm.VirtualDom.make = function (_elm) {
    _U = _N.Utils.make(_elm),
    _L = _N.List.make(_elm),
    $moduleName = "VirtualDom",
+   $Basics = Elm.Basics.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
    $Native$VirtualDom = Elm.Native.VirtualDom.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var lazy3 = $Native$VirtualDom.lazy3;
    var lazy2 = $Native$VirtualDom.lazy2;

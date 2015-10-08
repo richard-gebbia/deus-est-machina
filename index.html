@@ -17,6 +17,9 @@
         -o-user-select: none;
         user-select: none;
         pointer-events: none;
+
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        -moz-tap-highlight-color: rgba(0, 0, 0, 0);
     }
 
     img {
@@ -35,6 +38,42 @@
     <script src="src/conversation.js"></script>
     <script src="src/elm.js"></script>
     <script>
+        var images = [
+                 "Ava.png",
+                 "AvaDialogueBox.png",
+                 "AvaFrame.png",
+                 "Ellipsis.png",
+                 "Exclamation.png",
+                 "Gavin.png",
+                 "GavinDialogueBox.png",
+                 "GavinFrame.png",
+                 "Questions.png",
+                 "QuestionDialgueBox.png",
+                 "Sebastian.png",
+                 "SebastianDialogueBox.png",
+                 "SebastianFrame.png",
+                 "Sophie.png",
+                 "SophieDialogueBox.png",
+                 "SophieFrame.png"
+            ];
+
+        var index = 0;
+
+        var img = new Image();
+        img.src = "img/" + images[0];
+        img.onload = function () {
+            var img;
+
+            index++;
+            if (index >= images.length) {
+                return;
+            }
+
+            img = new Image();
+            img.src = "img/" + images[index];
+            img.onload = this.onload;
+        };
+
         var conversationJson = JSON.stringify(conversation);
         var deusEstMachina = 
             Elm.embed(Elm.DeusEstMachina, document.getElementById('elmDiv'), {

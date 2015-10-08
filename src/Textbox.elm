@@ -115,13 +115,11 @@ formText text =
         (iElWidth, iElHeight) = Element.sizeOf el
         (elWidth, elHeight) = (Basics.toFloat iElWidth, Basics.toFloat iElHeight)
     in
-    -- contain (Element.sizeOf el) Element.topLeft el
-    -- |> Collage.toForm
     Collage.text text
     |> Collage.move (elWidth / 2, -elHeight / 2)
 
 
-view : Signal.Address Event -> Model -> List Collage.Form
+view : Events -> Model -> List Collage.Form
 view address model = 
     let prepend x y = y ++ x
         drawText style x y text = 
@@ -133,7 +131,7 @@ view address model =
             if model.clickable then
                 ClickForm.spriteButton 
                     model.background 
-                    (Signal.message address Click)
+                    (Signal.message address ())
             else
                 Sprite.draw model.background
         linesOfText = List.length (textToShow model)
@@ -155,4 +153,4 @@ view address model =
 
 -- Events
 
-type Event = Click
+type alias Events = Signal.Address ()

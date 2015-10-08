@@ -10,7 +10,11 @@ Elm.Animation.make = function (_elm) {
    _U = _N.Utils.make(_elm),
    _L = _N.List.make(_elm),
    $moduleName = "Animation",
-   $Basics = Elm.Basics.make(_elm);
+   $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
    var isComplete = function (animation) {
       return animation.isLooping ? false : _U.cmp(animation.elapsedTime,
       animation.duration) > -1;
@@ -490,6 +494,9 @@ Elm.ClickForm.make = function (_elm) {
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $Graphics$Input = Elm.Graphics.Input.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Sprite = Elm.Sprite.make(_elm);
    var spriteButton = F2(function (sprite,
@@ -689,7 +696,7 @@ Elm.Color.make = function (_elm) {
                         ,saturation: s};
               }();}
          _U.badCase($moduleName,
-         "between lines 114 and 121");
+         "between lines 114 and 118");
       }();
    };
    var HSLA = F4(function (a,
@@ -745,7 +752,7 @@ Elm.Color.make = function (_elm) {
                  color._3);
               }();}
          _U.badCase($moduleName,
-         "between lines 105 and 111");
+         "between lines 105 and 108");
       }();
    };
    var grayscale = function (p) {
@@ -980,7 +987,9 @@ Elm.Conversation.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm);
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
    var questionText = function (questions) {
       return A2($List.map,
       function (_) {
@@ -1348,9 +1357,11 @@ Elm.ConversationGen.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $ParseConversation = Elm.ParseConversation.make(_elm),
-   $Result = Elm.Result.make(_elm);
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
    var testConversation = "\n    {\n        \"start\": {\n            \"name\": \"Ava\",\n            \"text\": [\n                \"Test\"\n            ],\n            \"children\": []\n        }\n    }\n    ";
    var starter = "0";
    var genConversation = function (conversationString) {
@@ -1372,7 +1383,7 @@ Elm.ConversationGen.make = function (_elm) {
                     $Dict.empty);
                   case "Ok": return result._0;}
                _U.badCase($moduleName,
-               "between lines 35 and 38");
+               "between lines 36 and 40");
             }();
          }(A2($Json$Decode.decodeString,
          $ParseConversation.conversation,
@@ -1447,6 +1458,7 @@ Elm.DeusEstMachina.make = function (_elm) {
    $PortraitBoxGen = Elm.PortraitBoxGen.make(_elm),
    $QuestionList = Elm.QuestionList.make(_elm),
    $QuestionListGen = Elm.QuestionListGen.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $TextboxList = Elm.TextboxList.make(_elm),
    $TextboxListGen = Elm.TextboxListGen.make(_elm),
@@ -1496,39 +1508,19 @@ Elm.DeusEstMachina.make = function (_elm) {
    });
    var view = F2(function (address,
    model) {
-      return function () {
-         var qlEventToAction = function (_v3) {
-            return function () {
-               switch (_v3.ctor)
-               {case "ChooseQuestion":
-                  return ChooseQuestion(_v3._0);}
-               _U.badCase($moduleName,
-               "on line 242, column 13 to 36");
-            }();
-         };
-         var pbEventToAction = function (_v6) {
-            return function () {
-               switch (_v6.ctor)
-               {case "OnPortraitClick":
-                  return ChooseSpeaker(_v6._0);}
-               _U.badCase($moduleName,
-               "on line 239, column 13 to 31");
-            }();
-         };
-         return A2($Basics._op["++"],
-         $TextboxList.view(unwrap(model).textboxList),
-         A2($Basics._op["++"],
-         A2($QuestionList.view,
-         A2($Signal.forwardTo,
-         address,
-         qlEventToAction),
-         unwrap(model).questionList),
-         A2($PortraitBox.view,
-         A2($Signal.forwardTo,
-         address,
-         pbEventToAction),
-         unwrap(model).portraitBox)));
-      }();
+      return A2($Basics._op["++"],
+      $TextboxList.view(unwrap(model).textboxList),
+      A2($Basics._op["++"],
+      A2($QuestionList.view,
+      A2($Signal.forwardTo,
+      address,
+      ChooseQuestion),
+      unwrap(model).questionList),
+      A2($PortraitBox.view,
+      A2($Signal.forwardTo,
+      address,
+      ChooseSpeaker),
+      unwrap(model).portraitBox)));
    });
    var Model = function (a) {
       return {ctor: "Model",_0: a};
@@ -1563,12 +1555,12 @@ Elm.DeusEstMachina.make = function (_elm) {
    });
    var advance = F3(function (modelData,
    name,
-   _v12) {
+   _v6) {
       return function () {
-         switch (_v12.ctor)
+         switch (_v6.ctor)
          {case "_Tuple2":
             return _U.replace([["conversation"
-                               ,_v12._0]
+                               ,_v6._0]
                               ,["previous",$Maybe.Just(name)]
                               ,["portraitBox"
                                ,A2($PortraitBox.update,
@@ -1577,14 +1569,14 @@ Elm.DeusEstMachina.make = function (_elm) {
                               ,["textboxList"
                                ,$Basics.fst(A2($TextboxList.update,
                                A2($TextboxList.AddTextbox,
-                               _v12._1.name,
-                               _v12._1.text),
+                               _v6._1.name,
+                               _v6._1.text),
                                modelData.textboxList))]
                               ,["gameStateUpdate"
                                ,waitingForTextboxToFinish]],
               modelData);}
          _U.badCase($moduleName,
-         "between lines 51 and 62");
+         "between lines 51 and 63");
       }();
    });
    var waitingForTextboxToFinish = F2(function (action,
@@ -1609,23 +1601,23 @@ Elm.DeusEstMachina.make = function (_elm) {
          };
          var onTick = F2(function (dt,
          modelData) {
-            return function (_v16) {
+            return function (_v10) {
                return function () {
-                  switch (_v16.ctor)
+                  switch (_v10.ctor)
                   {case "_Tuple2":
                      return function () {
-                          switch (_v16._1.ctor)
+                          switch (_v10._1.ctor)
                           {case "Just":
-                             switch (_v16._1._0.ctor)
+                             switch (_v10._1._0.ctor)
                                {case "ReadyForNewTextboxes":
                                   return onClick(modelData);}
                                break;}
                           return _U.replace([["textboxList"
-                                             ,_v16._0]],
+                                             ,_v10._0]],
                           modelData);
                        }();}
                   _U.badCase($moduleName,
-                  "between lines 117 and 125");
+                  "between lines 119 and 127");
                }();
             }(A2($TextboxList.update,
             $TextboxList.Tick(dt),
@@ -1669,12 +1661,12 @@ Elm.DeusEstMachina.make = function (_elm) {
    model) {
       return function () {
          var modelData = unwrap(model);
-         var onClick = function (_v27) {
+         var onClick = function (_v21) {
             return function () {
-               switch (_v27.ctor)
+               switch (_v21.ctor)
                {case "_Tuple2":
                   return _U.replace([["conversation"
-                                     ,_v27._0]
+                                     ,_v21._0]
                                     ,["previous",$Maybe.Nothing]
                                     ,["textboxList"
                                      ,$Basics.fst(A2($TextboxList.update,
@@ -1682,13 +1674,13 @@ Elm.DeusEstMachina.make = function (_elm) {
                                      modelData.textboxList))]
                                     ,["questionList"
                                      ,A2($QuestionList.update,
-                                     $QuestionList.ShowQuestions(_v27._1),
+                                     $QuestionList.ShowQuestions(_v21._1),
                                      modelData.questionList)]
                                     ,["gameStateUpdate"
                                      ,showingQuestions]],
                     modelData);}
                _U.badCase($moduleName,
-               "between lines 142 and 152");
+               "between lines 145 and 156");
             }();
          };
          return function () {
@@ -1706,9 +1698,9 @@ Elm.DeusEstMachina.make = function (_elm) {
       return function () {
          var modelData = unwrap(model);
          var respondToChosenQuestion = F2(function (index,
-         _v32) {
+         _v26) {
             return function () {
-               switch (_v32.ctor)
+               switch (_v26.ctor)
                {case "_Tuple2":
                   return _U.replace([["questionList"
                                      ,A2($QuestionList.update,
@@ -1717,36 +1709,36 @@ Elm.DeusEstMachina.make = function (_elm) {
                                     ,["textboxList"
                                      ,$Basics.fst($TextboxList.update(A2($TextboxList.AddFullTextbox,
                                      "Question",
-                                     _v32._0))($Basics.fst(A2($TextboxList.update,
+                                     _v26._0))($Basics.fst(A2($TextboxList.update,
                                      $TextboxList.Show,
                                      modelData.textboxList))))]
                                     ,["portraitBox"
                                      ,A2($PortraitBox.update,
-                                     $PortraitBox.SetResponders(_v32._1),
+                                     $PortraitBox.SetResponders(_v26._1),
                                      modelData.portraitBox)]
                                     ,["gameStateUpdate"
                                      ,waitingForQuestionResponse(index)]],
                     modelData);}
                _U.badCase($moduleName,
-               "between lines 171 and 184");
+               "between lines 175 and 189");
             }();
          });
          return function () {
             switch (action.ctor)
             {case "ChooseQuestion":
-               return Model(respondToChosenQuestion(action._0)(function (_v38) {
+               return Model(respondToChosenQuestion(action._0)(function (_v32) {
                     return function () {
-                       switch (_v38.ctor)
+                       switch (_v32.ctor)
                        {case "_Tuple2":
                           return {ctor: "_Tuple2"
                                  ,_0: A2($Maybe.withDefault,
                                  _L.fromArray([]),
-                                 _v38._0)
+                                 _v32._0)
                                  ,_1: A2($Maybe.withDefault,
                                  _L.fromArray([]),
-                                 _v38._1)};}
+                                 _v32._1)};}
                        _U.badCase($moduleName,
-                       "on line 197, column 22 to 80");
+                       "on line 201, column 22 to 80");
                     }();
                  }(function (names) {
                     return {ctor: "_Tuple2"
@@ -1849,7 +1841,7 @@ Elm.Dict.make = function (_elm) {
               A3(foldr,f,acc,t._4)),
               t._3);}
          _U.badCase($moduleName,
-         "between lines 417 and 425");
+         "between lines 417 and 421");
       }();
    });
    var keys = function (dict) {
@@ -1905,7 +1897,7 @@ Elm.Dict.make = function (_elm) {
               A3(foldl,f,acc,dict._3)),
               dict._4);}
          _U.badCase($moduleName,
-         "between lines 406 and 414");
+         "between lines 406 and 410");
       }();
    });
    var isBBlack = function (dict) {
@@ -1929,7 +1921,7 @@ Elm.Dict.make = function (_elm) {
             case "Remove": return "Remove";
             case "Same": return "Same";}
          _U.badCase($moduleName,
-         "between lines 182 and 188");
+         "between lines 182 and 185");
       }();
    };
    var Same = {ctor: "Same"};
@@ -1959,10 +1951,10 @@ Elm.Dict.make = function (_elm) {
                       targetKey,
                       dict._3);}
                  _U.badCase($moduleName,
-                 "between lines 129 and 135");
+                 "between lines 129 and 132");
               }();}
          _U.badCase($moduleName,
-         "between lines 124 and 135");
+         "between lines 124 and 132");
       }();
    });
    var member = F2(function (key,
@@ -1973,7 +1965,7 @@ Elm.Dict.make = function (_elm) {
          {case "Just": return true;
             case "Nothing": return false;}
          _U.badCase($moduleName,
-         "between lines 138 and 146");
+         "between lines 138 and 140");
       }();
    });
    var max = function (dict) {
@@ -1989,7 +1981,7 @@ Elm.Dict.make = function (_elm) {
                         ,_1: dict._2};}
               return max(dict._4);}
          _U.badCase($moduleName,
-         "between lines 100 and 121");
+         "between lines 100 and 108");
       }();
    };
    var min = function (dict) {
@@ -2061,7 +2053,7 @@ Elm.Dict.make = function (_elm) {
               A2(map,f,dict._3),
               A2(map,f,dict._4));}
          _U.badCase($moduleName,
-         "between lines 394 and 403");
+         "between lines 394 and 399");
       }();
    });
    var showNColor = function (c) {
@@ -2110,7 +2102,7 @@ Elm.Dict.make = function (_elm) {
                    dict._4);}
               break;}
          _U.badCase($moduleName,
-         "between lines 154 and 166");
+         "between lines 154 and 162");
       }();
    };
    var blackish = function (t) {
@@ -2194,7 +2186,7 @@ Elm.Dict.make = function (_elm) {
               t._3,
               t._4);}
          _U.badCase($moduleName,
-         "between lines 386 and 391");
+         "between lines 386 and 388");
       }();
    };
    var balance_node = function (t) {
@@ -2661,7 +2653,7 @@ Elm.Dict.make = function (_elm) {
                case "Same":
                return updatedDict;}
             _U.badCase($moduleName,
-            "between lines 222 and 228");
+            "between lines 222 and 225");
          }();
       }();
    });
@@ -2922,7 +2914,7 @@ Elm.Graphics.Collage.make = function (_elm) {
                               ,["y",f.y + _v0._1]],
               f);}
          _U.badCase($moduleName,
-         "on line 226, column 7 to 35");
+         "on line 226, column 3 to 37");
       }();
    });
    var form = function (f) {
@@ -3605,7 +3597,7 @@ Elm.Graphics.Element.make = function (_elm) {
                  maxOrZero(ws),
                  $List.sum(hs));}
             _U.badCase($moduleName,
-            "between lines 362 and 373");
+            "between lines 362 and 368");
          }();
       }();
    });
@@ -3738,7 +3730,11 @@ Elm.Interjection.make = function (_elm) {
    $Animation = Elm.Animation.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
-   $Graphics$Element = Elm.Graphics.Element.make(_elm);
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
    var viewSprite = F2(function (imageName,
    model) {
       return A3($Graphics$Element.image,
@@ -3763,7 +3759,7 @@ Elm.Interjection.make = function (_elm) {
                case "Quiet":
                return $Graphics$Element.empty;}
             _U.badCase($moduleName,
-            "between lines 53 and 63");
+            "between lines 54 and 64");
          }();
          return $Graphics$Collage.move({ctor: "_Tuple2"
                                        ,_0: model.x
@@ -3843,7 +3839,11 @@ Elm.InterjectionGen.make = function (_elm) {
    $moduleName = "InterjectionGen",
    $Animation = Elm.Animation.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Interjection = Elm.Interjection.make(_elm);
+   $Interjection = Elm.Interjection.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
    var defaultInterjection = F2(function (x,
    y) {
       return function () {
@@ -4133,7 +4133,7 @@ Elm.List.make = function (_elm) {
             case "[]":
             return $Maybe.Nothing;}
          _U.badCase($moduleName,
-         "between lines 87 and 95");
+         "between lines 87 and 89");
       }();
    };
    var head = function (list) {
@@ -4144,7 +4144,7 @@ Elm.List.make = function (_elm) {
             case "[]":
             return $Maybe.Nothing;}
          _U.badCase($moduleName,
-         "between lines 75 and 84");
+         "between lines 75 and 77");
       }();
    };
    _op["::"] = $Native$List.cons;
@@ -4183,7 +4183,7 @@ Elm.List.make = function (_elm) {
             return A2(_op["::"],_v15._0,xs);
             case "Nothing": return xs;}
          _U.badCase($moduleName,
-         "between lines 179 and 186");
+         "between lines 179 and 181");
       }();
    });
    var filterMap = F2(function (f,
@@ -4330,7 +4330,7 @@ Elm.List.make = function (_elm) {
             case "[]":
             return _L.fromArray([]);}
          _U.badCase($moduleName,
-         "between lines 350 and 361");
+         "between lines 350 and 356");
       }();
    });
    _elm.List.values = {_op: _op
@@ -4390,7 +4390,7 @@ Elm.Maybe.make = function (_elm) {
             case "Nothing":
             return $default;}
          _U.badCase($moduleName,
-         "between lines 45 and 56");
+         "between lines 45 and 47");
       }();
    });
    var Nothing = {ctor: "Nothing"};
@@ -4403,11 +4403,11 @@ Elm.Maybe.make = function (_elm) {
                     case "Nothing":
                     return oneOf(maybes._1);}
                  _U.badCase($moduleName,
-                 "between lines 64 and 73");
+                 "between lines 64 and 66");
               }();
             case "[]": return Nothing;}
          _U.badCase($moduleName,
-         "between lines 59 and 73");
+         "between lines 59 and 66");
       }();
    };
    var andThen = F2(function (maybeValue,
@@ -4432,7 +4432,7 @@ Elm.Maybe.make = function (_elm) {
             return Just(f(maybe._0));
             case "Nothing": return Nothing;}
          _U.badCase($moduleName,
-         "between lines 76 and 107");
+         "between lines 76 and 78");
       }();
    });
    _elm.Maybe.values = {_op: _op
@@ -4487,7 +4487,11 @@ Elm.MoveByAnimation.make = function (_elm) {
    _L = _N.List.make(_elm),
    $moduleName = "MoveByAnimation",
    $Animation = Elm.Animation.make(_elm),
-   $Basics = Elm.Basics.make(_elm);
+   $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
    var moveByTotal = function (animation) {
       return function () {
          var t = $Animation.tTotal(animation);
@@ -11281,6 +11285,7 @@ Elm.ParseConversation.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm);
    var verifyLeadToOneQuestion = function (dict) {
       return function () {
@@ -11578,9 +11583,9 @@ Elm.Portrait.make = function (_elm) {
    $Interjection = Elm.Interjection.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Sprite = Elm.Sprite.make(_elm);
-   var Click = {ctor: "Click"};
    var view = F2(function (address,
    model) {
       return function () {
@@ -11593,7 +11598,7 @@ Elm.Portrait.make = function (_elm) {
             model.frame,
             A2($Signal.message,
             address,
-            Click));
+            {ctor: "_Tuple0"}));
          }();
          return _L.fromArray([spriteView
                              ,$Sprite.draw(model.sprite)
@@ -11674,8 +11679,7 @@ Elm.Portrait.make = function (_elm) {
                           ,Tick: Tick
                           ,Quiet: Quiet
                           ,update: update
-                          ,view: view
-                          ,Click: Click};
+                          ,view: view};
    return _elm.Portrait.values;
 };
 Elm.PortraitBox = Elm.PortraitBox || {};
@@ -11692,12 +11696,10 @@ Elm.PortraitBox.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
    $Portrait = Elm.Portrait.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
-   var OnPortraitClick = function (a) {
-      return {ctor: "OnPortraitClick"
-             ,_0: a};
-   };
    var view = F2(function (address,
    model) {
       return function () {
@@ -11705,7 +11707,7 @@ Elm.PortraitBox.make = function (_elm) {
             return A2($Portrait.view,
             A2($Signal.forwardTo,
             address,
-            $Basics.always(OnPortraitClick(model.name))),
+            $Basics.always(model.name)),
             model);
          };
          return $List.concat(A2($List.map,
@@ -11793,8 +11795,7 @@ Elm.PortraitBox.make = function (_elm) {
                              ,ThePlayerIsSpeaking: ThePlayerIsSpeaking
                              ,Tick: Tick
                              ,update: update
-                             ,view: view
-                             ,OnPortraitClick: OnPortraitClick};
+                             ,view: view};
    return _elm.PortraitBox.values;
 };
 Elm.PortraitBoxGen = Elm.PortraitBoxGen || {};
@@ -11809,8 +11810,12 @@ Elm.PortraitBoxGen.make = function (_elm) {
    _L = _N.List.make(_elm),
    $moduleName = "PortraitBoxGen",
    $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
    $PortraitBox = Elm.PortraitBox.make(_elm),
-   $PortraitGen = Elm.PortraitGen.make(_elm);
+   $PortraitGen = Elm.PortraitGen.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
    var genPortraitBox = F2(function (x,
    y) {
       return {_: {}
@@ -11841,7 +11846,11 @@ Elm.PortraitGen.make = function (_elm) {
    $moduleName = "PortraitGen",
    $Basics = Elm.Basics.make(_elm),
    $InterjectionGen = Elm.InterjectionGen.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
    $Portrait = Elm.Portrait.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
    $Sprite = Elm.Sprite.make(_elm);
    var model = F3(function (x,
    y,
@@ -11917,12 +11926,10 @@ Elm.QuestionList.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Textbox = Elm.Textbox.make(_elm);
-   var ChooseQuestion = function (a) {
-      return {ctor: "ChooseQuestion"
-             ,_0: a};
-   };
    var view = F2(function (address,
    model) {
       return function () {
@@ -11931,7 +11938,7 @@ Elm.QuestionList.make = function (_elm) {
             return A2($Textbox.view,
             A2($Signal.forwardTo,
             address,
-            $Basics.always(ChooseQuestion(index))),
+            $Basics.always(index)),
             question);
          });
          return $List.concat(A2($List.indexedMap,
@@ -12020,8 +12027,7 @@ Elm.QuestionList.make = function (_elm) {
                               ,Hide: Hide
                               ,makeQuestions: makeQuestions
                               ,update: update
-                              ,view: view
-                              ,ChooseQuestion: ChooseQuestion};
+                              ,view: view};
    return _elm.QuestionList.values;
 };
 Elm.QuestionListGen = Elm.QuestionListGen || {};
@@ -12035,7 +12041,12 @@ Elm.QuestionListGen.make = function (_elm) {
    _U = _N.Utils.make(_elm),
    _L = _N.List.make(_elm),
    $moduleName = "QuestionListGen",
+   $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
    $QuestionList = Elm.QuestionList.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
    $TextboxGen = Elm.TextboxGen.make(_elm);
    var genQuestionList = {_: {}
                          ,firstQuestionPosition: {ctor: "_Tuple2"
@@ -12072,7 +12083,7 @@ Elm.Result.make = function (_elm) {
             case "Ok":
             return $Maybe.Just(result._0);}
          _U.badCase($moduleName,
-         "between lines 164 and 177");
+         "between lines 164 and 166");
       }();
    };
    var Err = function (a) {
@@ -12087,7 +12098,7 @@ Elm.Result.make = function (_elm) {
             case "Ok":
             return callback(result._0);}
          _U.badCase($moduleName,
-         "between lines 126 and 145");
+         "between lines 126 and 128");
       }();
    });
    var Ok = function (a) {
@@ -12101,7 +12112,7 @@ Elm.Result.make = function (_elm) {
             case "Ok":
             return Ok(func(ra._0));}
          _U.badCase($moduleName,
-         "between lines 41 and 52");
+         "between lines 41 and 43");
       }();
    });
    var map2 = F3(function (func,
@@ -12255,7 +12266,7 @@ Elm.Result.make = function (_elm) {
                  return Err(_v39._4._0);}
               break;}
          _U.badCase($moduleName,
-         "between lines 82 and 123");
+         "between lines 82 and 88");
       }();
    });
    var formatError = F2(function (f,
@@ -12267,7 +12278,7 @@ Elm.Result.make = function (_elm) {
             case "Ok":
             return Ok(result._0);}
          _U.badCase($moduleName,
-         "between lines 148 and 161");
+         "between lines 148 and 150");
       }();
    });
    var fromMaybe = F2(function (err,
@@ -12398,7 +12409,7 @@ Elm.Signal.make = function (_elm) {
             case "[]":
             return $Debug.crash("mergeMany was given an empty list!");}
          _U.badCase($moduleName,
-         "between lines 177 and 197");
+         "between lines 177 and 182");
       }();
    };
    var foldp = $Native$Signal.foldp;
@@ -12453,7 +12464,11 @@ Elm.Sprite.make = function (_elm) {
    $moduleName = "Sprite",
    $Basics = Elm.Basics.make(_elm),
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
-   $Graphics$Element = Elm.Graphics.Element.make(_elm);
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
    var draw = function (sprite) {
       return $Graphics$Collage.move({ctor: "_Tuple2"
                                     ,_0: sprite.x
@@ -12908,11 +12923,11 @@ Elm.Textbox.make = function (_elm) {
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Sprite = Elm.Sprite.make(_elm),
    $String = Elm.String.make(_elm),
    $Text = Elm.Text.make(_elm);
-   var Click = {ctor: "Click"};
    var formText = function (text) {
       return function () {
          var el = $Graphics$Element.leftAligned(text);
@@ -13056,7 +13071,7 @@ Elm.Textbox.make = function (_elm) {
          model.background,
          A2($Signal.message,
          address,
-         Click)) : $Sprite.draw(model.background);
+         {ctor: "_Tuple0"})) : $Sprite.draw(model.background);
          var drawText = F4(function (style,
          x,
          y,
@@ -13138,8 +13153,7 @@ Elm.Textbox.make = function (_elm) {
                          ,FinishedShowingText: FinishedShowingText
                          ,update: update
                          ,formText: formText
-                         ,view: view
-                         ,Click: Click};
+                         ,view: view};
    return _elm.Textbox.values;
 };
 Elm.TextboxGen = Elm.TextboxGen || {};
@@ -13155,7 +13169,10 @@ Elm.TextboxGen.make = function (_elm) {
    $moduleName = "TextboxGen",
    $Basics = Elm.Basics.make(_elm),
    $Color = Elm.Color.make(_elm),
+   $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
    $Textbox = Elm.Textbox.make(_elm);
    var genTextbox = F4(function (name,
    clickable,
@@ -13212,7 +13229,7 @@ Elm.TextboxGen.make = function (_elm) {
                                  ,textX: -236 + _v0._0
                                  ,textY: 19 + _v0._1};}
          _U.badCase($moduleName,
-         "between lines 9 and 51");
+         "between lines 8 and 52");
       }();
    });
    _elm.TextboxGen.values = {_op: _op
@@ -13237,6 +13254,7 @@ Elm.TextboxList.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $MoveByAnimation = Elm.MoveByAnimation.make(_elm),
+   $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Textbox = Elm.Textbox.make(_elm);
    var nullMailbox = $Signal.mailbox({ctor: "_Tuple0"});
@@ -13469,7 +13487,11 @@ Elm.TextboxListGen.make = function (_elm) {
    $moduleName = "TextboxListGen",
    $Basics = Elm.Basics.make(_elm),
    $Dict = Elm.Dict.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
    $MoveByAnimation = Elm.MoveByAnimation.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
    $TextboxGen = Elm.TextboxGen.make(_elm),
    $TextboxList = Elm.TextboxList.make(_elm);
    var genTextboxList = {_: {}

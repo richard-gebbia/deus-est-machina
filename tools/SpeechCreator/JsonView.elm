@@ -52,15 +52,8 @@ update action model =
 
 -- View
 
-type alias Context =
-    { actions: Signal.Address Action 
-    , submit: Signal.Address String
-    , viewGraph: Signal.Address ()
-    }
-
-
-view : Context -> Model -> Html
-view context model =
+view : Events -> Model -> Html
+view events model =
     let width : Int
         width = 400
 
@@ -78,13 +71,13 @@ view context model =
                         [ ("width", toString width ++ "px")
                         , ("height", toString height ++ "px")
                         ]
-                    , HtmlEvents.onFocus context.actions (SetFocus False)
-                    , HtmlEvents.onFocus context.actions (SetFocus True)
+                    , HtmlEvents.onFocus events.actions (SetFocus False)
+                    , HtmlEvents.onFocus events.actions (SetFocus True)
                     ] []
                 ]
     in
     Html.div []  
-        [ HtmlUtils.button context.viewGraph () "Graph"
+        [ HtmlUtils.button events.viewGraph () "Graph"
         , Html.div []
             [ jsonTextArea "Conversation" "Replace conversation.js with this" model.json
             , jsonTextArea "Save" "Copy this into a separate file" model.saveData
@@ -93,7 +86,7 @@ view context model =
                 , Html.div [] 
                     [ Html.div []
                         [ Html.text "Put what you \"save\"d here and press " 
-                        , HtmlUtils.button context.submit model.loadData "Submit"
+                        , HtmlUtils.button events.submit model.loadData "Submit"
                         ]
                     ]
                 , Html.textarea
@@ -102,9 +95,9 @@ view context model =
                         [ ("width", toString width ++ "px")
                         , ("height", toString height ++ "px")
                         ]
-                    , HtmlEvents.onFocus context.actions (SetFocus False)
-                    , HtmlEvents.onBlur context.actions (SetFocus True)
-                    , EditLoadData >> Signal.message context.actions |>
+                    , HtmlEvents.onFocus events.actions (SetFocus False)
+                    , HtmlEvents.onBlur events.actions (SetFocus True)
+                    , EditLoadData >> Signal.message events.actions |>
                         HtmlEvents.on "input" HtmlEvents.targetValue
                     ] []
                 , Html.div 
@@ -113,3 +106,13 @@ view context model =
                 ]
             ]
         ]
+
+
+-- Events
+
+type alias Events =
+    { actions: Signal.Address Action 
+    , submit: Signal.Address String
+    , viewGraph: Signal.Address ()
+    }
+

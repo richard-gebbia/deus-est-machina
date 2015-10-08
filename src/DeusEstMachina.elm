@@ -86,7 +86,8 @@ choosingSpeaker action model =
 
 waitingForTextboxToFinish : Action -> Model -> Model
 waitingForTextboxToFinish action model =
-    let onClick modelData =
+    let onClick : ModelData -> ModelData
+        onClick modelData =
             { modelData |
                 portraitBox <- 
                     if Conversation.areQuestionsComingUp modelData.conversation then
@@ -111,6 +112,7 @@ waitingForTextboxToFinish action model =
                         choosingSpeaker
             }
 
+        onTick : Float -> ModelData -> ModelData
         onTick dt modelData =
             TextboxList.update (TextboxList.Tick dt) modelData.textboxList
             |> \(tblist, request) ->
@@ -138,6 +140,7 @@ waitingToShowQuestions : Action -> Model -> Model
 waitingToShowQuestions action model = 
     let modelData = unwrap model
 
+        onClick : (Conversation, List (List String)) -> ModelData
         onClick (newConversation, questionText) =
             { modelData |
                 conversation <- newConversation,
@@ -167,6 +170,7 @@ showingQuestions : Action -> Model -> Model
 showingQuestions action model =
     let modelData = unwrap model
 
+        respondToChosenQuestion : Int -> (List String, List String) -> ModelData
         respondToChosenQuestion index (text, names) =
             { modelData | 
                 questionList <- 
@@ -235,18 +239,12 @@ update action model =
 
 view : Signal.Address Action -> Model -> List Collage.Form
 view address model = 
-    let pbEventToAction (PortraitBox.OnPortraitClick name) =
-            ChooseSpeaker name
-
-        qlEventToAction (QuestionList.ChooseQuestion children) =
-            ChooseQuestion children
-    in
     TextboxList.view (unwrap model).textboxList ++
-    QuestionList.view (Signal.forwardTo address qlEventToAction) (unwrap model).questionList ++
-    PortraitBox.view (Signal.forwardTo address pbEventToAction) (unwrap model).portraitBox
+    QuestionList.view (Signal.forwardTo address ChooseQuestion) (unwrap model).questionList ++
+    PortraitBox.view (Signal.forwardTo address ChooseSpeaker) (unwrap model).portraitBox
 
 
--- Events
+-- Main
 
 actions : Signal.Mailbox Action
 actions = Signal.mailbox (Tick 0)

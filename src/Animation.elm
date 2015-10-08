@@ -59,7 +59,8 @@ oneShot animation =
 
 update : Float -> Animation a -> Animation a
 update dt animation = 
-    let wrapTime anim =
+    let wrapTime : Animation a -> Animation a
+        wrapTime anim =
         if anim.isLooping && anim.elapsedTime > anim.duration then
             { anim | elapsedTime <- anim.elapsedTime - anim.duration }
         else

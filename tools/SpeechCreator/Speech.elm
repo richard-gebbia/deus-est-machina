@@ -111,15 +111,6 @@ update action model =
 
 -- View
 
-type alias Context = 
-    { actions: Signal.Address Action
-    , focus: Signal.Address Bool
-    , remove: Signal.Address ()
-    , startParenting: Signal.Address ()
-    , parentThis: Signal.Address ()
-    }
-
-
  -- width of the div
 width : Int
 width = 250
@@ -145,25 +136,25 @@ childBtnPosition model index =
     )
 
 
-view : Context -> Model -> Html
-view context model = 
+view : Events -> Model -> Html
+view events model = 
     let textLine : String -> Int -> Html
         textLine txt lineNum = 
             input 
                 [ style [("width", "243px")]
                 , value txt 
                 , on "input" targetValue (setTextMessage lineNum)
-                , onFocus context.focus True
-                , onBlur context.focus False
+                , onFocus events.focus True
+                , onBlur events.focus False
                 ] []
 
         setTextMessage : Int -> String -> Signal.Message
         setTextMessage lineNum =
-            SetText lineNum >> Signal.message context.actions
+            SetText lineNum >> Signal.message events.actions
 
         setSpeakerMessage : String -> Signal.Message
         setSpeakerMessage =
-            SetSpeaker >> Signal.message context.actions
+            SetSpeaker >> Signal.message events.actions
 
         backgroundColor : String
         backgroundColor =
@@ -191,9 +182,9 @@ view context model =
             ]
             [ button 
                 [ style [ ("float", "left" ) ]
-                , onClick context.parentThis () 
+                , onClick events.parentThis () 
                 ] [ text "child"]
-            , HtmlUtils.closeButton context.remove
+            , HtmlUtils.closeButton events.remove
             , HtmlUtils.title "Speech"
             , text "Speaker "
             , HtmlUtils.selection speakers model.speaker setSpeakerMessage
@@ -210,9 +201,9 @@ view context model =
                 childBtnXPadding
                 childBtnYPadding
                 childBtnStride
-                (Parentable.Context
-                    (Signal.forwardTo context.actions ModifyParentable)
-                    (Signal.forwardTo context.startParenting (always ())))
+                (Parentable.Events
+                    (Signal.forwardTo events.actions ModifyParentable)
+                    (Signal.forwardTo events.startParenting (always ())))
                 model
             ]
         ]
@@ -246,3 +237,10 @@ toJson model =
 
 -- Events
 
+type alias Events = 
+    { actions: Signal.Address Action
+    , focus: Signal.Address Bool
+    , remove: Signal.Address ()
+    , startParenting: Signal.Address ()
+    , parentThis: Signal.Address ()
+    }

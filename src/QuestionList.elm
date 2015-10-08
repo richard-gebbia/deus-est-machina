@@ -53,11 +53,11 @@ update action model =
 
 -- View
 
-view : Signal.Address Event -> Model -> List Collage.Form
+view : Events -> Model -> List Collage.Form
 view address model =
     let viewQuestion index question =
             Textbox.view 
-                (Signal.forwardTo address (always (ChooseQuestion index)))
+                (Signal.forwardTo address (always index))
                 question
     in
     List.indexedMap viewQuestion model.questions
@@ -65,5 +65,4 @@ view address model =
 
 -- Events
 
-type Event
-    = ChooseQuestion Int
+type alias Events = Signal.Address Int

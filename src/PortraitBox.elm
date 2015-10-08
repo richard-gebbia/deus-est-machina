@@ -68,12 +68,11 @@ update action model =
 
 -- View
 
-view : Signal.Address Event -> Model -> List Collage.Form
+view : Events -> Model -> List Collage.Form
 view address model = 
     let viewPortrait model = 
             Portrait.view 
-                (Signal.forwardTo address 
-                    (always (OnPortraitClick model.name)))
+                (Signal.forwardTo address (always model.name))
                 model
     in
     List.map viewPortrait model.portraits |> List.concat
@@ -81,4 +80,4 @@ view address model =
 
 -- Events
 
-type Event = OnPortraitClick String
+type alias Events = Signal.Address String

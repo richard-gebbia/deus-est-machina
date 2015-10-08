@@ -49,7 +49,8 @@ viewSprite imageName model =
 
 view : Model -> Collage.Form
 view model =
-    let element = 
+    let element : Element
+        element = 
             case model.interjection of
                 Exclamation -> 
                     viewSprite model.exclamationImageName model
@@ -60,6 +61,7 @@ view model =
                 Quiet -> 
                     Element.empty
 
+        opacity : Float
         opacity = 
             Animation.tTotal model.pulseFade
     in

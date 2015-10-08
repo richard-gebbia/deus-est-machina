@@ -70,7 +70,7 @@ update action model =
 
 -- View
 
-view : Signal.Address Event -> Model -> List Collage.Form
+view : Events -> Model -> List Collage.Form
 view address model = 
     let spriteView = 
         case model.interjection.interjection of
@@ -80,7 +80,7 @@ view address model =
             _ ->
                 ClickForm.spriteButton 
                     model.frame 
-                    (Signal.message address Click)
+                    (Signal.message address ())
     in
     [
         spriteView,
@@ -90,4 +90,4 @@ view address model =
 
 -- Events
 
-type Event = Click
+type alias Events = Signal.Address ()

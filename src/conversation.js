@@ -1,5 +1,5 @@
 conversation = {
-    "start": {
+    "0": {
         "name": "Ava",
         "text": [
             "Hello, my name is Ava,",
@@ -33,7 +33,7 @@ conversation = {
         "text": [
             "This sentence should end with a period?"
         ],
-        "children": []
+        "children": ["ava3"]
     },
     "sophie1": {
         "name": "Sophie",

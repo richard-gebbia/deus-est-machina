@@ -5,7 +5,8 @@ import Interjection
 
 defaultInterjection : Float -> Float -> Interjection.Model
 defaultInterjection x y = 
-    let fadeFormula x = (cos (x * 2 * pi) + 1) / 2
+    let fadeFormula : Float -> Float 
+        fadeFormula x = (cos (x * 2 * pi) + 1) / 2
     in
     {
         x = x,

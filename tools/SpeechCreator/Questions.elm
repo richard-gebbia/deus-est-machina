@@ -120,33 +120,28 @@ update action model =
 
 -- View
 
-type alias Context =
-    { actions: Signal.Address Action
-    , focus: Signal.Address Bool
-    , remove: Signal.Address ()
-    , startParenting: Signal.Address Int
-    , parentThis: Signal.Address ()
-    }
-
-
-view : Context -> Model -> Html
-view context model =
-    let subContext i = 
-            { actions = Signal.forwardTo context.actions (ModifyQuestion i)
-            , remove = Signal.forwardTo context.actions (always (DeleteQuestion i))
-            , focus = Signal.forwardTo context.focus identity
-            , startParenting = Signal.forwardTo context.startParenting (always i)
+view : Events -> Model -> Html
+view events model =
+    let qEvents : Int -> Question.Events
+        qEvents i = 
+            { actions = Signal.forwardTo events.actions (ModifyQuestion i)
+            , remove = Signal.forwardTo events.actions (always (DeleteQuestion i))
+            , focus = Signal.forwardTo events.focus identity
+            , startParenting = Signal.forwardTo events.startParenting (always i)
             }
 
+        questionViews : List Html
         questionViews = 
             Array.indexedMap 
-                (\i question -> Question.view (subContext i) question) 
+                (\i question -> Question.view (qEvents i) question) 
                 model.questions
             |> Array.toList
     
+        addButton : Html
         addButton =
-            button [onClick context.actions NewQuestion] [text "Add"]
+            button [onClick events.actions NewQuestion] [text "Add"]
 
+        questionGap : Html
         questionGap =
             div
                 [ style
@@ -176,9 +171,9 @@ view context model =
             ]
             (  button 
                 [ style [ ("float", "left") ]
-                , onClick context.parentThis () 
+                , onClick events.parentThis () 
                 ] [ text "child" ]
-            :: HtmlUtils.closeButton context.remove 
+            :: HtmlUtils.closeButton events.remove 
             :: HtmlUtils.title "Questions" 
             :: questionGap
             :: addButton
@@ -194,3 +189,12 @@ toJson model =
 
 
 -- Events
+
+type alias Events =
+    { actions: Signal.Address Action
+    , focus: Signal.Address Bool
+    , remove: Signal.Address ()
+    , startParenting: Signal.Address Int
+    , parentThis: Signal.Address ()
+    }
+

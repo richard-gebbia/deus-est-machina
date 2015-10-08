@@ -113,29 +113,21 @@ update action model =
 
 -- View
 
-type alias Context =
-    { actions : Signal.Address Action
-    , remove : Signal.Address ()
-    , focus : Signal.Address Bool
-    , startParenting: Signal.Address ()
-    }
-
-
-view : Context -> Model -> Html
-view context model =
+view : Events -> Model -> Html
+view events model =
     let textLine : String -> Int -> Html
         textLine txt lineNum = 
             input 
                 [ style [("width", "243px")]
                 , value txt 
                 , on "input" targetValue (setTextMessage lineNum)
-                , onFocus context.focus True
-                , onBlur context.focus False
+                , onFocus events.focus True
+                , onBlur events.focus False
                 ] []
 
         setTextMessage : Int -> String -> Signal.Message
         setTextMessage lineNum =
-            SetText lineNum >> Signal.message context.actions
+            SetText lineNum >> Signal.message events.actions
     in
     div 
         [ style 
@@ -148,7 +140,7 @@ view context model =
             , ("top", toString model.y ++ "px")
             ] ++ HtmlUtils.bordered)
         ]
-        [ HtmlUtils.closeButton context.remove
+        [ HtmlUtils.closeButton events.remove
         , text "Question"
         , br [] []
         , textLine model.line1 1
@@ -161,9 +153,9 @@ view context model =
             childBtnXPadding
             childBtnYPadding
             childBtnStride
-            (Parentable.Context
-                (Signal.forwardTo context.actions ModifyParentable)
-                (Signal.forwardTo context.startParenting (always ())))
+            (Parentable.Events
+                (Signal.forwardTo events.actions ModifyParentable)
+                (Signal.forwardTo events.startParenting (always ())))
             model
         ]
 
@@ -180,3 +172,11 @@ toJson model =
 
 
 -- Events
+
+type alias Events =
+    { actions : Signal.Address Action
+    , remove : Signal.Address ()
+    , focus : Signal.Address Bool
+    , startParenting: Signal.Address ()
+    }
+

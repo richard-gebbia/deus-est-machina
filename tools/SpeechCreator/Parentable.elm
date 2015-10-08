@@ -39,13 +39,8 @@ update action model =
 
 -- View
 
-type alias Context =
-    { actions: Signal.Address Action
-    , startParenting: Signal.Address ()
-    }
-
-view : Int -> Int -> Int -> Int -> Context -> Model a -> Html
-view width xPadding yPadding yStride context model =
+view : Int -> Int -> Int -> Int -> Events -> Model a -> Html
+view width xPadding yPadding yStride events model =
     let removeChildButton : Int -> Html
         removeChildButton index =
             Html.button
@@ -53,7 +48,7 @@ view width xPadding yPadding yStride context model =
                     [ ("position", "absolute")
                     , ("top", toString (index * yStride) ++ "px")
                     ]
-                , HtmlEvents.onClick context.actions (RemoveChild index)
+                , HtmlEvents.onClick events.actions (RemoveChild index)
                 ]
                 [ Html.text "-" ]
 
@@ -64,7 +59,7 @@ view width xPadding yPadding yStride context model =
                     [ ("position", "absolute")
                     , ("top", toString (index * yStride) ++ "px")
                     ]
-                , HtmlEvents.onClick context.startParenting ()
+                , HtmlEvents.onClick events.startParenting ()
                 ]
                 [ Html.text "+" ]
 
@@ -85,3 +80,8 @@ view width xPadding yPadding yStride context model =
 
 
 -- Events
+
+type alias Events =
+    { actions: Signal.Address Action
+    , startParenting: Signal.Address ()
+    }
